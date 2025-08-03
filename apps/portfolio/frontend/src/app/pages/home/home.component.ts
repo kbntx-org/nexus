@@ -4,24 +4,20 @@ import { Router } from '@angular/router';
 
 import { SkillsComponent } from '../../shared/components/skills/skills.component';
 import { ThemeToggleComponent } from '../../shared/components/theme-toggle/theme-toggle.component';
+import { LineBreakPipe } from '../../shared/pipes/nl2br.pipe';
+import { HERO_DATA } from './data/home.data';
 
 // Skills functionality is now handled by the SkillsComponent
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, SkillsComponent, ThemeToggleComponent],
+  imports: [CommonModule, SkillsComponent, ThemeToggleComponent, LineBreakPipe],
   templateUrl: './home.component.html',
 })
 export class HomeComponent {
-  // Hero section data
-  public heroData = {
-    name: 'Kenny',
-    title: 'Full-Stack Developer',
-    subtitle: 'Passionate about creating beautiful, functional web applications',
-    description:
-      "I'm a passionate full-stack developer with 5+ years of experience building modern web applications. I specialize in Angular, React, and Node.js, creating scalable solutions that deliver exceptional user experiences."
-  };
+  // Hero section data from external file
+  public heroData = HERO_DATA;
 
   constructor(private router: Router) {}
 

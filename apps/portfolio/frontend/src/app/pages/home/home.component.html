@@ -69,11 +69,7 @@
         </h2>
         <div class="max-w-4xl mx-auto">
           <div class="space-y-6 text-lg text-muted-foreground leading-relaxed">
-            <p>{{ heroData.description }}</p>
-            <p>
-              When I'm not coding, you can find me exploring new technologies, contributing to
-              open-source projects, or sharing knowledge with the developer community.
-            </p>
+            <div [innerHTML]="heroData.description | lineBreak"></div>
           </div>
         </div>
       </div>

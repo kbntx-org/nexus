@@ -7,7 +7,7 @@ export interface HeroData {
 
 export const HERO_DATA: HeroData = {
   name: 'Kenny',
-  title: 'Full Stack Developer',
-  subtitle: 'Passionate about creating innovative web solutions and turning ideas into reality through clean, efficient code.',
-  description: 'I am a dedicated full-stack developer with a passion for creating exceptional digital experiences. With expertise in modern web technologies, I specialize in building scalable applications that solve real-world problems. My approach combines technical excellence with creative problem-solving to deliver solutions that exceed expectations.'
+  title: 'Platform Engineer',
+  subtitle: 'Passionate about exploring every step of software development, from full-stack development to platform engineering, focusing on optimizing and scaling cloud-based systems for fast, reliable software delivery.',
+  description: 'With a strong foundation in software engineering, I\'ve evolved from full-stack development into platform engineering, focusing on optimizing and scaling cloud-based systems to enable fast, reliable software delivery and better developer experience.\n\nAt PowerUs ⚡️, I\'m part of the platform team, leading initiatives around developer experience, observability, self-service, cloud services and CI/CD acceleration. My goal is to empower engineers to ship features quickly and safely, while maintaining platform stability and security.\n\nCurious and proactive by nature, I\'m always looking for opportunities to learn, take initiative, and contribute meaningfully to team and company growth.'
 };
