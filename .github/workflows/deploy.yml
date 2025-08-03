@@ -36,6 +36,10 @@ jobs:
     - name: Build portfolio frontend
       run: pnpm nx build portfolio-frontend --configuration=production
 
+    # Github pages does not support wildcard routing
+    - name: Copy index.html to 404.html
+      run: cp ./dist/apps/portfolio/frontend/browser/index.html ./dist/apps/portfolio/frontend/browser/404.html
+
     - name: Setup Pages
       uses: actions/configure-pages@v4
 
