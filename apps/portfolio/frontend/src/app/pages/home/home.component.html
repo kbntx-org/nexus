@@ -1,7 +1,5 @@
 <div class="bg-background text-foreground font-roboto overflow-x-hidden">
-  <!-- Hero Section -->
   <section class="py-10 md:py-8 bg-gradient-to-br from-background via-muted/20 to-background relative overflow-hidden">
-    <!-- Animated background gradient -->
     <div class="absolute inset-0 bg-gradient-radial from-primary/8 via-primary/3 to-transparent opacity-50 animate-pulse-slow" style="background: radial-gradient(ellipse at center, hsl(var(--primary) / 0.08) 0%, hsl(var(--primary) / 0.03) 40%, transparent 70%);"></div>
 
     <div class="max-w-6xl mx-auto px-4 relative z-10">
@@ -16,16 +14,16 @@
           <p class="text-lg sm:text-xl text-muted-foreground mb-8 leading-relaxed" style="animation-delay: 0.2s">
             {{ heroData.subtitle }}
           </p>
-          <div class="flex flex-wrap gap-4" style="animation-delay: 0.4s">
-            <button class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group" (click)="navigateToExperiences()">
-              <span class="relative z-10">View Experiences</span>
-              <div class="absolute inset-0 bg-gradient-to-r from-primary/80 to-primary transform -translate-x-full group-hover:translate-x-0 transition-transform duration-500"></div>
-            </button>
-            <!-- <button class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-secondary to-secondary/80 text-secondary-foreground font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group">
-              <span class="relative z-10">Download CV</span>
-              <div class="absolute inset-0 bg-gradient-to-r from-secondary/80 to-secondary transform -translate-x-full group-hover:translate-x-0 transition-transform duration-500"></div>
-            </button> -->
-          </div>
+                      <div class="flex flex-wrap gap-4" style="animation-delay: 0.4s">
+              <button class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group" (click)="navigateToExperiences()">
+                <span class="relative z-10">View Experiences</span>
+                <div class="absolute inset-0 bg-gradient-to-r from-primary/80 to-primary transform -translate-x-full group-hover:translate-x-0 transition-transform duration-500"></div>
+              </button>
+              <a href="assets/documents/cv-kenny-talbi.pdf" download="cv-kenny-talbi.pdf" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-secondary to-secondary/80 text-secondary-foreground font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group">
+                <span class="relative z-10">Download CV</span>
+                <div class="absolute inset-0 bg-gradient-to-r from-secondary/80 to-secondary transform -translate-x-full group-hover:translate-x-0 transition-transform duration-500"></div>
+              </a>
+            </div>
         </div>
 
         <div class="animate-slide-in-up" style="animation-delay: 0.3s; opacity: 0; animation-fill-mode: forwards;">
@@ -38,7 +36,6 @@
               <p class="text-muted-foreground">{{ heroData.title }}</p>
             </div>
 
-            <!-- Social Links -->
             <div class="flex justify-center gap-4">
               <a href="https://www.linkedin.com/in/kennytalbi" target="_blank" rel="noopener noreferrer"
                  class="w-12 h-12 rounded-full bg-[#0077b5] text-white flex items-center justify-center shadow-lg">
@@ -59,7 +56,6 @@
     </div>
   </section>
 
-  <!-- About Section -->
   <section class="py-12 md:py-8 bg-muted/20">
     <div class="max-w-6xl mx-auto px-4">
       <div class="animate-slide-in-up">
@@ -76,6 +72,5 @@
     </div>
   </section>
 
-  <!-- Skills Section -->
   <app-skills></app-skills>
 </div>

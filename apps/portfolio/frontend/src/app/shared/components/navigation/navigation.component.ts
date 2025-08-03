@@ -11,20 +11,20 @@ import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
   templateUrl: './navigation.component.html'
 })
 export class NavigationComponent {
-  isMenuOpen = false;
+  public navigationItems = [
+    { path: '/home', label: 'Home', icon: '🏠' },
+    { path: '/experiences', label: 'Experiences', icon: '💼' },
+    { path: '/cv', label: 'CV', icon: '📄' }
+  ];
 
-  toggleMenu(): void {
+  public isMenuOpen = false;
+
+  public toggleMenu(): void {
     this.isMenuOpen = !this.isMenuOpen;
   }
 
-  closeMenu(): void {
+  public closeMenu(): void {
     this.isMenuOpen = false;
   }
 
-  navigationItems = [
-    { path: '/home', label: 'Home', icon: '🏠' },
-    { path: '/experiences', label: 'Experiences', icon: '💼' }
-    // { path: '/projects', label: 'Projects', icon: '🚀' },
-    // { path: '/cv', label: 'CV', icon: '📄' }
-  ];
 }

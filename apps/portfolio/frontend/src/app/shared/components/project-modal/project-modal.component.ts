@@ -19,7 +19,6 @@ export interface Project {
   imports: [CommonModule],
   template: `
     <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50" (click)="closeModal()">
-      <!-- Desktop Modal -->
       <div class="hidden lg:block bg-card border border-border rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl mx-4 custom-scrollbar box-border" (click)="$event.stopPropagation()">
         <button class="absolute top-4 right-4 bg-background border border-border rounded-full w-10 h-10 flex items-center justify-center cursor-pointer text-foreground z-10 transition-all duration-200 hover:bg-accent hover:scale-110" (click)="closeModal()">
           <svg
@@ -41,7 +40,6 @@ export interface Project {
         </div>
 
         <div class="p-8 pt-6">
-          <!-- Project Images Carousel -->
           <div class="mb-8" *ngIf="project.images && project.images.length > 0">
             <div class="relative rounded-lg overflow-hidden">
               <div class="w-full h-80 overflow-hidden">
@@ -55,7 +53,6 @@ export interface Project {
                 </div>
               </div>
 
-              <!-- Navigation Arrows -->
               <button
                 class="absolute top-1/2 left-4 -translate-y-1/2 bg-background/90 border border-border rounded-full w-10 h-10 flex items-center justify-center cursor-pointer text-foreground transition-all duration-200 hover:bg-accent hover:scale-110 z-5"
                 (click)="previousImage()"
@@ -90,7 +87,6 @@ export interface Project {
                 </svg>
               </button>
 
-              <!-- Indicators -->
               <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-5" *ngIf="project.images.length > 1">
                 <button
                   class="w-2 h-2 rounded-full transition-all duration-200"
@@ -102,14 +98,12 @@ export interface Project {
             </div>
           </div>
 
-          <!-- Project Details -->
           <div class="space-y-8">
             <div>
               <h3 class="text-xl font-semibold text-foreground mb-4">About this project</h3>
               <p class="text-muted-foreground leading-relaxed">{{ project.longDescription || project.description }}</p>
             </div>
 
-            <!-- Features -->
             <div *ngIf="project.features && project.features.length > 0">
               <h3 class="text-xl font-semibold text-foreground mb-4">Key Features</h3>
               <ul class="space-y-2">
@@ -120,7 +114,6 @@ export interface Project {
               </ul>
             </div>
 
-            <!-- Tech Stack -->
             <div>
               <h3 class="text-xl font-semibold text-foreground mb-4">Technologies Used</h3>
               <div class="flex flex-wrap gap-2">
@@ -176,10 +169,8 @@ export interface Project {
         </div>
       </div>
 
-      <!-- Mobile Bottom Sheet -->
       <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border rounded-t-2xl shadow-2xl max-h-[85vh] overflow-y-auto transform transition-transform duration-300 ease-out" [class]="isOpening ? 'translate-y-0' : 'translate-y-full'" (click)="$event.stopPropagation()">
 
-        <!-- Close Button -->
         <button class="absolute top-4 right-4 bg-background border border-border rounded-full w-10 h-10 flex items-center justify-center cursor-pointer text-foreground z-10 transition-all duration-200 hover:bg-accent hover:scale-110" (click)="closeModal()">
           <svg
             width="24"
@@ -200,7 +191,6 @@ export interface Project {
         </div>
 
         <div class="p-6 pt-4">
-          <!-- Project Images Carousel -->
           <div class="mb-6" *ngIf="project.images && project.images.length > 0">
             <div class="relative rounded-lg overflow-hidden">
               <div class="w-full h-48 overflow-hidden">
@@ -214,7 +204,6 @@ export interface Project {
                 </div>
               </div>
 
-              <!-- Navigation Arrows -->
               <button
                 class="absolute top-1/2 left-2 -translate-y-1/2 bg-background/90 border border-border rounded-full w-8 h-8 flex items-center justify-center cursor-pointer text-foreground transition-all duration-200 hover:bg-accent hover:scale-110 z-5"
                 (click)="previousImage()"
@@ -249,7 +238,6 @@ export interface Project {
                 </svg>
               </button>
 
-              <!-- Indicators -->
               <div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-5" *ngIf="project.images.length > 1">
                 <button
                   class="w-1.5 h-1.5 rounded-full transition-all duration-200"
@@ -261,14 +249,12 @@ export interface Project {
             </div>
           </div>
 
-          <!-- Project Details -->
           <div class="space-y-6">
             <div>
               <h3 class="text-lg font-semibold text-foreground mb-3">About this project</h3>
               <p class="text-muted-foreground leading-relaxed text-sm">{{ project.longDescription || project.description }}</p>
             </div>
 
-            <!-- Features -->
             <div *ngIf="project.features && project.features.length > 0">
               <h3 class="text-lg font-semibold text-foreground mb-3">Key Features</h3>
               <ul class="space-y-2">
@@ -279,7 +265,6 @@ export interface Project {
               </ul>
             </div>
 
-            <!-- Tech Stack -->
             <div>
               <h3 class="text-lg font-semibold text-foreground mb-3">Technologies Used</h3>
               <div class="flex flex-wrap gap-2">
@@ -369,17 +354,14 @@ export class ProjectModalComponent implements OnInit, OnDestroy {
   public isOpening = false;
 
   public ngOnInit(): void {
-    // Lock body scroll when modal opens
     document.body.style.overflow = 'hidden';
 
-    // Trigger slide-up animation after component initializes
     setTimeout(() => {
       this.isOpening = true;
     }, 10);
   }
 
   public ngOnDestroy(): void {
-    // Restore body scroll when modal closes
     document.body.style.overflow = '';
   }
 

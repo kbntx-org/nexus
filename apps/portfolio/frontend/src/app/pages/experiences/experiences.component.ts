@@ -15,19 +15,15 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
           <p class="text-lg sm:text-xl text-muted-foreground text-center mb-12">My professional journey and career progression</p>
         </div>
 
-        <!-- Timeline Section -->
-        <div class="relative pt-8">
-          <!-- Timeline Line -->
+        <div class="relative">
           <div class="absolute left-4 md:left-1/2 top-8 bottom-0 w-0.5 bg-gradient-to-b from-[#667eea] to-[#764ba2] transform -translate-x-1/2 opacity-0 animate-fade-in" style="animation-delay: 0.8s; animation-fill-mode: forwards;"></div>
 
-          <!-- Experiences -->
           <div class="space-y-12">
             <div
               *ngFor="let experience of experiences; let i = index"
               class="relative animate-slide-in-up will-change-transform"
               style="animation-delay: 0.2s;"
             >
-              <!-- Company Card -->
               <div class="relative z-10 bg-card border border-border rounded-lg shadow-lg p-6 md:p-8 mb-8">
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
                   <div>
@@ -41,18 +37,15 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
                   </div>
                 </div>
 
-                <!-- Company Description -->
                 <div class="mb-6">
                   <p class="text-muted-foreground leading-relaxed">{{ experience.description }}</p>
                 </div>
 
-                <!-- Roles -->
                 <div class="space-y-4">
                   <div
                     *ngFor="let role of experience.roles; let j = index"
                     class="border-l-4 border-[#667eea] pl-6"
                   >
-                    <!-- Role Header (Always Visible) -->
                     <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
                       <div class="flex-1">
                         <h3 class="text-xl font-semibold text-foreground">{{ role.title }}</h3>
@@ -77,14 +70,12 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
                       </button>
                     </div>
 
-                    <!-- Collapsible Content -->
                     <div
                       class="overflow-hidden transition-all duration-300 ease-in-out"
                       [class.max-h-0]="!isRoleExpanded(i, j)"
                       [class.max-h-[1000px]]="isRoleExpanded(i, j)"
                     >
                       <div class="space-y-6 pb-4">
-                        <!-- Responsibilities -->
                         <div>
                           <h4 class="text-lg font-medium text-foreground mb-3">Key Responsibilities</h4>
                           <ul class="space-y-2">
@@ -98,7 +89,6 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
                           </ul>
                         </div>
 
-                        <!-- Achievements -->
                         <div>
                           <h4 class="text-lg font-medium text-foreground mb-3">Major Achievements</h4>
                           <ul class="space-y-2">
@@ -112,7 +102,6 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
                           </ul>
                         </div>
 
-                        <!-- Technologies -->
                         <div>
                           <h4 class="text-lg font-medium text-foreground mb-3">Technologies Used</h4>
                           <div class="flex flex-wrap gap-2">

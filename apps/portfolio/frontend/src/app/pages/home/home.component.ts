@@ -7,8 +7,6 @@ import { ThemeToggleComponent } from '../../shared/components/theme-toggle/theme
 import { LineBreakPipe } from '../../shared/pipes/nl2br.pipe';
 import { HERO_DATA } from './data/home.data';
 
-// Skills functionality is now handled by the SkillsComponent
-
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -16,12 +14,9 @@ import { HERO_DATA } from './data/home.data';
   templateUrl: './home.component.html',
 })
 export class HomeComponent {
-  // Hero section data from external file
   public heroData = HERO_DATA;
 
   constructor(private router: Router) {}
-
-  // Skills functionality is now handled by the SkillsComponent
 
   public navigateToExperiences(): void {
     this.router.navigate(['/experiences']);

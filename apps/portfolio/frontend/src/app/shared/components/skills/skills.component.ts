@@ -1,5 +1,5 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, AfterViewInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
 
 import { SKILLS, Skill } from '../../../pages/skills/data/skills.data';
 
@@ -23,7 +23,6 @@ interface Particle {
           <div class="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-gradient-to-r from-[#667eea] to-[#764ba2] rounded-full"></div>
         </h2>
 
-        <!-- Floating Particles -->
         <div class="skills-particles relative w-full h-[300px] md:h-[400px] max-w-full overflow-visible animate-slide-in-up" style="animation-delay: 0.2s">
           <div
             class="particle absolute flex items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-card/60 backdrop-blur-sm border border-border/40 rounded-full shadow-lg transition-all duration-300 cursor-pointer opacity-90 hover:scale-130 hover:opacity-100 hover:bg-card/80 hover:border-primary/50 hover:shadow-xl hover:z-10"
@@ -42,28 +41,25 @@ interface Particle {
     </section>
   `
 })
-export class SkillsComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild('skillsSection') skillsSection!: ElementRef;
+export class SkillsComponent implements AfterViewInit, OnDestroy {
+  @ViewChild('skillsSection') public skillsSection!: ElementRef;
 
-  skills: Skill[] = SKILLS;
+  public skills: Skill[] = SKILLS;
 
   private particles: Particle[] = [];
   private animationId: number | null = null;
 
-  constructor() {}
 
-  ngOnInit(): void {}
-
-  ngAfterViewInit(): void {
+  public ngAfterViewInit(): void {
     this.setupScrollAnimations();
     this.setupParticlePhysics();
   }
 
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     this.stopParticleAnimation();
   }
 
-  setupScrollAnimations(): void {
+  public setupScrollAnimations(): void {
     const observerOptions = {
       threshold: 0.1,
       rootMargin: '0px 0px -50px 0px'
@@ -89,7 +85,7 @@ export class SkillsComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  setupParticlePhysics(): void {
+  public setupParticlePhysics(): void {
     if (!this.skillsSection) {return;}
 
     const container = this.skillsSection.nativeElement.querySelector('.skills-particles');
@@ -97,16 +93,14 @@ export class SkillsComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const particleElements = container.querySelectorAll('.particle');
     const containerRect = container.getBoundingClientRect();
-    const particleSize = window.innerWidth < 768 ? 40 : 48; // Smaller particles
+    const particleSize = window.innerWidth < 768 ? 40 : 48;
 
     particleElements.forEach((element: HTMLElement, index: number) => {
-      // Random initial position within container bounds
       const x = Math.random() * (containerRect.width - particleSize);
       const y = Math.random() * (containerRect.height - particleSize);
 
-      // Slower, more spaced velocity
-      const vx = (Math.random() - 0.5) * 1.5; // Slower movement
-      const vy = (Math.random() - 0.5) * 1.5; // Slower movement
+      const vx = (Math.random() - 0.5) * 1.5;
+      const vy = (Math.random() - 0.5) * 1.5;
 
       this.particles.push({
         x,
@@ -116,39 +110,36 @@ export class SkillsComponent implements OnInit, AfterViewInit, OnDestroy {
         element
       });
 
-      // Set initial position
       element.style.left = x + 'px';
       element.style.top = y + 'px';
     });
   }
 
-  startParticleAnimation(): void {
+  public startParticleAnimation(): void {
     if (this.animationId) {return;}
     this.animateParticles();
   }
 
-  stopParticleAnimation(): void {
+  public stopParticleAnimation(): void {
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
       this.animationId = null;
     }
   }
 
-  animateParticles(): void {
+  public animateParticles(): void {
     if (!this.skillsSection) {return;}
 
     const container = this.skillsSection.nativeElement.querySelector('.skills-particles');
     if (!container) {return;}
 
     const containerRect = container.getBoundingClientRect();
-    const particleSize = window.innerWidth < 768 ? 40 : 48; // Smaller particles
+    const particleSize = window.innerWidth < 768 ? 40 : 48;
 
     this.particles.forEach(particle => {
-      // Update position
       particle.x += particle.vx;
       particle.y += particle.vy;
 
-      // Bounce off walls
       if (particle.x <= 0 || particle.x >= containerRect.width - particleSize) {
         particle.vx = -particle.vx;
         particle.x = Math.max(0, Math.min(particle.x, containerRect.width - particleSize));
@@ -159,7 +150,6 @@ export class SkillsComponent implements OnInit, AfterViewInit, OnDestroy {
         particle.y = Math.max(0, Math.min(particle.y, containerRect.height - particleSize));
       }
 
-      // Apply position to element
       particle.element.style.left = particle.x + 'px';
       particle.element.style.top = particle.y + 'px';
     });
@@ -167,7 +157,7 @@ export class SkillsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.animationId = requestAnimationFrame(() => this.animateParticles());
   }
 
-  getIconUrl(skill: Skill): string {
+  public getIconUrl(skill: Skill): string {
     if (skill.customUrl) {
       return skill.customUrl;
     }

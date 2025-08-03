@@ -1,5 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, Input, OnInit } from '@angular/core';
 
 export interface TimelineItem {
   company: string;
@@ -17,9 +17,7 @@ export interface TimelineItem {
   imports: [CommonModule],
   template: `
     <div class="timeline-container">
-      <!-- Central Timeline Line -->
       <div class="timeline-line">
-        <!-- Timeline Dots -->
         <div
           class="timeline-dot"
           *ngFor="let item of items; let i = index"
@@ -27,7 +25,6 @@ export interface TimelineItem {
         ></div>
       </div>
 
-      <!-- Timeline Cards -->
       <div class="timeline-content">
         <div
           class="timeline-card"
@@ -60,7 +57,6 @@ export interface TimelineItem {
       </div>
     </div>
 
-    <!-- Details Dialog -->
     <div class="dialog-overlay" *ngIf="showDialog" (click)="closeDetails()">
       <div class="dialog-content" (click)="$event.stopPropagation()">
         <button class="dialog-close" (click)="closeDetails()">
@@ -462,22 +458,21 @@ export interface TimelineItem {
   ]
 })
 export class TimelineComponent implements OnInit {
-  @Input() items: TimelineItem[] = [];
+  @Input() public items: TimelineItem[] = [];
 
-  showDialog = false;
-  selectedItem: TimelineItem | null = null;
+  public showDialog = false;
+  public selectedItem: TimelineItem | null = null;
 
-  ngOnInit() {
-    // Sort items by start date for proper chronological order
+  public ngOnInit(): void {
     this.items.sort((a, b) => parseInt(a.startDate) - parseInt(b.startDate));
   }
 
-  openDetails(item: TimelineItem): void {
+  public openDetails(item: TimelineItem): void {
     this.selectedItem = item;
     this.showDialog = true;
   }
 
-  closeDetails(): void {
+  public closeDetails(): void {
     this.showDialog = false;
     this.selectedItem = null;
   }

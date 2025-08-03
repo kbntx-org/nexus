@@ -1,6 +1,5 @@
 <nav class="fixed top-0 left-0 right-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
   <div class="max-w-6xl mx-auto px-4 flex items-center justify-between h-16 lg:h-[70px] gap-4">
-    <!-- Logo/Brand -->
     <div class="flex items-center">
       <a routerLink="/" class="flex items-center gap-2 text-gray-900 dark:text-white font-bold text-xl">
         <span class="text-2xl">👨‍💻</span>
@@ -8,7 +7,6 @@
       </a>
     </div>
 
-    <!-- Desktop Navigation -->
     <div class="hidden lg:flex items-center gap-8">
       <a
         *ngFor="let item of navigationItems"
@@ -21,19 +19,15 @@
       </a>
     </div>
 
-    <!-- Controls -->
     <div class="flex items-center gap-4">
-      <!-- Desktop Theme Toggle -->
       <div class="hidden lg:block">
         <app-theme-toggle></app-theme-toggle>
       </div>
 
-      <!-- Mobile Theme Toggle -->
       <div class="lg:hidden">
         <app-theme-toggle></app-theme-toggle>
       </div>
 
-      <!-- Burger Menu Button -->
       <button
         class="lg:hidden flex flex-col justify-around w-8 h-8 bg-transparent border-none cursor-pointer p-0 relative"
         (click)="toggleMenu()"
@@ -46,14 +40,12 @@
     </div>
   </div>
 
-  <!-- Mobile Navigation Overlay -->
   <div
     class="fixed inset-0 bg-black/50 z-40 transition-all duration-300"
     [class]="isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'"
     (click)="closeMenu()"
   ></div>
 
-  <!-- Mobile Navigation Menu -->
   <div
     class="fixed top-0 right-0 w-full h-full bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 z-50 transition-all duration-300 flex flex-col shadow-2xl lg:w-80"
     [class]="isMenuOpen ? 'translate-x-0' : 'translate-x-full'"
