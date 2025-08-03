@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
 
 import { EXPERIENCES, Experience } from './data/experiences.data';
 
@@ -10,8 +10,10 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
   template: `
     <div class="min-h-screen bg-background text-foreground py-8 md:py-12">
       <div class="max-w-6xl mx-auto px-4">
-        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-center text-foreground mb-4 animate-slide-in-up">My Experience</h1>
-        <p class="text-lg sm:text-xl text-muted-foreground text-center mb-12 animate-slide-in-up" style="animation-delay: 0.2s">My professional journey and career progression</p>
+        <div class="animate-slide-in-up">
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-center text-foreground mb-4">My Experience</h1>
+          <p class="text-lg sm:text-xl text-muted-foreground text-center mb-12">My professional journey and career progression</p>
+        </div>
 
         <!-- Timeline Section -->
         <div class="relative">
