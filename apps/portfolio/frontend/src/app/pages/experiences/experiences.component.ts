@@ -8,24 +8,24 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="min-h-screen bg-background text-foreground py-8 md:py-12">
+    <div class="bg-background text-foreground py-8 md:py-12">
       <div class="max-w-6xl mx-auto px-4">
-        <div class="animate-slide-in-up">
+        <div class="animate-slide-in-up will-change-transform" style="animation-delay: 0.1s;">
           <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-center text-foreground mb-4">My Experience</h1>
           <p class="text-lg sm:text-xl text-muted-foreground text-center mb-12">My professional journey and career progression</p>
         </div>
 
         <!-- Timeline Section -->
-        <div class="relative">
+        <div class="relative pt-8">
           <!-- Timeline Line -->
-          <div class="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#667eea] to-[#764ba2] transform -translate-x-1/2"></div>
+          <div class="absolute left-4 md:left-1/2 top-8 bottom-0 w-0.5 bg-gradient-to-b from-[#667eea] to-[#764ba2] transform -translate-x-1/2 opacity-0 animate-fade-in" style="animation-delay: 0.8s; animation-fill-mode: forwards;"></div>
 
           <!-- Experiences -->
           <div class="space-y-12">
             <div
               *ngFor="let experience of experiences; let i = index"
-              class="relative animate-slide-in-up"
-              [style.animation-delay]="(i * 0.2) + 's'"
+              class="relative animate-slide-in-up will-change-transform"
+              style="animation-delay: 0.2s;"
             >
               <!-- Company Card -->
               <div class="relative z-10 bg-card border border-border rounded-lg shadow-lg p-6 md:p-8 mb-8">
