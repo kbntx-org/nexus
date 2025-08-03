@@ -13,8 +13,8 @@ import { Component } from '@angular/core';
           <p class="text-lg sm:text-xl text-muted-foreground text-center mb-12">My professional background and qualifications</p>
         </div>
 
-        <div class="max-w-4xl mx-auto h-[500px] md:h-[calc(100vh-200px)]">
-          <div class="relative bg-card border border-border rounded-lg shadow-lg overflow-hidden h-full group">
+        <div class="max-w-4xl mx-auto h-[400px] sm:h-[500px] md:h-[calc(100vh-200px)]">
+          <div class="relative bg-card border-0 md:border md:border-border rounded-lg shadow-lg overflow-hidden h-full group">
             <div class="relative h-full">
               <div
                 class="absolute inset-0 transition-opacity duration-500"
@@ -41,7 +41,7 @@ import { Component } from '@angular/core';
               </div>
             </div>
 
-            <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center gap-4 bg-card/80 backdrop-blur-sm rounded-full px-4 py-2 border border-border z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center gap-4 bg-card/80 backdrop-blur-sm rounded-full px-4 py-2 border border-border z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden md:flex">
               <button
                 (click)="previousPage()"
                 [disabled]="currentPage === 0"
@@ -78,11 +78,11 @@ import { Component } from '@angular/core';
               </button>
             </div>
 
-            <div class="absolute top-4 right-4 z-10">
+            <div class="absolute top-4 right-4 z-10 hidden md:block">
               <a
                 href="assets/documents/cv-kenny-talbi.pdf"
                 download="cv-kenny-talbi.pdf"
-                class="bg-primary text-primary-foreground px-4 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2"
+                class="bg-primary text-primary-foreground px-4 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 text-sm"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -90,7 +90,60 @@ import { Component } from '@angular/core';
                 Download CV
               </a>
             </div>
+
           </div>
+        </div>
+
+        <div class="flex flex-col items-center gap-4 mt-6 md:hidden">
+          <div class="flex items-center gap-3 bg-card/60 backdrop-blur-sm rounded-full px-4 py-2 border border-border">
+            <button
+              (click)="previousPage()"
+              [disabled]="currentPage === 0"
+              class="p-1.5 rounded-full transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+            </button>
+
+            <div class="flex gap-2">
+              <button
+                (click)="goToPage(0)"
+                class="w-2.5 h-2.5 rounded-full transition-colors duration-200"
+                [class.bg-primary]="currentPage === 0"
+                [class.bg-muted]="currentPage !== 0"
+              ></button>
+              <button
+                (click)="goToPage(1)"
+                class="w-2.5 h-2.5 rounded-full transition-colors duration-200"
+                [class.bg-primary]="currentPage === 1"
+                [class.bg-muted]="currentPage !== 1"
+              ></button>
+            </div>
+
+            <button
+              (click)="nextPage()"
+              [disabled]="currentPage === 1"
+              class="p-1.5 rounded-full transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="flex flex-col items-center gap-4 mt-8 md:hidden">
+          <a
+            href="assets/documents/cv-kenny-talbi.pdf"
+            download="cv-kenny-talbi.pdf"
+            class="bg-primary text-primary-foreground px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 text-base font-medium"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            Download CV
+          </a>
         </div>
       </div>
     </div>
