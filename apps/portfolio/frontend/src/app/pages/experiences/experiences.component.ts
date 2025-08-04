@@ -7,7 +7,10 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
   template: `
     <div class="bg-background text-foreground py-8 md:py-12">
       <div class="mx-auto max-w-6xl px-4">
-        <div class="animate-slide-in-up will-change-transform" style="animation-delay: 0.1s;">
+        <div
+          class="animate-slide-in-up opacity-0 will-change-transform"
+          style="animation-delay: 0.1s; animation-fill-mode: forwards;"
+        >
           <h1 class="text-foreground mb-4 text-center text-4xl font-bold sm:text-5xl lg:text-6xl">
             My Experience
           </h1>
@@ -19,17 +22,16 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
         <div class="relative">
           <div
             class="animate-fade-in absolute bottom-0 left-4 top-8 w-0.5 -translate-x-1/2 transform bg-gradient-to-b from-[#667eea] to-[#764ba2] opacity-0 md:left-1/2"
-            style="animation-delay: 0.8s; animation-fill-mode: forwards;"
+            style="animation-delay: 1.2s; animation-fill-mode: forwards;"
           ></div>
 
           <div class="space-y-12">
             @for (experience of experiences; track experience; let i = $index) {
-              <div
-                class="animate-slide-in-up relative will-change-transform"
-                style="animation-delay: 0.2s;"
-              >
+              <div class="relative">
                 <div
-                  class="bg-card border-border relative z-10 mb-8 rounded-lg border p-6 shadow-lg md:p-8"
+                  class="bg-card border-border animate-slide-in-up relative z-10 mb-8 rounded-lg border p-6 opacity-0 shadow-lg md:p-8"
+                  [style.animation-delay]="0.5 + i * 0.1 + 's'"
+                  style="animation-fill-mode: forwards;"
                 >
                   <div class="mb-4 flex flex-col md:flex-row md:items-center md:justify-between">
                     <div>

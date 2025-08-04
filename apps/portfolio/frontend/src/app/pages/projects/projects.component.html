@@ -14,51 +14,51 @@
 
     <section class="space-y-8">
       <div class="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8 lg:grid-cols-3">
-        <div
-          class="bg-card border-border animate-slide-in-up overflow-hidden rounded-lg border shadow-lg"
-          *ngFor="let project of projects; let i = index"
-          [style.animation-delay]="i * 0.1 + 's'"
-        >
-          <div class="bg-muted flex h-48 items-center justify-center">
-            <div
-              class="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#667eea] to-[#764ba2] text-2xl font-semibold text-white"
-            >
-              {{ project.title.charAt(0) }}
+        @for (project of projects; track project; let i = $index) {
+          <div
+            class="bg-card border-border animate-slide-in-up overflow-hidden rounded-lg border shadow-lg"
+            [style.animation-delay]="0.4 + i * 0.1 + 's'"
+          >
+            <div class="bg-muted flex h-48 items-center justify-center">
+              <div
+                class="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#667eea] to-[#764ba2] text-2xl font-semibold text-white"
+              >
+                {{ project.title.charAt(0) }}
+              </div>
+            </div>
+            <div class="p-6">
+              <h3 class="text-foreground mb-3 text-xl font-semibold">{{ project.title }}</h3>
+              <p class="text-muted-foreground mb-4 leading-relaxed">{{ project.description }}</p>
+              <div class="mb-6 flex flex-wrap gap-2">
+                @for (tech of project.tech; track tech) {
+                  <span
+                    class="bg-secondary text-secondary-foreground rounded-full px-3 py-1 text-sm font-medium"
+                    >{{ tech }}</span
+                  >
+                }
+              </div>
+              <div class="flex gap-3">
+                <button
+                  class="text-foreground border-border hover:bg-accent hover:text-accent-foreground flex-1 rounded-md border bg-transparent px-4 py-2 font-medium transition-all duration-200"
+                  (click)="openProjectModal(project)"
+                >
+                  View Project
+                </button>
+                <button
+                  class="text-muted-foreground border-border hover:bg-accent hover:text-accent-foreground flex-1 rounded-md border bg-transparent px-4 py-2 font-medium transition-all duration-200"
+                >
+                  Source Code
+                </button>
+              </div>
             </div>
           </div>
-          <div class="p-6">
-            <h3 class="text-foreground mb-3 text-xl font-semibold">{{ project.title }}</h3>
-            <p class="text-muted-foreground mb-4 leading-relaxed">{{ project.description }}</p>
-            <div class="mb-6 flex flex-wrap gap-2">
-              <span
-                class="bg-secondary text-secondary-foreground rounded-full px-3 py-1 text-sm font-medium"
-                *ngFor="let tech of project.tech"
-                >{{ tech }}</span
-              >
-            </div>
-            <div class="flex gap-3">
-              <button
-                class="text-foreground border-border hover:bg-accent hover:text-accent-foreground flex-1 rounded-md border bg-transparent px-4 py-2 font-medium transition-all duration-200"
-                (click)="openProjectModal(project)"
-              >
-                View Project
-              </button>
-              <button
-                class="text-muted-foreground border-border hover:bg-accent hover:text-accent-foreground flex-1 rounded-md border bg-transparent px-4 py-2 font-medium transition-all duration-200"
-              >
-                Source Code
-              </button>
-            </div>
-          </div>
-        </div>
+        }
       </div>
     </section>
   </div>
 </div>
 
-<app-project-modal
-  *ngIf="showModal && selectedProject"
-  [project]="selectedProject"
-  (modalClose)="closeProjectModal()"
->
-</app-project-modal>
+@if (showModal && selectedProject) {
+  <app-project-modal [project]="selectedProject" (modalClose)="closeProjectModal()">
+  </app-project-modal>
+}

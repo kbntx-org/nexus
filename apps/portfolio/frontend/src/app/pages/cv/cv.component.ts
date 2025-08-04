@@ -6,7 +6,10 @@ import { Component } from '@angular/core';
   template: `
     <div class="bg-background text-foreground py-8 md:py-12">
       <div class="mx-auto max-w-6xl px-4">
-        <div class="animate-slide-in-up will-change-transform" style="animation-delay: 0.1s;">
+        <div
+          class="animate-slide-in-up opacity-0 will-change-transform"
+          style="animation-delay: 0.1s; animation-fill-mode: forwards;"
+        >
           <h1 class="text-foreground mb-4 text-center text-4xl font-bold sm:text-5xl lg:text-6xl">
             Curriculum Vitae
           </h1>
@@ -15,7 +18,10 @@ import { Component } from '@angular/core';
           </p>
         </div>
 
-        <div class="mx-auto h-[400px] max-w-4xl sm:h-[500px] md:h-[calc(100vh-200px)]">
+        <div
+          class="animate-slide-in-up mx-auto h-[400px] max-w-4xl opacity-0 sm:h-[500px] md:h-[calc(100vh-200px)]"
+          style="animation-delay: 0.3s; animation-fill-mode: forwards;"
+        >
           <div
             class="bg-card md:border-border group relative h-full overflow-hidden rounded-lg border-0 shadow-lg md:border"
           >
@@ -46,7 +52,8 @@ import { Component } from '@angular/core';
             </div>
 
             <div
-              class="bg-card/80 border-border absolute bottom-4 left-1/2 z-10 flex hidden -translate-x-1/2 transform items-center gap-4 rounded-full border px-4 py-2 opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100 md:flex"
+              class="bg-card/80 border-border animate-fade-in absolute bottom-4 left-1/2 z-10 flex hidden -translate-x-1/2 transform items-center gap-4 rounded-full border px-4 py-2 opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100 md:flex"
+              style="animation-delay: 0.6s; animation-fill-mode: forwards;"
             >
               <button
                 (click)="previousPage()"
@@ -93,28 +100,13 @@ import { Component } from '@angular/core';
                 </svg>
               </button>
             </div>
-
-            <div class="absolute right-4 top-4 z-10 hidden md:block">
-              <a
-                href="assets/documents/cv-kenny-talbi.pdf"
-                download="cv-kenny-talbi.pdf"
-                class="bg-primary text-primary-foreground flex items-center gap-2 rounded-lg px-4 py-2 text-sm shadow-lg transition-all duration-300 hover:shadow-xl"
-              >
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  ></path>
-                </svg>
-                Download CV
-              </a>
-            </div>
           </div>
         </div>
 
-        <div class="mt-6 flex flex-col items-center gap-4 md:hidden">
+        <div
+          class="animate-slide-in-up mt-6 flex flex-col items-center gap-4 opacity-0 md:hidden"
+          style="animation-delay: 0.5s; animation-fill-mode: forwards;"
+        >
           <div
             class="bg-card/60 border-border flex items-center gap-3 rounded-full border px-4 py-2 backdrop-blur-sm"
           >
@@ -165,11 +157,15 @@ import { Component } from '@angular/core';
           </div>
         </div>
 
-        <div class="mt-8 flex flex-col items-center gap-4 md:hidden">
+        <!-- Download CV Button - Both Desktop and Mobile -->
+        <div
+          class="animate-slide-in-up mt-8 flex flex-col items-center gap-4 opacity-0"
+          style="animation-delay: 0.7s; animation-fill-mode: forwards;"
+        >
           <a
             href="assets/documents/cv-kenny-talbi.pdf"
             download="cv-kenny-talbi.pdf"
-            class="bg-primary text-primary-foreground flex items-center gap-2 rounded-lg px-6 py-3 text-base font-medium shadow-lg transition-all duration-300 hover:shadow-xl"
+            class="bg-primary text-primary-foreground flex items-center gap-2 rounded-lg px-6 py-3 text-base font-medium shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
           >
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
