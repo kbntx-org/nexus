@@ -163,7 +163,7 @@ import { Component } from '@angular/core';
           style="animation-delay: 0.7s; animation-fill-mode: forwards;"
         >
           <a
-            href="assets/documents/cv-kenny-talbi.pdf"
+            href="assets/pdfs/cv-kenny-talbi.pdf"
             download="cv-kenny-talbi.pdf"
             class="bg-primary text-primary-foreground flex items-center gap-2 rounded-lg px-6 py-3 text-base font-medium shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
           >

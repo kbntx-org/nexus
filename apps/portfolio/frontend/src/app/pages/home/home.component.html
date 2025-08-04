@@ -1,52 +1,100 @@
 <div class="bg-background text-foreground font-roboto overflow-x-hidden">
-  <section class="py-10 md:py-8 bg-gradient-to-br from-background via-muted/20 to-background relative overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-radial from-primary/8 via-primary/3 to-transparent opacity-50 animate-pulse-slow" style="background: radial-gradient(ellipse at center, hsl(var(--primary) / 0.08) 0%, hsl(var(--primary) / 0.03) 40%, transparent 70%);"></div>
+  <section
+    class="from-background via-muted/20 to-background relative overflow-hidden bg-gradient-to-br py-10 md:py-8"
+  >
+    <div
+      class="bg-gradient-radial from-primary/8 via-primary/3 animate-pulse-slow absolute inset-0 to-transparent opacity-50"
+      style="
+        background: radial-gradient(
+          ellipse at center,
+          hsl(var(--primary) / 0.08) 0%,
+          hsl(var(--primary) / 0.03) 40%,
+          transparent 70%
+        );
+      "
+    ></div>
 
-    <div class="max-w-6xl mx-auto px-4 relative z-10">
-      <div class="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+    <div class="relative z-10 mx-auto max-w-6xl px-4">
+      <div class="grid items-center gap-8 lg:grid-cols-2 lg:gap-16">
         <div class="animate-slide-in-up">
-          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6">
-            Hi, I'm <span class="bg-gradient-to-r from-[#667eea] to-[#764ba2] bg-clip-text text-transparent relative">
+          <h1 class="mb-6 text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">
+            Hi, I'm
+            <span
+              class="relative bg-gradient-to-r from-[#667eea] to-[#764ba2] bg-clip-text text-transparent"
+            >
               {{ heroData.name }}
-              <div class="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-[#667eea] to-[#764ba2] transform scale-x-0 animate-expand-width"></div>
+              <div
+                class="animate-expand-width absolute -bottom-2 left-0 h-1 w-full scale-x-0 transform bg-gradient-to-r from-[#667eea] to-[#764ba2]"
+              ></div>
             </span>
           </h1>
-          <p class="text-lg sm:text-xl text-muted-foreground mb-8 leading-relaxed" style="animation-delay: 0.2s">
+          <p
+            class="text-muted-foreground mb-8 text-lg leading-relaxed sm:text-xl"
+            style="animation-delay: 0.2s"
+          >
             {{ heroData.subtitle }}
           </p>
-                      <div class="flex flex-wrap gap-4" style="animation-delay: 0.4s">
-              <button class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group" (click)="navigateToExperiences()">
-                <span class="relative z-10">View Experiences</span>
-                <div class="absolute inset-0 bg-gradient-to-r from-primary/80 to-primary transform -translate-x-full group-hover:translate-x-0 transition-transform duration-500"></div>
-              </button>
-              <a href="assets/documents/cv-kenny-talbi.pdf" download="cv-kenny-talbi.pdf" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-secondary to-secondary/80 text-secondary-foreground font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group">
-                <span class="relative z-10">Download CV</span>
-                <div class="absolute inset-0 bg-gradient-to-r from-secondary/80 to-secondary transform -translate-x-full group-hover:translate-x-0 transition-transform duration-500"></div>
-              </a>
-            </div>
+          <div class="flex flex-wrap gap-4" style="animation-delay: 0.4s">
+            <button
+              class="from-primary to-primary/80 text-primary-foreground group relative inline-flex items-center gap-2 overflow-hidden rounded-lg bg-gradient-to-r px-6 py-3 font-medium shadow-lg transition-all duration-300 hover:shadow-xl"
+              (click)="navigateToExperiences()"
+            >
+              <span class="relative z-10">View Experiences</span>
+              <div
+                class="from-primary/80 to-primary absolute inset-0 -translate-x-full transform bg-gradient-to-r transition-transform duration-500 group-hover:translate-x-0"
+              ></div>
+            </button>
+            <a
+              href="assets/pdfs/cv-kenny-talbi.pdf"
+              download="cv-kenny-talbi.pdf"
+              class="from-secondary to-secondary/80 text-secondary-foreground group relative inline-flex items-center gap-2 overflow-hidden rounded-lg bg-gradient-to-r px-6 py-3 font-medium shadow-lg transition-all duration-300 hover:shadow-xl"
+            >
+              <span class="relative z-10">Download CV</span>
+              <div
+                class="from-secondary/80 to-secondary absolute inset-0 -translate-x-full transform bg-gradient-to-r transition-transform duration-500 group-hover:translate-x-0"
+              ></div>
+            </a>
+          </div>
         </div>
 
-        <div class="animate-slide-in-up" style="animation-delay: 0.3s; opacity: 0; animation-fill-mode: forwards;">
-          <div class="bg-card border border-border rounded-xl p-8 shadow-2xl text-center">
+        <div
+          class="animate-slide-in-up"
+          style="animation-delay: 0.3s; opacity: 0; animation-fill-mode: forwards"
+        >
+          <div class="bg-card border-border rounded-xl border p-8 text-center shadow-2xl">
             <div class="mb-6">
-              <div class="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden border-4 border-transparent bg-gradient-to-br from-[#667eea] to-[#764ba2] bg-clip-border shadow-lg">
-                <img src="assets/images/kenny.png" alt="Kenny" class="w-full h-full object-cover" />
+              <div
+                class="mx-auto mb-4 h-32 w-32 overflow-hidden rounded-full border-4 border-transparent bg-gradient-to-br from-[#667eea] to-[#764ba2] bg-clip-border shadow-lg"
+              >
+                <img src="assets/images/kenny.png" alt="Kenny" class="h-full w-full object-cover" />
               </div>
-              <h3 class="text-2xl font-semibold text-foreground mb-2">{{ heroData.name }}</h3>
+              <h3 class="text-foreground mb-2 text-2xl font-semibold">{{ heroData.name }}</h3>
               <p class="text-muted-foreground">{{ heroData.title }}</p>
             </div>
 
             <div class="flex justify-center gap-4">
-              <a href="https://www.linkedin.com/in/kennytalbi" target="_blank" rel="noopener noreferrer"
-                 class="w-12 h-12 rounded-full bg-[#0077b5] text-white flex items-center justify-center shadow-lg">
+              <a
+                href="https://www.linkedin.com/in/kennytalbi"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex h-12 w-12 items-center justify-center rounded-full bg-[#0077b5] text-white shadow-lg"
+              >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                  <path
+                    d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
+                  />
                 </svg>
               </a>
-              <a href="https://github.com/kbntx" target="_blank" rel="noopener noreferrer"
-                 class="w-12 h-12 rounded-full bg-[#333] text-white flex items-center justify-center shadow-lg">
+              <a
+                href="https://github.com/kbntx"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex h-12 w-12 items-center justify-center rounded-full bg-[#333] text-white shadow-lg"
+              >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                  <path
+                    d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
+                  />
                 </svg>
               </a>
             </div>
@@ -56,15 +104,17 @@
     </div>
   </section>
 
-  <section class="py-12 md:py-8 bg-muted/20">
-    <div class="max-w-6xl mx-auto px-4">
+  <section class="bg-muted/20 py-12 md:py-8">
+    <div class="mx-auto max-w-6xl px-4">
       <div class="animate-slide-in-up">
-        <h2 class="text-3xl sm:text-4xl font-bold text-center text-foreground mb-12 relative">
+        <h2 class="text-foreground relative mb-12 text-center text-3xl font-bold sm:text-4xl">
           About Me
-          <div class="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-gradient-to-r from-[#667eea] to-[#764ba2] rounded-full"></div>
+          <div
+            class="absolute -bottom-3 left-1/2 h-1 w-16 -translate-x-1/2 transform rounded-full bg-gradient-to-r from-[#667eea] to-[#764ba2]"
+          ></div>
         </h2>
-        <div class="max-w-4xl mx-auto">
-          <div class="space-y-6 text-lg text-muted-foreground leading-relaxed">
+        <div class="mx-auto max-w-4xl">
+          <div class="text-muted-foreground space-y-6 text-lg leading-relaxed">
             <div [innerHTML]="heroData.description | lineBreak"></div>
           </div>
         </div>
