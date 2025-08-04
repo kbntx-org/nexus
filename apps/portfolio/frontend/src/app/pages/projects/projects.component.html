@@ -1,25 +1,51 @@
-<div class="min-h-screen bg-background text-foreground py-8 md:py-12">
-  <div class="max-w-6xl mx-auto px-4">
-    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-center text-foreground mb-4 animate-slide-in-up">My Projects</h1>
-    <p class="text-lg sm:text-xl text-muted-foreground text-center mb-12 animate-slide-in-up" style="animation-delay: 0.2s">A showcase of my recent work and technical expertise</p>
+<div class="bg-background text-foreground min-h-screen py-8 md:py-12">
+  <div class="mx-auto max-w-6xl px-4">
+    <h1
+      class="text-foreground animate-slide-in-up mb-4 text-center text-4xl font-bold sm:text-5xl lg:text-6xl"
+    >
+      My Projects
+    </h1>
+    <p
+      class="text-muted-foreground animate-slide-in-up mb-12 text-center text-lg sm:text-xl"
+      style="animation-delay: 0.2s"
+    >
+      A showcase of my recent work and technical expertise
+    </p>
 
     <section class="space-y-8">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-        <div class="bg-card border border-border rounded-lg overflow-hidden shadow-lg animate-slide-in-up" *ngFor="let project of projects; let i = index" [style.animation-delay]="(i * 0.1) + 's'">
-          <div class="h-48 bg-muted flex items-center justify-center">
-            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-[#667eea] to-[#764ba2] text-white flex items-center justify-center text-2xl font-semibold">{{ project.title.charAt(0) }}</div>
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8 lg:grid-cols-3">
+        <div
+          class="bg-card border-border animate-slide-in-up overflow-hidden rounded-lg border shadow-lg"
+          *ngFor="let project of projects; let i = index"
+          [style.animation-delay]="i * 0.1 + 's'"
+        >
+          <div class="bg-muted flex h-48 items-center justify-center">
+            <div
+              class="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#667eea] to-[#764ba2] text-2xl font-semibold text-white"
+            >
+              {{ project.title.charAt(0) }}
+            </div>
           </div>
           <div class="p-6">
-            <h3 class="text-xl font-semibold text-foreground mb-3">{{ project.title }}</h3>
+            <h3 class="text-foreground mb-3 text-xl font-semibold">{{ project.title }}</h3>
             <p class="text-muted-foreground mb-4 leading-relaxed">{{ project.description }}</p>
-            <div class="flex flex-wrap gap-2 mb-6">
-              <span class="bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm font-medium" *ngFor="let tech of project.tech">{{ tech }}</span>
+            <div class="mb-6 flex flex-wrap gap-2">
+              <span
+                class="bg-secondary text-secondary-foreground rounded-full px-3 py-1 text-sm font-medium"
+                *ngFor="let tech of project.tech"
+                >{{ tech }}</span
+              >
             </div>
             <div class="flex gap-3">
-              <button class="flex-1 bg-transparent text-foreground border border-border px-4 py-2 rounded-md font-medium transition-all duration-200 hover:bg-accent hover:text-accent-foreground" (click)="openProjectModal(project)">
+              <button
+                class="text-foreground border-border hover:bg-accent hover:text-accent-foreground flex-1 rounded-md border bg-transparent px-4 py-2 font-medium transition-all duration-200"
+                (click)="openProjectModal(project)"
+              >
                 View Project
               </button>
-              <button class="flex-1 bg-transparent text-muted-foreground border border-border px-4 py-2 rounded-md font-medium transition-all duration-200 hover:bg-accent hover:text-accent-foreground">
+              <button
+                class="text-muted-foreground border-border hover:bg-accent hover:text-accent-foreground flex-1 rounded-md border bg-transparent px-4 py-2 font-medium transition-all duration-200"
+              >
                 Source Code
               </button>
             </div>

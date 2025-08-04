@@ -1,20 +1,24 @@
-import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-cv',
-  standalone: true,
-  imports: [CommonModule],
+  imports: [],
   template: `
     <div class="bg-background text-foreground py-8 md:py-12">
-      <div class="max-w-6xl mx-auto px-4">
-                <div class="animate-slide-in-up will-change-transform" style="animation-delay: 0.1s;">
-          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-center text-foreground mb-4">Curriculum Vitae</h1>
-          <p class="text-lg sm:text-xl text-muted-foreground text-center mb-12">My professional background and qualifications</p>
+      <div class="mx-auto max-w-6xl px-4">
+        <div class="animate-slide-in-up will-change-transform" style="animation-delay: 0.1s;">
+          <h1 class="text-foreground mb-4 text-center text-4xl font-bold sm:text-5xl lg:text-6xl">
+            Curriculum Vitae
+          </h1>
+          <p class="text-muted-foreground mb-12 text-center text-lg sm:text-xl">
+            My professional background and qualifications
+          </p>
         </div>
 
-        <div class="max-w-4xl mx-auto h-[400px] sm:h-[500px] md:h-[calc(100vh-200px)]">
-          <div class="relative bg-card border-0 md:border md:border-border rounded-lg shadow-lg overflow-hidden h-full group">
+        <div class="mx-auto h-[400px] max-w-4xl sm:h-[500px] md:h-[calc(100vh-200px)]">
+          <div
+            class="bg-card md:border-border group relative h-full overflow-hidden rounded-lg border-0 shadow-lg md:border"
+          >
             <div class="relative h-full">
               <div
                 class="absolute inset-0 transition-opacity duration-500"
@@ -24,7 +28,7 @@ import { Component } from '@angular/core';
                 <img
                   src="assets/images/cv-kenny-page-1.png"
                   alt="CV Page 1"
-                  class="w-full h-full object-contain"
+                  class="h-full w-full object-contain"
                 />
               </div>
 
@@ -36,32 +40,39 @@ import { Component } from '@angular/core';
                 <img
                   src="assets/images/cv-kenny-page-2.png"
                   alt="CV Page 2"
-                  class="w-full h-full object-contain"
+                  class="h-full w-full object-contain"
                 />
               </div>
             </div>
 
-            <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center gap-4 bg-card/80 backdrop-blur-sm rounded-full px-4 py-2 border border-border z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden md:flex">
+            <div
+              class="bg-card/80 border-border absolute bottom-4 left-1/2 z-10 flex hidden -translate-x-1/2 transform items-center gap-4 rounded-full border px-4 py-2 opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100 md:flex"
+            >
               <button
                 (click)="previousPage()"
                 [disabled]="currentPage === 0"
-                class="p-2 rounded-full transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted"
+                class="hover:bg-muted rounded-full p-2 transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 19l-7-7 7-7"
+                  ></path>
                 </svg>
               </button>
 
               <div class="flex gap-2">
                 <button
                   (click)="goToPage(0)"
-                  class="w-3 h-3 rounded-full transition-colors duration-200"
+                  class="h-3 w-3 rounded-full transition-colors duration-200"
                   [class.bg-primary]="currentPage === 0"
                   [class.bg-muted]="currentPage !== 0"
                 ></button>
                 <button
                   (click)="goToPage(1)"
-                  class="w-3 h-3 rounded-full transition-colors duration-200"
+                  class="h-3 w-3 rounded-full transition-colors duration-200"
                   [class.bg-primary]="currentPage === 1"
                   [class.bg-muted]="currentPage !== 1"
                 ></button>
@@ -70,52 +81,68 @@ import { Component } from '@angular/core';
               <button
                 (click)="nextPage()"
                 [disabled]="currentPage === 1"
-                class="p-2 rounded-full transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted"
+                class="hover:bg-muted rounded-full p-2 transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  ></path>
                 </svg>
               </button>
             </div>
 
-            <div class="absolute top-4 right-4 z-10 hidden md:block">
+            <div class="absolute right-4 top-4 z-10 hidden md:block">
               <a
                 href="assets/documents/cv-kenny-talbi.pdf"
                 download="cv-kenny-talbi.pdf"
-                class="bg-primary text-primary-foreground px-4 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 text-sm"
+                class="bg-primary text-primary-foreground flex items-center gap-2 rounded-lg px-4 py-2 text-sm shadow-lg transition-all duration-300 hover:shadow-xl"
               >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  ></path>
                 </svg>
                 Download CV
               </a>
             </div>
-
           </div>
         </div>
 
-        <div class="flex flex-col items-center gap-4 mt-6 md:hidden">
-          <div class="flex items-center gap-3 bg-card/60 backdrop-blur-sm rounded-full px-4 py-2 border border-border">
+        <div class="mt-6 flex flex-col items-center gap-4 md:hidden">
+          <div
+            class="bg-card/60 border-border flex items-center gap-3 rounded-full border px-4 py-2 backdrop-blur-sm"
+          >
             <button
               (click)="previousPage()"
               [disabled]="currentPage === 0"
-              class="p-1.5 rounded-full transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted"
+              class="hover:bg-muted rounded-full p-1.5 transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 19l-7-7 7-7"
+                ></path>
               </svg>
             </button>
 
             <div class="flex gap-2">
               <button
                 (click)="goToPage(0)"
-                class="w-2.5 h-2.5 rounded-full transition-colors duration-200"
+                class="h-2.5 w-2.5 rounded-full transition-colors duration-200"
                 [class.bg-primary]="currentPage === 0"
                 [class.bg-muted]="currentPage !== 0"
               ></button>
               <button
                 (click)="goToPage(1)"
-                class="w-2.5 h-2.5 rounded-full transition-colors duration-200"
+                class="h-2.5 w-2.5 rounded-full transition-colors duration-200"
                 [class.bg-primary]="currentPage === 1"
                 [class.bg-muted]="currentPage !== 1"
               ></button>
@@ -124,23 +151,33 @@ import { Component } from '@angular/core';
             <button
               (click)="nextPage()"
               [disabled]="currentPage === 1"
-              class="p-1.5 rounded-full transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted"
+              class="hover:bg-muted rounded-full p-1.5 transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                ></path>
               </svg>
             </button>
           </div>
         </div>
 
-        <div class="flex flex-col items-center gap-4 mt-8 md:hidden">
+        <div class="mt-8 flex flex-col items-center gap-4 md:hidden">
           <a
             href="assets/documents/cv-kenny-talbi.pdf"
             download="cv-kenny-talbi.pdf"
-            class="bg-primary text-primary-foreground px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 text-base font-medium"
+            class="bg-primary text-primary-foreground flex items-center gap-2 rounded-lg px-6 py-3 text-base font-medium shadow-lg transition-all duration-300 hover:shadow-xl"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              ></path>
             </svg>
             Download CV
           </a>

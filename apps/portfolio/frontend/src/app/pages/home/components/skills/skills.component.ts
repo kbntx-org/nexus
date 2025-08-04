@@ -1,7 +1,6 @@
-import { CommonModule } from '@angular/common';
 import { Component, AfterViewInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
 
-import { SKILLS, Skill } from '../../../pages/skills/data/skills.data';
+import { SKILLS, Skill } from '../../data/skills.data';
 
 interface Particle {
   x: number;
@@ -13,29 +12,36 @@ interface Particle {
 
 @Component({
   selector: 'app-skills',
-  standalone: true,
-  imports: [CommonModule],
-    template: `
+  imports: [],
+  template: `
     <section class="relative py-12 md:py-8" #skillsSection>
-      <div class="max-w-6xl mx-auto px-4">
-        <h2 class="text-3xl sm:text-4xl font-bold text-center text-foreground mb-12 relative animate-slide-in-up">
+      <div class="mx-auto max-w-6xl px-4">
+        <h2
+          class="text-foreground animate-slide-in-up relative mb-12 text-center text-3xl font-bold sm:text-4xl"
+        >
           Skills & Technologies
-          <div class="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-gradient-to-r from-[#667eea] to-[#764ba2] rounded-full"></div>
+          <div
+            class="absolute -bottom-3 left-1/2 h-1 w-16 -translate-x-1/2 transform rounded-full bg-gradient-to-r from-[#667eea] to-[#764ba2]"
+          ></div>
         </h2>
 
-        <div class="skills-particles relative w-full h-[300px] md:h-[400px] max-w-full overflow-visible animate-slide-in-up" style="animation-delay: 0.2s">
-          <div
-            class="particle absolute flex items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-card/60 backdrop-blur-sm border border-border/40 rounded-full shadow-lg transition-all duration-300 cursor-pointer opacity-90 hover:scale-130 hover:opacity-100 hover:bg-card/80 hover:border-primary/50 hover:shadow-xl hover:z-10"
-            *ngFor="let skill of skills; let i = index"
-            [style.animation-delay]="i * 0.5 + 's'"
-            [style.animation-duration]="8 + i * 2 + 's'"
-          >
-            <img
-              [src]="getIconUrl(skill)"
-              [alt]="skill.simpleIconName || 'Technology icon'"
-              class="w-5 h-5 md:w-6 md:h-6 transition-transform duration-300 group-hover:scale-120"
-            />
-          </div>
+        <div
+          class="skills-particles animate-slide-in-up relative h-[300px] w-full max-w-full overflow-visible md:h-[400px]"
+          style="animation-delay: 0.2s"
+        >
+          @for (skill of skills; track skill; let i = $index) {
+            <div
+              class="particle bg-card/60 border-border/40 hover:scale-130 hover:bg-card/80 hover:border-primary/50 absolute flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border opacity-90 shadow-lg backdrop-blur-sm transition-all duration-300 hover:z-10 hover:opacity-100 hover:shadow-xl md:h-12 md:w-12"
+              [style.animation-delay]="i * 0.5 + 's'"
+              [style.animation-duration]="8 + i * 2 + 's'"
+            >
+              <img
+                [src]="getIconUrl(skill)"
+                [alt]="skill.simpleIconName || 'Technology icon'"
+                class="group-hover:scale-120 h-5 w-5 transition-transform duration-300 md:h-6 md:w-6"
+              />
+            </div>
+          }
         </div>
       </div>
     </section>
@@ -48,7 +54,6 @@ export class SkillsComponent implements AfterViewInit, OnDestroy {
 
   private particles: Particle[] = [];
   private animationId: number | null = null;
-
 
   public ngAfterViewInit(): void {
     this.setupScrollAnimations();
@@ -86,10 +91,14 @@ export class SkillsComponent implements AfterViewInit, OnDestroy {
   }
 
   public setupParticlePhysics(): void {
-    if (!this.skillsSection) {return;}
+    if (!this.skillsSection) {
+      return;
+    }
 
     const container = this.skillsSection.nativeElement.querySelector('.skills-particles');
-    if (!container) {return;}
+    if (!container) {
+      return;
+    }
 
     const particleElements = container.querySelectorAll('.particle');
     const containerRect = container.getBoundingClientRect();
@@ -116,7 +125,9 @@ export class SkillsComponent implements AfterViewInit, OnDestroy {
   }
 
   public startParticleAnimation(): void {
-    if (this.animationId) {return;}
+    if (this.animationId) {
+      return;
+    }
     this.animateParticles();
   }
 
@@ -128,10 +139,14 @@ export class SkillsComponent implements AfterViewInit, OnDestroy {
   }
 
   public animateParticles(): void {
-    if (!this.skillsSection) {return;}
+    if (!this.skillsSection) {
+      return;
+    }
 
     const container = this.skillsSection.nativeElement.querySelector('.skills-particles');
-    if (!container) {return;}
+    if (!container) {
+      return;
+    }
 
     const containerRect = container.getBoundingClientRect();
     const particleSize = window.innerWidth < 768 ? 40 : 48;

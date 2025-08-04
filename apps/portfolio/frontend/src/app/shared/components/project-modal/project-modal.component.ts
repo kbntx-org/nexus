@@ -15,12 +15,20 @@ export interface Project {
 
 @Component({
   selector: 'app-project-modal',
-  standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50" (click)="closeModal()">
-      <div class="hidden lg:block bg-card border border-border rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl mx-4 custom-scrollbar box-border" (click)="$event.stopPropagation()">
-        <button class="absolute top-4 right-4 bg-background border border-border rounded-full w-10 h-10 flex items-center justify-center cursor-pointer text-foreground z-10 transition-all duration-200 hover:bg-accent hover:scale-110" (click)="closeModal()">
+    <div
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      (click)="closeModal()"
+    >
+      <div
+        class="bg-card border-border custom-scrollbar relative mx-4 box-border hidden max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-lg border shadow-2xl lg:block"
+        (click)="$event.stopPropagation()"
+      >
+        <button
+          class="bg-background border-border text-foreground hover:bg-accent absolute right-4 top-4 z-10 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border transition-all duration-200 hover:scale-110"
+          (click)="closeModal()"
+        >
           <svg
             width="24"
             height="24"
@@ -34,27 +42,34 @@ export interface Project {
           </svg>
         </button>
 
-        <div class="p-8 pb-4 border-b border-border">
-          <h2 class="text-3xl font-bold text-foreground mb-2">{{ project.title }}</h2>
-          <p class="text-lg text-muted-foreground leading-relaxed">{{ project.description }}</p>
+        <div class="border-border border-b p-8 pb-4">
+          <h2 class="text-foreground mb-2 text-3xl font-bold">{{ project.title }}</h2>
+          <p class="text-muted-foreground text-lg leading-relaxed">{{ project.description }}</p>
         </div>
 
         <div class="p-8 pt-6">
           <div class="mb-8" *ngIf="project.images && project.images.length > 0">
-            <div class="relative rounded-lg overflow-hidden">
-              <div class="w-full h-80 overflow-hidden">
+            <div class="relative overflow-hidden rounded-lg">
+              <div class="h-80 w-full overflow-hidden">
                 <div
-                  class="flex w-full h-full transition-transform duration-300 ease-in-out"
+                  class="flex h-full w-full transition-transform duration-300 ease-in-out"
                   [style.transform]="'translateX(-' + currentImageIndex * 100 + '%)'"
                 >
-                  <div class="min-w-full h-full bg-muted flex items-center justify-center" *ngFor="let image of project.images; let i = index">
-                    <div class="w-20 h-20 rounded-full bg-gradient-to-br from-[#667eea] to-[#764ba2] text-white flex items-center justify-center text-2xl font-semibold">{{ project.title.charAt(0) }}</div>
+                  <div
+                    class="bg-muted flex h-full min-w-full items-center justify-center"
+                    *ngFor="let image of project.images; let i = index"
+                  >
+                    <div
+                      class="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-[#667eea] to-[#764ba2] text-2xl font-semibold text-white"
+                    >
+                      {{ project.title.charAt(0) }}
+                    </div>
                   </div>
                 </div>
               </div>
 
               <button
-                class="absolute top-1/2 left-4 -translate-y-1/2 bg-background/90 border border-border rounded-full w-10 h-10 flex items-center justify-center cursor-pointer text-foreground transition-all duration-200 hover:bg-accent hover:scale-110 z-5"
+                class="bg-background/90 border-border text-foreground hover:bg-accent z-5 absolute left-4 top-1/2 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border transition-all duration-200 hover:scale-110"
                 (click)="previousImage()"
                 *ngIf="project.images.length > 1"
               >
@@ -71,7 +86,7 @@ export interface Project {
               </button>
 
               <button
-                class="absolute top-1/2 right-4 -translate-y-1/2 bg-background/90 border border-border rounded-full w-10 h-10 flex items-center justify-center cursor-pointer text-foreground transition-all duration-200 hover:bg-accent hover:scale-110 z-5"
+                class="bg-background/90 border-border text-foreground hover:bg-accent z-5 absolute right-4 top-1/2 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border transition-all duration-200 hover:scale-110"
                 (click)="nextImage()"
                 *ngIf="project.images.length > 1"
               >
@@ -87,10 +102,17 @@ export interface Project {
                 </svg>
               </button>
 
-              <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-5" *ngIf="project.images.length > 1">
+              <div
+                class="z-5 absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2"
+                *ngIf="project.images.length > 1"
+              >
                 <button
-                  class="w-2 h-2 rounded-full transition-all duration-200"
-                  [class]="i === currentImageIndex ? 'bg-primary scale-125' : 'bg-muted-foreground/50 hover:bg-muted-foreground/80'"
+                  class="h-2 w-2 rounded-full transition-all duration-200"
+                  [class]="
+                    i === currentImageIndex
+                      ? 'bg-primary scale-125'
+                      : 'bg-muted-foreground/50 hover:bg-muted-foreground/80'
+                  "
                   *ngFor="let image of project.images; let i = index"
                   (click)="goToImage(i)"
                 ></button>
@@ -100,36 +122,45 @@ export interface Project {
 
           <div class="space-y-8">
             <div>
-              <h3 class="text-xl font-semibold text-foreground mb-4">About this project</h3>
-              <p class="text-muted-foreground leading-relaxed">{{ project.longDescription || project.description }}</p>
+              <h3 class="text-foreground mb-4 text-xl font-semibold">About this project</h3>
+              <p class="text-muted-foreground leading-relaxed">
+                {{ project.longDescription || project.description }}
+              </p>
             </div>
 
             <div *ngIf="project.features && project.features.length > 0">
-              <h3 class="text-xl font-semibold text-foreground mb-4">Key Features</h3>
+              <h3 class="text-foreground mb-4 text-xl font-semibold">Key Features</h3>
               <ul class="space-y-2">
-                <li class="text-muted-foreground flex items-start gap-3" *ngFor="let feature of project.features">
-                  <span class="text-primary font-bold mt-0.5">✓</span>
+                <li
+                  class="text-muted-foreground flex items-start gap-3"
+                  *ngFor="let feature of project.features"
+                >
+                  <span class="text-primary mt-0.5 font-bold">✓</span>
                   <span>{{ feature }}</span>
                 </li>
               </ul>
             </div>
 
             <div>
-              <h3 class="text-xl font-semibold text-foreground mb-4">Technologies Used</h3>
+              <h3 class="text-foreground mb-4 text-xl font-semibold">Technologies Used</h3>
               <div class="flex flex-wrap gap-2">
-                <span class="bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm font-medium" *ngFor="let tech of project.tech">{{ tech }}</span>
+                <span
+                  class="bg-secondary text-secondary-foreground rounded-full px-3 py-1 text-sm font-medium"
+                  *ngFor="let tech of project.tech"
+                  >{{ tech }}</span
+                >
               </div>
             </div>
           </div>
         </div>
 
-        <div class="p-8 pt-6 border-t border-border bg-muted/30">
-          <div class="flex gap-4 flex-wrap w-full">
+        <div class="border-border bg-muted/30 border-t p-8 pt-6">
+          <div class="flex w-full flex-wrap gap-4">
             <a
               *ngIf="project.liveUrl"
               [href]="project.liveUrl"
               target="_blank"
-              class="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-md font-medium transition-all duration-200 hover:bg-primary/90 hover:-translate-y-0.5"
+              class="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-2 rounded-md px-6 py-3 font-medium transition-all duration-200 hover:-translate-y-0.5"
             >
               <svg
                 width="16"
@@ -149,7 +180,7 @@ export interface Project {
               *ngIf="project.githubUrl"
               [href]="project.githubUrl"
               target="_blank"
-              class="inline-flex items-center gap-2 bg-transparent text-foreground border border-border px-6 py-3 rounded-md font-medium transition-all duration-200 hover:bg-accent hover:text-accent-foreground hover:-translate-y-0.5"
+              class="text-foreground border-border hover:bg-accent hover:text-accent-foreground inline-flex items-center gap-2 rounded-md border bg-transparent px-6 py-3 font-medium transition-all duration-200 hover:-translate-y-0.5"
             >
               <svg
                 width="16"
@@ -169,9 +200,15 @@ export interface Project {
         </div>
       </div>
 
-      <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border rounded-t-2xl shadow-2xl max-h-[85vh] overflow-y-auto transform transition-transform duration-300 ease-out" [class]="isOpening ? 'translate-y-0' : 'translate-y-full'" (click)="$event.stopPropagation()">
-
-        <button class="absolute top-4 right-4 bg-background border border-border rounded-full w-10 h-10 flex items-center justify-center cursor-pointer text-foreground z-10 transition-all duration-200 hover:bg-accent hover:scale-110" (click)="closeModal()">
+      <div
+        class="bg-card border-border fixed bottom-0 left-0 right-0 max-h-[85vh] transform overflow-y-auto rounded-t-2xl border-t shadow-2xl transition-transform duration-300 ease-out lg:hidden"
+        [class]="isOpening ? 'translate-y-0' : 'translate-y-full'"
+        (click)="$event.stopPropagation()"
+      >
+        <button
+          class="bg-background border-border text-foreground hover:bg-accent absolute right-4 top-4 z-10 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border transition-all duration-200 hover:scale-110"
+          (click)="closeModal()"
+        >
           <svg
             width="24"
             height="24"
@@ -185,27 +222,34 @@ export interface Project {
           </svg>
         </button>
 
-        <div class="p-6 pb-4 border-b border-border">
-          <h2 class="text-2xl font-bold text-foreground mb-2 pr-12">{{ project.title }}</h2>
-          <p class="text-base text-muted-foreground leading-relaxed">{{ project.description }}</p>
+        <div class="border-border border-b p-6 pb-4">
+          <h2 class="text-foreground mb-2 pr-12 text-2xl font-bold">{{ project.title }}</h2>
+          <p class="text-muted-foreground text-base leading-relaxed">{{ project.description }}</p>
         </div>
 
         <div class="p-6 pt-4">
           <div class="mb-6" *ngIf="project.images && project.images.length > 0">
-            <div class="relative rounded-lg overflow-hidden">
-              <div class="w-full h-48 overflow-hidden">
+            <div class="relative overflow-hidden rounded-lg">
+              <div class="h-48 w-full overflow-hidden">
                 <div
-                  class="flex w-full h-full transition-transform duration-300 ease-in-out"
+                  class="flex h-full w-full transition-transform duration-300 ease-in-out"
                   [style.transform]="'translateX(-' + currentImageIndex * 100 + '%)'"
                 >
-                  <div class="min-w-full h-full bg-muted flex items-center justify-center" *ngFor="let image of project.images; let i = index">
-                    <div class="w-16 h-16 rounded-full bg-gradient-to-br from-[#667eea] to-[#764ba2] text-white flex items-center justify-center text-xl font-semibold">{{ project.title.charAt(0) }}</div>
+                  <div
+                    class="bg-muted flex h-full min-w-full items-center justify-center"
+                    *ngFor="let image of project.images; let i = index"
+                  >
+                    <div
+                      class="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#667eea] to-[#764ba2] text-xl font-semibold text-white"
+                    >
+                      {{ project.title.charAt(0) }}
+                    </div>
                   </div>
                 </div>
               </div>
 
               <button
-                class="absolute top-1/2 left-2 -translate-y-1/2 bg-background/90 border border-border rounded-full w-8 h-8 flex items-center justify-center cursor-pointer text-foreground transition-all duration-200 hover:bg-accent hover:scale-110 z-5"
+                class="bg-background/90 border-border text-foreground hover:bg-accent z-5 absolute left-2 top-1/2 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border transition-all duration-200 hover:scale-110"
                 (click)="previousImage()"
                 *ngIf="project.images.length > 1"
               >
@@ -222,7 +266,7 @@ export interface Project {
               </button>
 
               <button
-                class="absolute top-1/2 right-2 -translate-y-1/2 bg-background/90 border border-border rounded-full w-8 h-8 flex items-center justify-center cursor-pointer text-foreground transition-all duration-200 hover:bg-accent hover:scale-110 z-5"
+                class="bg-background/90 border-border text-foreground hover:bg-accent z-5 absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border transition-all duration-200 hover:scale-110"
                 (click)="nextImage()"
                 *ngIf="project.images.length > 1"
               >
@@ -238,10 +282,17 @@ export interface Project {
                 </svg>
               </button>
 
-              <div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-5" *ngIf="project.images.length > 1">
+              <div
+                class="z-5 absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-1.5"
+                *ngIf="project.images.length > 1"
+              >
                 <button
-                  class="w-1.5 h-1.5 rounded-full transition-all duration-200"
-                  [class]="i === currentImageIndex ? 'bg-primary scale-125' : 'bg-muted-foreground/50 hover:bg-muted-foreground/80'"
+                  class="h-1.5 w-1.5 rounded-full transition-all duration-200"
+                  [class]="
+                    i === currentImageIndex
+                      ? 'bg-primary scale-125'
+                      : 'bg-muted-foreground/50 hover:bg-muted-foreground/80'
+                  "
                   *ngFor="let image of project.images; let i = index"
                   (click)="goToImage(i)"
                 ></button>
@@ -251,36 +302,45 @@ export interface Project {
 
           <div class="space-y-6">
             <div>
-              <h3 class="text-lg font-semibold text-foreground mb-3">About this project</h3>
-              <p class="text-muted-foreground leading-relaxed text-sm">{{ project.longDescription || project.description }}</p>
+              <h3 class="text-foreground mb-3 text-lg font-semibold">About this project</h3>
+              <p class="text-muted-foreground text-sm leading-relaxed">
+                {{ project.longDescription || project.description }}
+              </p>
             </div>
 
             <div *ngIf="project.features && project.features.length > 0">
-              <h3 class="text-lg font-semibold text-foreground mb-3">Key Features</h3>
+              <h3 class="text-foreground mb-3 text-lg font-semibold">Key Features</h3>
               <ul class="space-y-2">
-                <li class="text-muted-foreground flex items-start gap-3 text-sm" *ngFor="let feature of project.features">
-                  <span class="text-primary font-bold mt-0.5">✓</span>
+                <li
+                  class="text-muted-foreground flex items-start gap-3 text-sm"
+                  *ngFor="let feature of project.features"
+                >
+                  <span class="text-primary mt-0.5 font-bold">✓</span>
                   <span>{{ feature }}</span>
                 </li>
               </ul>
             </div>
 
             <div>
-              <h3 class="text-lg font-semibold text-foreground mb-3">Technologies Used</h3>
+              <h3 class="text-foreground mb-3 text-lg font-semibold">Technologies Used</h3>
               <div class="flex flex-wrap gap-2">
-                <span class="bg-secondary text-secondary-foreground px-2 py-1 rounded-full text-xs font-medium" *ngFor="let tech of project.tech">{{ tech }}</span>
+                <span
+                  class="bg-secondary text-secondary-foreground rounded-full px-2 py-1 text-xs font-medium"
+                  *ngFor="let tech of project.tech"
+                  >{{ tech }}</span
+                >
               </div>
             </div>
           </div>
         </div>
 
-        <div class="p-6 pt-4 border-t border-border bg-card sticky bottom-0">
+        <div class="border-border bg-card sticky bottom-0 border-t p-6 pt-4">
           <div class="flex gap-3">
             <a
               *ngIf="project.liveUrl"
               [href]="project.liveUrl"
               target="_blank"
-              class="flex-1 inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-4 py-3 rounded-md font-medium transition-all duration-200 hover:bg-primary/90 active:scale-95"
+              class="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-3 font-medium transition-all duration-200 active:scale-95"
             >
               <svg
                 width="16"
@@ -300,7 +360,7 @@ export interface Project {
               *ngIf="project.githubUrl"
               [href]="project.githubUrl"
               target="_blank"
-              class="flex-1 inline-flex items-center justify-center gap-2 bg-transparent text-foreground border border-border px-4 py-3 rounded-md font-medium transition-all duration-200 hover:bg-accent hover:text-accent-foreground active:scale-95"
+              class="text-foreground border-border hover:bg-accent hover:text-accent-foreground inline-flex flex-1 items-center justify-center gap-2 rounded-md border bg-transparent px-4 py-3 font-medium transition-all duration-200 active:scale-95"
             >
               <svg
                 width="16"
@@ -321,30 +381,32 @@ export interface Project {
       </div>
     </div>
   `,
-  styles: [`
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 8px;
-    }
+  styles: [
+    `
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+      }
 
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: transparent;
-    }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
 
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: hsl(var(--muted-foreground) / 0.3);
-      border-radius: 4px;
-    }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: hsl(var(--muted-foreground) / 0.3);
+        border-radius: 4px;
+      }
 
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: hsl(var(--muted-foreground) / 0.5);
-    }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: hsl(var(--muted-foreground) / 0.5);
+      }
 
-    .custom-scrollbar {
-      scrollbar-width: thin;
-      scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
-      box-sizing: border-box;
-    }
-  `]
+      .custom-scrollbar {
+        scrollbar-width: thin;
+        scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
+        box-sizing: border-box;
+      }
+    `
+  ]
 })
 export class ProjectModalComponent implements OnInit, OnDestroy {
   @Input() public project!: Project;

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
@@ -6,7 +6,6 @@ import { filter } from 'rxjs/operators';
 import { NavigationComponent } from './shared/components/navigation/navigation.component';
 
 @Component({
-  standalone: true,
   imports: [RouterModule, NavigationComponent],
   selector: 'app-root',
   template: `
@@ -18,8 +17,7 @@ import { NavigationComponent } from './shared/components/navigation/navigation.c
 })
 export class AppComponent implements OnInit, OnDestroy {
   private routerSubscription?: Subscription;
-
-  constructor(private router: Router) {}
+  private router = inject(Router);
 
   public ngOnInit(): void {
     this.routerSubscription = this.router.events

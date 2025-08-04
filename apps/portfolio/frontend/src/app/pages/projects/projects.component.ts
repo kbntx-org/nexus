@@ -9,7 +9,6 @@ import { PROJECTS } from './data/projects.data';
 
 @Component({
   selector: 'app-projects',
-  standalone: true,
   imports: [CommonModule, ProjectModalComponent],
   templateUrl: './projects.component.html'
 })

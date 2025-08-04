@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
@@ -6,8 +5,7 @@ import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
 
 @Component({
   selector: 'app-navigation',
-  standalone: true,
-  imports: [CommonModule, RouterModule, ThemeToggleComponent],
+  imports: [RouterModule, ThemeToggleComponent],
   templateUrl: './navigation.component.html'
 })
 export class NavigationComponent {
@@ -26,5 +24,4 @@ export class NavigationComponent {
   public closeMenu(): void {
     this.isMenuOpen = false;
   }
-
 }
