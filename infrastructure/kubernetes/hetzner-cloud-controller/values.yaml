@@ -1,0 +1,4 @@
+hcloud-cloud-controller-manager:
+  enabled: true
+  networking:
+    clusterCIDR: 10.42.0.0/16
