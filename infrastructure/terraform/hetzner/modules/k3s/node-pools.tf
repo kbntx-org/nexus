@@ -56,13 +56,6 @@ resource "hcloud_server" "node_pool" {
   }
 }
 
-resource "hcloud_server_network" "node_pool_network" {
-  for_each = local.flattened_node_pools
-
-  server_id  = hcloud_server.node_pool[each.key].id
-  network_id = data.hcloud_network.main_network.id
-}
-
 
 data "cloudinit_config" "node_pool" {
   for_each = var.node_pools

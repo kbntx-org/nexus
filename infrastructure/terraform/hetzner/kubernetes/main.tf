@@ -31,7 +31,7 @@ module "nexus_cluster" {
 
   node_pools = {
     "default" = {
-      count       = 1
+      count       = 2
       server_type = "cpx21"
       location    = "fsn1"
       labels = {
