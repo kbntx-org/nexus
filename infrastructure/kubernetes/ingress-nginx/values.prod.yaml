@@ -1,5 +1,7 @@
 ingress-nginx:
   controller:
+    service:
+      type: ClusterIP
     config:
       proxy-real-ip-cidr: '10.0.0.0/16'
       use-forwarded-headers: 'true'
