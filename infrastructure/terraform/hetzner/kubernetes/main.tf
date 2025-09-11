@@ -46,7 +46,7 @@ module "control_plane_firewall" {
   name   = "nexus-control-plane-firewall"
 
   ingress_rules = [
-    { protocol = "tcp", port = "22", source_ips = ["0.0.0.0/0"] },
+    { protocol = "tcp", port = "22", source_ips = ["10.0.0.0/16"] },
     { protocol = "tcp", port = "6443", source_ips = ["10.0.0.0/16"] }
   ]
 
@@ -58,7 +58,7 @@ module "worker_nodes_firewall" {
   name   = "nexus-worker-nodes-firewall"
 
   ingress_rules = [
-    { protocol = "tcp", port = "22", source_ips = ["0.0.0.0/0"] }
+    { protocol = "tcp", port = "22", source_ips = ["10.0.0.0/16"] }
   ]
 
   label_selector = "type=worker,cluster-name=nexus"

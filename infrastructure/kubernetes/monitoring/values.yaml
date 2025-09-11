@@ -1,0 +1,29 @@
+kube-prometheus-stack:
+  prometheus:
+    prometheusSpec:
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            storageClassName: hcloud-volumes
+            accessModes:
+              - ReadWriteOnce
+            resources:
+              requests:
+                storage: 10Gi
+
+  grafana:
+    grafana.ini:
+      server:
+        domain: grafana.kbntx.com
+        root_url: 'https://%(domain)s/'
+    persistence:
+      type: pvc
+      enabled: true
+      storageClassName: hcloud-volumes
+      accessModes:
+        - ReadWriteOnce
+      size: 10Gi
+    sidecar:
+      dashboards:
+        provider:
+          allowUiUpdates: true
