@@ -1,0 +1,15 @@
+ingress-nginx:
+  controller:
+    config:
+      proxy-real-ip-cidr: '10.0.0.0/16'
+      use-forwarded-headers: 'true'
+      enable-real-ip: 'true'
+      proxy-body-size: 32M
+      client-body-buffer-size: 16M
+      proxy-buffering: 'on'
+      proxy-buffer-size: 128K
+      proxy-buffers-number: 32
+      proxy-busy-buffers-size: 1M
+    replicaCount: 2
+    ingressClassResource:
+      default: true

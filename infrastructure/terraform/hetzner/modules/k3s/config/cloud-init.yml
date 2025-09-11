@@ -1,0 +1,43 @@
+#cloud-config
+ssh_pwauth: false
+
+users:
+  - name: ${default_user}
+    groups:
+      - sudo
+    sudo:
+      - ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    lock_passwd: true
+    ssh_authorized_keys:
+      - ${default_ssh_key}
+
+runcmd:
+  - ufw disable
+  %{ if type == "control-plane" }
+  - |
+    curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.33.3+k3s1 sh -s - server \
+      --cluster-init \
+      --disable-cloud-controller \
+      --disable local-storage \
+      --node-name="$(hostname -f)" \
+      --flannel-iface=enp7s0 \
+      --kubelet-arg="cloud-provider=external" \
+      --secrets-encryption \
+      --disable=traefik \
+      --disable=servicelb \
+      --node-taint="node-role.kubernetes.io/control-plane=true:NoSchedule" \
+      --node-label="node.kubernetes.io/exclude-from-external-load-balancers=true" \
+      --token=${cluster_token}
+  %{ else }
+  - |
+    curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.33.3+k3s1 sh -s - agent \
+    --server "https://${server_address}:6443" \
+    --node-name="$(hostname -f)" \
+    --flannel-iface=enp7s0 \
+    --kubelet-arg="cloud-provider=external" \
+    %{ for taint in taints ~}
+    --node-taint="${taint.key}=${taint.value}:${taint.effect}" \
+    %{ endfor ~}
+    --token=${cluster_token}
+  %{ endif }

@@ -3,7 +3,9 @@
 /coverage
 /.nx/cache
 /node_modules
-*.tmpl.yaml
 .angular
 
 /.nx/workspace-data
+
+**/templates/**/*.yaml
+**/templates/**/*.yml

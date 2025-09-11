@@ -1,0 +1,64 @@
+#cloud-config
+packages:
+  - ca-certificates
+  - curl
+
+groups:
+  - docker
+
+system_info:
+  default_user:
+    groups: [docker]
+
+ssh_pwauth: false
+
+users:
+  - name: ${default_user}
+    groups:
+      - sudo
+      - docker
+    sudo:
+      - ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    lock_passwd: true
+    ssh_authorized_keys:
+      - ${default_ssh_key}
+%{ for user_key, user in additional_users ~}
+  - name: ${user.name}
+    groups:
+%{ for group in user.groups ~}
+      - ${group}
+%{ endfor ~}
+    shell: /bin/bash
+    lock_passwd: true
+    ssh_authorized_keys:
+      - ${user.ssh_key}
+%{ endfor ~}
+
+write_files:
+  - path: /home/${default_user}/docker-cleanup.sh
+    owner: ${default_user}:${default_user}
+    permissions: '0700'
+    content: |
+      #!/bin/bash
+      docker system prune -af
+
+runcmd:
+  - ufw disable
+  - |
+    # Install Docker using official Docker repository
+    install -m 0755 -d /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+    chmod a+r /etc/apt/keyrings/docker.asc
+
+    # Add the repository to Apt sources (supports both ARM and AMD64)
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+    # Update and install Docker
+    apt-get update
+    apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+    # Verify installation
+    docker --version
+    docker compose version
+  - echo "0 23 * * * /home/${default_user}/docker-cleanup.sh" | crontab -u ${default_user} -

@@ -1,0 +1,41 @@
+name: 'Deploy with Docker Compose'
+description: 'Composite action to deploy using Docker Compose with SSH'
+inputs:
+  user:
+    description: 'SSH user'
+    required: true
+  server:
+    description: 'SSH server'
+    required: true
+  ssh-key:
+    description: 'SSH key'
+    required: true
+  ssh-known-hosts:
+    description: 'SSH known hosts'
+    required: true
+  files:
+    description: 'Space-separated list of docker-compose files'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup SSH and Deploy
+      shell: bash
+      run: |
+        ./tools/bash/setup-ssh.sh "$SSH_KEY" "$SSH_KNOWN_HOSTS"
+        ssh -fNT -L /tmp/docker.sock:/var/run/docker.sock "${{ inputs.user }}@${{ inputs.server }}"
+        docker system prune -af
+        COMPOSE_CMD="docker compose"
+        for f in $FILES; do
+          COMPOSE_CMD="$COMPOSE_CMD -f $f"
+        done
+
+        $COMPOSE_CMD pull
+        $COMPOSE_CMD build
+        $COMPOSE_CMD down --remove-orphans
+        $COMPOSE_CMD up -V -d
+      env:
+        FILES: ${{ inputs.files }}
+        DOCKER_HOST: unix:///tmp/docker.sock
+        SSH_KEY: ${{ inputs.ssh-key }}
+        SSH_KNOWN_HOSTS: ${{ inputs.ssh-known-hosts }}

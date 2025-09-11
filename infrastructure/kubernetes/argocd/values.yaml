@@ -1,0 +1,59 @@
+global:
+  domain: argocd.kbntx.com
+argo-cd:
+  controller:
+    resources:
+      requests:
+        cpu: 150m
+        memory: 350Mi
+  dex:
+    resources:
+      requests:
+        cpu: 1m
+        memory: 120Mi
+  redis:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 15Mi
+  server:
+    resources:
+      requests:
+        cpu: 15m
+        memory: 60Mi
+  repoServer:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 500Mi
+  applicationSet:
+    resources:
+      requests:
+        cpu: 2m
+        memory: 25Mi
+  notifications:
+    resources:
+      requests:
+        cpu: 1m
+        memory: 35Mi
+  configs:
+    cm:
+      admin.enabled: false
+      exec.enabled: true
+      dex.config: |
+        connectors:
+          - type: github
+            id: github
+            name: GitHub
+            config:
+              clientID: $github-oauth-secret:clientId
+              clientSecret: $github-oauth-secret:clientSecret
+              orgs:
+                - name: kbntx-org
+    params:
+      server.insecure: true
+      server.dex.server: http://argocd-dex-server:5556
+      server.dex.server.plaintext: true
+      server.dex.server.strict.tls: false
+      dexserver.disable.tls: 'true'
+      reposerver.repo.cache.expiration: '1h'
