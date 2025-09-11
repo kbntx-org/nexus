@@ -50,6 +50,10 @@ argo-cd:
               clientSecret: $github-oauth-secret:clientSecret
               orgs:
                 - name: kbntx-org
+    rbac:
+      policy.default: ''
+      policy.csv: |
+        g, kbntx-org:platform, role:admin
     params:
       server.insecure: true
       server.dex.server: http://argocd-dex-server:5556
