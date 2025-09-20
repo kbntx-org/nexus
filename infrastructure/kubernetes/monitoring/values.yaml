@@ -25,6 +25,9 @@ kube-prometheus-stack:
       server:
         domain: grafana.kbntx.com
         root_url: 'https://%(domain)s/'
+      auth:
+        disable_login: true
+        disable_login_form: true
       database:
         type: postgres
         host: postgres:5432
