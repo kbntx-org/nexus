@@ -12,20 +12,29 @@ kube-prometheus-stack:
                 storage: 10Gi
 
   grafana:
+    envValueFrom:
+      POSTGRES_USER:
+        secretKeyRef:
+          name: postgres-credentials
+          key: username
+      POSTGRES_PASSWORD:
+        secretKeyRef:
+          name: postgres-credentials
+          key: password
     grafana.ini:
       server:
         domain: grafana.kbntx.com
         root_url: 'https://%(domain)s/'
-      auth:
-        disable_login: true
-        disable_login_form: true
+      database:
+        type: postgres
+        host: postgres:5432
+        name: grafana
+        user: ${POSTGRES_USER}
+        password: ${POSTGRES_PASSWORD}
+        ssl_mode: disable
+
     persistence:
-      type: pvc
-      enabled: true
-      storageClassName: hcloud-volumes
-      accessModes:
-        - ReadWriteOnce
-      size: 10Gi
+      enabled: false
     sidecar:
       dashboards:
         provider:
