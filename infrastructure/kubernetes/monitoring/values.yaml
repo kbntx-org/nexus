@@ -78,6 +78,12 @@ loki:
           index:
             prefix: loki_index_
             period: 24h
+    limits_config:
+      retention_period: 360h
+    compactor:
+      retention_enabled: true
+      retention_delete_delay: 1h
+      delete_request_store: s3
     ingester:
       chunk_encoding: snappy
     auth_enabled: false
