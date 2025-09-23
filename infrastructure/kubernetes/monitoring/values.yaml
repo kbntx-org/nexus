@@ -80,6 +80,7 @@ loki:
             period: 24h
     ingester:
       chunk_encoding: snappy
+    auth_enabled: false
     tracing:
       enabled: true
     querier:
