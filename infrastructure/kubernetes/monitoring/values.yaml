@@ -68,6 +68,8 @@ loki:
           secretKeyRef:
             name: s3-loki-credentials
             key: bucketName
+  chunksCache:
+    enabled: false
   loki:
     schemaConfig:
       configs:
