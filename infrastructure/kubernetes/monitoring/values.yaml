@@ -122,3 +122,11 @@ promtail:
     clients:
       - url: http://monitoring-loki-gateway/loki/api/v1/push
         tenant_id: 1
+    snippets:
+      extraRelabelConfigs:
+        - action: replace
+          source_labels: [__meta_kubernetes_pod_controller_kind]
+          target_label: kind_name
+        - action: replace
+          source_labels: [__meta_kubernetes_pod_controller_name]
+          target_label: controller_name
