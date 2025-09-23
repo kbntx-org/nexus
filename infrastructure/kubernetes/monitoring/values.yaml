@@ -116,3 +116,8 @@ loki:
     enabled: false
   ruler:
     enabled: false
+
+promtail:
+  clients:
+    - url: http://monitoring-loki-gateway/loki/api/v1/push
+      tenant_id: 1
