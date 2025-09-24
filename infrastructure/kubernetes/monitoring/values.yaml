@@ -24,6 +24,10 @@ victoria-metrics-single:
               action: keep
 
 grafana:
+  admin:
+    existingSecret: grafana-credentials
+    userKey: username
+    passwordKey: password
   envValueFrom:
     POSTGRES_USER:
       secretKeyRef:
