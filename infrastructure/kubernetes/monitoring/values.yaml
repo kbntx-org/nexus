@@ -1,47 +1,34 @@
-kube-prometheus-stack:
-  prometheus:
-    prometheusSpec:
-      storageSpec:
-        volumeClaimTemplate:
-          spec:
-            storageClassName: hcloud-volumes
-            accessModes:
-              - ReadWriteOnce
-            resources:
-              requests:
-                storage: 10Gi
+grafana:
+  envValueFrom:
+    POSTGRES_USER:
+      secretKeyRef:
+        name: postgres-credentials
+        key: username
+    POSTGRES_PASSWORD:
+      secretKeyRef:
+        name: postgres-credentials
+        key: password
+  grafana.ini:
+    server:
+      domain: grafana.kbntx.com
+      root_url: 'https://%(domain)s/'
+    auth:
+      disable_login: true
+      disable_login_form: true
+    database:
+      type: postgres
+      host: postgres:5432
+      name: grafana
+      user: ${POSTGRES_USER}
+      password: ${POSTGRES_PASSWORD}
+      ssl_mode: disable
 
-  grafana:
-    envValueFrom:
-      POSTGRES_USER:
-        secretKeyRef:
-          name: postgres-credentials
-          key: username
-      POSTGRES_PASSWORD:
-        secretKeyRef:
-          name: postgres-credentials
-          key: password
-    grafana.ini:
-      server:
-        domain: grafana.kbntx.com
-        root_url: 'https://%(domain)s/'
-      auth:
-        disable_login: true
-        disable_login_form: true
-      database:
-        type: postgres
-        host: postgres:5432
-        name: grafana
-        user: ${POSTGRES_USER}
-        password: ${POSTGRES_PASSWORD}
-        ssl_mode: disable
-
-    persistence:
-      enabled: false
-    sidecar:
-      dashboards:
-        provider:
-          allowUiUpdates: true
+  persistence:
+    enabled: false
+  sidecar:
+    dashboards:
+      provider:
+        allowUiUpdates: true
 
 loki:
   global:
