@@ -51,7 +51,8 @@
           "buildTarget": "portfolio-frontend:build:production"
         },
         "development": {
-          "buildTarget": "portfolio-frontend:build:development"
+          "buildTarget": "portfolio-frontend:build:development",
+          "host": "0.0.0.0"
         }
       },
       "defaultConfiguration": "development"
