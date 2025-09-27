@@ -163,7 +163,7 @@ export interface Project {
       </div>
 
       <div
-        class="bg-card border-border fixed bottom-0 left-0 right-0 max-h-[90vh] transform overflow-y-auto rounded-t-2xl border-t shadow-2xl transition-transform duration-300 ease-out lg:hidden"
+        class="bg-card border-border pb-safe fixed bottom-0 left-0 right-0 max-h-[90vh] transform overflow-y-auto rounded-t-2xl border-t shadow-2xl transition-transform duration-300 ease-out lg:hidden"
         [class]="isOpening ? 'translate-y-0' : 'translate-y-full'"
         (click)="$event.stopPropagation()"
       >
