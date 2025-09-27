@@ -1,54 +1,71 @@
 <div class="bg-background text-foreground min-h-screen py-8 md:py-12">
   <div class="mx-auto max-w-6xl px-4">
-    <h1
-      class="text-foreground animate-slide-in-up mb-4 text-center text-4xl font-bold sm:text-5xl lg:text-6xl"
+    <div
+      class="animate-slide-in-up opacity-0 will-change-transform"
+      style="animation-delay: 0.1s; animation-fill-mode: forwards"
     >
-      My Projects
-    </h1>
-    <p
-      class="text-muted-foreground animate-slide-in-up mb-12 text-center text-lg sm:text-xl"
-      style="animation-delay: 0.2s"
-    >
-      A showcase of my recent work and technical expertise
-    </p>
+      <h1 class="text-foreground mb-4 text-center text-4xl font-bold sm:text-5xl lg:text-6xl">
+        My Projects
+      </h1>
+      <p class="text-muted-foreground mb-12 text-center text-lg sm:text-xl">
+        A showcase of my recent work and technical expertise
+      </p>
+    </div>
 
     <section class="space-y-8">
       <div class="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8 lg:grid-cols-3">
-        @for (project of projects; track project; let i = $index) {
+        @for (project of projects; track project.id; let i = $index) {
           <div
-            class="bg-card border-border animate-slide-in-up overflow-hidden rounded-lg border shadow-lg"
-            [style.animation-delay]="0.4 + i * 0.1 + 's'"
+            class="bg-card animate-slide-in-up border-border flex flex-col overflow-hidden rounded-lg border opacity-0 shadow-lg transition-all duration-300 hover:shadow-xl"
+            [class]="getCardVariation(i)"
+            [style.animation-delay]="'0.5s'"
+            style="animation-fill-mode: forwards"
           >
-            <div class="bg-muted flex h-48 items-center justify-center">
-              <div
-                class="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#667eea] to-[#764ba2] text-2xl font-semibold text-white"
-              >
-                {{ project.title.charAt(0) }}
+            <div class="flex flex-1 flex-col p-6">
+              <div class="mb-3 flex items-center gap-3">
+                @if (project.logo) {
+                  <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center">
+                    <img
+                      [src]="project.logo"
+                      [alt]="project.title + ' logo'"
+                      class="h-full w-full object-contain"
+                    />
+                  </div>
+                } @else {
+                  <div
+                    class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full text-lg font-semibold text-white shadow-lg"
+                    [class]="getLogoGradient(i)"
+                  >
+                    {{ project.title.charAt(0) }}
+                  </div>
+                }
+                <h3 class="text-foreground text-xl font-semibold">{{ project.title }}</h3>
               </div>
-            </div>
-            <div class="p-6">
-              <h3 class="text-foreground mb-3 text-xl font-semibold">{{ project.title }}</h3>
               <p class="text-muted-foreground mb-4 leading-relaxed">{{ project.description }}</p>
               <div class="mb-6 flex flex-wrap gap-2">
-                @for (tech of project.tech; track tech) {
+                @for (tech of project.tech.slice(0, 6); track tech; let techIndex = $index) {
                   <span
-                    class="bg-secondary text-secondary-foreground rounded-full px-3 py-1 text-sm font-medium"
+                    class="rounded-full px-3 py-1 text-sm font-medium"
+                    [class]="getTechTagColor(techIndex)"
                     >{{ tech }}</span
                   >
                 }
               </div>
-              <div class="flex gap-3">
+              <div class="mt-auto flex justify-start gap-3">
                 <button
-                  class="text-foreground border-border hover:bg-accent hover:text-accent-foreground flex-1 rounded-md border bg-transparent px-4 py-2 font-medium transition-all duration-200"
+                  class="text-foreground border-border hover:bg-accent hover:text-accent-foreground rounded-md border bg-transparent px-4 py-2 font-medium transition-all duration-200"
                   (click)="openProjectModal(project)"
                 >
                   View Project
                 </button>
-                <button
-                  class="text-muted-foreground border-border hover:bg-accent hover:text-accent-foreground flex-1 rounded-md border bg-transparent px-4 py-2 font-medium transition-all duration-200"
-                >
-                  Source Code
-                </button>
+                @if (project.githubUrl) {
+                  <button
+                    class="text-muted-foreground border-border hover:bg-accent hover:text-accent-foreground rounded-md border bg-transparent px-4 py-2 font-medium transition-all duration-200"
+                    (click)="openSourceCode(project.githubUrl!)"
+                  >
+                    Source Code
+                  </button>
+                }
               </div>
             </div>
           </div>

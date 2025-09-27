@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
+import { LucideAngularModule, ChevronDown } from 'lucide-angular';
 
 import { EXPERIENCES, Experience } from './data/experiences.data';
 
 @Component({
   selector: 'app-experiences',
+  imports: [LucideAngularModule],
   template: `
     <div class="bg-background text-foreground py-8 md:py-12">
       <div class="mx-auto max-w-6xl px-4">
@@ -12,7 +14,7 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
           style="animation-delay: 0.1s; animation-fill-mode: forwards;"
         >
           <h1 class="text-foreground mb-4 text-center text-4xl font-bold sm:text-5xl lg:text-6xl">
-            My Experience
+            My Experiences
           </h1>
           <p class="text-muted-foreground mb-12 text-center text-lg sm:text-xl">
             My professional journey and career progression
@@ -67,25 +69,16 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
                           </div>
                           <button
                             (click)="toggleRole(i, j)"
-                            class="mt-2 flex items-center gap-2 text-[#667eea] transition-colors duration-200 hover:text-[#764ba2] md:mt-0"
+                            class="mt-2 flex items-center gap-2 text-[#667eea] transition-colors duration-200 md:mt-0"
                           >
                             <span class="text-sm font-medium">
                               {{ isRoleExpanded(i, j) ? 'Show Less' : 'Show Details' }}
                             </span>
-                            <svg
+                            <lucide-angular
+                              [img]="ChevronDownIcon"
                               class="h-4 w-4 transition-transform duration-200"
                               [class.rotate-180]="isRoleExpanded(i, j)"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M19 9l-7 7-7-7"
-                              ></path>
-                            </svg>
+                            ></lucide-angular>
                           </button>
                         </div>
                         <div
@@ -158,6 +151,9 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
 export class ExperiencesComponent {
   public experiences: Experience[] = EXPERIENCES;
   public expandedRoles: Set<string> = new Set();
+
+  // Lucide icons
+  public readonly ChevronDownIcon = ChevronDown;
 
   public toggleRole(experienceIndex: number, roleIndex: number): void {
     const key = `${experienceIndex}-${roleIndex}`;

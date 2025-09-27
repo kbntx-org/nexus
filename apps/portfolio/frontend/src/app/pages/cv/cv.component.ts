@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
+import { LucideAngularModule, ChevronLeft, ChevronRight, Download } from 'lucide-angular';
 
 @Component({
   selector: 'app-cv',
-  imports: [],
+  imports: [LucideAngularModule],
   template: `
     <div class="bg-background text-foreground py-8 md:py-12">
       <div class="mx-auto max-w-6xl px-4">
@@ -60,14 +61,7 @@ import { Component } from '@angular/core';
                 [disabled]="currentPage === 0"
                 class="hover:bg-muted rounded-full p-2 transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M15 19l-7-7 7-7"
-                  ></path>
-                </svg>
+                <lucide-angular [img]="ChevronLeftIcon" class="h-5 w-5"></lucide-angular>
               </button>
 
               <div class="flex gap-2">
@@ -90,14 +84,7 @@ import { Component } from '@angular/core';
                 [disabled]="currentPage === 1"
                 class="hover:bg-muted rounded-full p-2 transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 5l7 7-7 7"
-                  ></path>
-                </svg>
+                <lucide-angular [img]="ChevronRightIcon" class="h-5 w-5"></lucide-angular>
               </button>
             </div>
           </div>
@@ -115,14 +102,7 @@ import { Component } from '@angular/core';
               [disabled]="currentPage === 0"
               class="hover:bg-muted rounded-full p-1.5 transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M15 19l-7-7 7-7"
-                ></path>
-              </svg>
+              <lucide-angular [img]="ChevronLeftIcon" class="h-4 w-4"></lucide-angular>
             </button>
 
             <div class="flex gap-2">
@@ -145,14 +125,7 @@ import { Component } from '@angular/core';
               [disabled]="currentPage === 1"
               class="hover:bg-muted rounded-full p-1.5 transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 5l7 7-7 7"
-                ></path>
-              </svg>
+              <lucide-angular [img]="ChevronRightIcon" class="h-4 w-4"></lucide-angular>
             </button>
           </div>
         </div>
@@ -167,14 +140,7 @@ import { Component } from '@angular/core';
             download="cv-kenny-talbi.pdf"
             class="bg-primary text-primary-foreground flex items-center gap-2 rounded-lg px-6 py-3 text-base font-medium shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
           >
-            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              ></path>
-            </svg>
+            <lucide-angular [img]="DownloadIcon" class="h-5 w-5"></lucide-angular>
             Download CV
           </a>
         </div>
@@ -184,6 +150,11 @@ import { Component } from '@angular/core';
 })
 export class CvComponent {
   public currentPage = 0;
+
+  // Lucide icons
+  public readonly ChevronLeftIcon = ChevronLeft;
+  public readonly ChevronRightIcon = ChevronRight;
+  public readonly DownloadIcon = Download;
 
   public nextPage(): void {
     if (this.currentPage < 1) {

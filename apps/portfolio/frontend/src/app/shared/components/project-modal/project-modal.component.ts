@@ -1,21 +1,29 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
+import {
+  LucideAngularModule,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  ExternalLink,
+  Github
+} from 'lucide-angular';
 
 export interface Project {
   title: string;
   description: string;
   tech: string[];
-  image: string;
   longDescription?: string;
   features?: string[];
   liveUrl?: string;
   githubUrl?: string;
   images?: string[];
+  logo?: string;
 }
 
 @Component({
   selector: 'app-project-modal',
-  imports: [CommonModule],
+  imports: [CommonModule, LucideAngularModule],
   template: `
     <div
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
@@ -25,26 +33,16 @@ export interface Project {
         class="bg-card border-border custom-scrollbar relative mx-4 box-border hidden max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-lg border shadow-2xl lg:block"
         (click)="$event.stopPropagation()"
       >
-        <button
-          class="bg-background border-border text-foreground hover:bg-accent absolute right-4 top-4 z-10 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border transition-all duration-200 hover:scale-110"
-          (click)="closeModal()"
-        >
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-
-        <div class="border-border border-b p-8 pb-4">
-          <h2 class="text-foreground mb-2 text-3xl font-bold">{{ project.title }}</h2>
-          <p class="text-muted-foreground text-lg leading-relaxed">{{ project.description }}</p>
+        <div class="border-border border-b p-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-foreground text-2xl font-bold">{{ project.title }}</h2>
+            <button
+              class="bg-background border-border text-foreground hover:bg-accent flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border transition-all duration-200 hover:scale-110"
+              (click)="closeModal()"
+            >
+              <lucide-angular [img]="XIcon" class="h-6 w-6"></lucide-angular>
+            </button>
+          </div>
         </div>
 
         <div class="p-8 pt-6">
@@ -56,54 +54,36 @@ export interface Project {
                   [style.transform]="'translateX(-' + currentImageIndex * 100 + '%)'"
                 >
                   <div
-                    class="bg-muted flex h-full min-w-full items-center justify-center"
+                    class="h-full w-full flex-shrink-0"
                     *ngFor="let image of project.images; let i = index"
                   >
-                    <div
-                      class="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-[#667eea] to-[#764ba2] text-2xl font-semibold text-white"
-                    >
-                      {{ project.title.charAt(0) }}
-                    </div>
+                    <img
+                      [src]="image"
+                      [alt]="project.title + ' image ' + (i + 1)"
+                      class="h-full w-full object-contain p-2"
+                    />
                   </div>
                 </div>
               </div>
 
               <button
-                class="bg-background/90 border-border text-foreground hover:bg-accent z-5 absolute left-4 top-1/2 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border transition-all duration-200 hover:scale-110"
+                class="bg-background/90 border-border text-foreground hover:bg-accent absolute left-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border transition-all duration-200 hover:scale-110"
                 (click)="previousImage()"
                 *ngIf="project.images.length > 1"
               >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <polyline points="15,18 9,12 15,6"></polyline>
-                </svg>
+                <lucide-angular [img]="ChevronLeftIcon" class="h-5 w-5"></lucide-angular>
               </button>
 
               <button
-                class="bg-background/90 border-border text-foreground hover:bg-accent z-5 absolute right-4 top-1/2 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border transition-all duration-200 hover:scale-110"
+                class="bg-background/90 border-border text-foreground hover:bg-accent absolute right-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border transition-all duration-200 hover:scale-110"
                 (click)="nextImage()"
                 *ngIf="project.images.length > 1"
               >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <polyline points="9,18 15,12 9,6"></polyline>
-                </svg>
+                <lucide-angular [img]="ChevronRightIcon" class="h-5 w-5"></lucide-angular>
               </button>
 
               <div
-                class="z-5 absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2"
+                class="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-2"
                 *ngIf="project.images.length > 1"
               >
                 <button
@@ -123,9 +103,10 @@ export interface Project {
           <div class="space-y-8">
             <div>
               <h3 class="text-foreground mb-4 text-xl font-semibold">About this project</h3>
-              <p class="text-muted-foreground leading-relaxed">
-                {{ project.longDescription || project.description }}
-              </p>
+              <p
+                [innerHTML]="project.longDescription || project.description"
+                class="text-muted-foreground leading-relaxed"
+              ></p>
             </div>
 
             <div *ngIf="project.features && project.features.length > 0">
@@ -154,7 +135,10 @@ export interface Project {
           </div>
         </div>
 
-        <div class="border-border bg-muted/30 border-t p-8 pt-6">
+        <div
+          class="border-border bg-muted/30 border-t p-8 pt-6"
+          *ngIf="project.liveUrl || project.githubUrl"
+        >
           <div class="flex w-full flex-wrap gap-4">
             <a
               *ngIf="project.liveUrl"
@@ -162,18 +146,7 @@ export interface Project {
               target="_blank"
               class="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-2 rounded-md px-6 py-3 font-medium transition-all duration-200 hover:-translate-y-0.5"
             >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                <polyline points="15,3 21,3 21,9"></polyline>
-                <line x1="10" y1="14" x2="21" y2="3"></line>
-              </svg>
+              <lucide-angular [img]="ExternalLinkIcon" class="h-4 w-4"></lucide-angular>
               Live Demo
             </a>
             <a
@@ -182,18 +155,7 @@ export interface Project {
               target="_blank"
               class="text-foreground border-border hover:bg-accent hover:text-accent-foreground inline-flex items-center gap-2 rounded-md border bg-transparent px-6 py-3 font-medium transition-all duration-200 hover:-translate-y-0.5"
             >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path
-                  d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
-                ></path>
-              </svg>
+              <lucide-angular [img]="GithubIcon" class="h-4 w-4"></lucide-angular>
               View Code
             </a>
           </div>
@@ -201,89 +163,61 @@ export interface Project {
       </div>
 
       <div
-        class="bg-card border-border fixed bottom-0 left-0 right-0 max-h-[85vh] transform overflow-y-auto rounded-t-2xl border-t shadow-2xl transition-transform duration-300 ease-out lg:hidden"
+        class="bg-card border-border fixed bottom-0 left-0 right-0 max-h-[90vh] transform overflow-y-auto rounded-t-2xl border-t shadow-2xl transition-transform duration-300 ease-out lg:hidden"
         [class]="isOpening ? 'translate-y-0' : 'translate-y-full'"
         (click)="$event.stopPropagation()"
       >
-        <button
-          class="bg-background border-border text-foreground hover:bg-accent absolute right-4 top-4 z-10 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border transition-all duration-200 hover:scale-110"
-          (click)="closeModal()"
-        >
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-
-        <div class="border-border border-b p-6 pb-4">
-          <h2 class="text-foreground mb-2 pr-12 text-2xl font-bold">{{ project.title }}</h2>
-          <p class="text-muted-foreground text-base leading-relaxed">{{ project.description }}</p>
+        <div class="border-border border-b p-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-foreground text-xl font-bold">{{ project.title }}</h2>
+            <button
+              class="bg-background border-border text-foreground hover:bg-accent flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border transition-all duration-200 hover:scale-110"
+              (click)="closeModal()"
+            >
+              <lucide-angular [img]="XIcon" class="h-6 w-6"></lucide-angular>
+            </button>
+          </div>
         </div>
 
         <div class="p-6 pt-4">
           <div class="mb-6" *ngIf="project.images && project.images.length > 0">
             <div class="relative overflow-hidden rounded-lg">
-              <div class="h-48 w-full overflow-hidden">
+              <div class="h-56 w-full overflow-hidden">
                 <div
                   class="flex h-full w-full transition-transform duration-300 ease-in-out"
                   [style.transform]="'translateX(-' + currentImageIndex * 100 + '%)'"
                 >
                   <div
-                    class="bg-muted flex h-full min-w-full items-center justify-center"
+                    class="h-full w-full flex-shrink-0"
                     *ngFor="let image of project.images; let i = index"
                   >
-                    <div
-                      class="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#667eea] to-[#764ba2] text-xl font-semibold text-white"
-                    >
-                      {{ project.title.charAt(0) }}
-                    </div>
+                    <img
+                      [src]="image"
+                      [alt]="project.title + ' image ' + (i + 1)"
+                      class="h-full w-full object-contain p-2"
+                    />
                   </div>
                 </div>
               </div>
 
               <button
-                class="bg-background/90 border-border text-foreground hover:bg-accent z-5 absolute left-2 top-1/2 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border transition-all duration-200 hover:scale-110"
+                class="bg-background/90 border-border text-foreground hover:bg-accent absolute left-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border transition-all duration-200 hover:scale-110"
                 (click)="previousImage()"
                 *ngIf="project.images.length > 1"
               >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <polyline points="15,18 9,12 15,6"></polyline>
-                </svg>
+                <lucide-angular [img]="ChevronLeftIcon" class="h-4 w-4"></lucide-angular>
               </button>
 
               <button
-                class="bg-background/90 border-border text-foreground hover:bg-accent z-5 absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border transition-all duration-200 hover:scale-110"
+                class="bg-background/90 border-border text-foreground hover:bg-accent absolute right-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border transition-all duration-200 hover:scale-110"
                 (click)="nextImage()"
                 *ngIf="project.images.length > 1"
               >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <polyline points="9,18 15,12 9,6"></polyline>
-                </svg>
+                <lucide-angular [img]="ChevronRightIcon" class="h-4 w-4"></lucide-angular>
               </button>
 
               <div
-                class="z-5 absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-1.5"
+                class="absolute bottom-2 left-1/2 z-10 flex -translate-x-1/2 gap-1.5"
                 *ngIf="project.images.length > 1"
               >
                 <button
@@ -303,9 +237,10 @@ export interface Project {
           <div class="space-y-6">
             <div>
               <h3 class="text-foreground mb-3 text-lg font-semibold">About this project</h3>
-              <p class="text-muted-foreground text-sm leading-relaxed">
-                {{ project.longDescription || project.description }}
-              </p>
+              <p
+                [innerHTML]="project.longDescription || project.description"
+                class="text-muted-foreground text-sm leading-relaxed"
+              ></p>
             </div>
 
             <div *ngIf="project.features && project.features.length > 0">
@@ -334,7 +269,10 @@ export interface Project {
           </div>
         </div>
 
-        <div class="border-border bg-card sticky bottom-0 border-t p-6 pt-4">
+        <div
+          class="border-border bg-card sticky bottom-0 border-t p-6 pt-4"
+          *ngIf="project.liveUrl || project.githubUrl"
+        >
           <div class="flex gap-3">
             <a
               *ngIf="project.liveUrl"
@@ -342,18 +280,7 @@ export interface Project {
               target="_blank"
               class="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-3 font-medium transition-all duration-200 active:scale-95"
             >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                <polyline points="15,3 21,3 21,9"></polyline>
-                <line x1="10" y1="14" x2="21" y2="3"></line>
-              </svg>
+              <lucide-angular [img]="ExternalLinkIcon" class="h-4 w-4"></lucide-angular>
               Live Demo
             </a>
             <a
@@ -362,18 +289,7 @@ export interface Project {
               target="_blank"
               class="text-foreground border-border hover:bg-accent hover:text-accent-foreground inline-flex flex-1 items-center justify-center gap-2 rounded-md border bg-transparent px-4 py-3 font-medium transition-all duration-200 active:scale-95"
             >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path
-                  d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
-                ></path>
-              </svg>
+              <lucide-angular [img]="GithubIcon" class="h-4 w-4"></lucide-angular>
               View Code
             </a>
           </div>
@@ -414,6 +330,13 @@ export class ProjectModalComponent implements OnInit, OnDestroy {
 
   public currentImageIndex = 0;
   public isOpening = false;
+
+  // Lucide icons
+  public readonly XIcon = X;
+  public readonly ChevronLeftIcon = ChevronLeft;
+  public readonly ChevronRightIcon = ChevronRight;
+  public readonly ExternalLinkIcon = ExternalLink;
+  public readonly GithubIcon = Github;
 
   public ngOnInit(): void {
     document.body.style.overflow = 'hidden';

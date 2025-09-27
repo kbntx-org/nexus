@@ -1,128 +1,118 @@
 export interface Project {
+  id: string;
   title: string;
   description: string;
   tech: string[];
-  image: string;
   longDescription?: string;
   features?: string[];
   liveUrl?: string;
   githubUrl?: string;
   images?: string[];
+  logo?: string;
 }
 
 export const PROJECTS: Project[] = [
   {
-    title: 'E-Commerce Platform',
+    id: 'nexus-observability',
+    title: 'Nexus - Monitoring & Observability',
     description:
-      'A full-stack e-commerce solution with React frontend and Node.js backend, featuring user authentication, payment processing, and admin dashboard.',
-    tech: ['React', 'Node.js', 'MongoDB', 'Stripe'],
-    image: 'assets/images/ecommerce.jpg',
-    longDescription:
-      'A comprehensive e-commerce platform built with modern web technologies. Features include user authentication, product catalog, shopping cart, payment processing with Stripe, order management, and an admin dashboard for inventory and sales tracking.',
-    features: [
-      'User authentication and authorization',
-      'Product catalog with search and filtering',
-      'Shopping cart and checkout process',
-      'Payment processing with Stripe',
-      'Order tracking and management',
-      'Admin dashboard for inventory control'
+      'Lightweight Kubernetes-native observability stack with Grafana, VictoriaMetrics, Loki, and automated S3 backups.',
+    tech: [
+      'Kubernetes',
+      'VictoriaMetrics',
+      'Grafana',
+      'Loki',
+      'Promtail',
+      'PostgreSQL',
+      'Hetzner Cloud',
+      'Cloudflare',
+      'S3',
+      'Helm',
+      'GitOps',
+      'ArgoCD'
     ],
-    liveUrl: 'https://ecommerce-demo.com',
-    githubUrl: 'https://github.com/username/ecommerce-platform'
+    logo: 'https://nbg1.your-objectstorage.com/nexus-public-statics/images/grafana-logo.svg',
+    images: [
+      'https://nbg1.your-objectstorage.com/nexus-public-statics/images/ingress-nginx-dashboard.png',
+      'https://nbg1.your-objectstorage.com/nexus-public-statics/images/node-k8s-dashboard.png',
+      'https://nbg1.your-objectstorage.com/nexus-public-statics/images/api-server-dashboard.png'
+    ],
+    longDescription: `Nexus is my homelab project where I experiment with building a production-grade observability platform. <br/><br/>
+    The stack provides full monitoring, logging, and alerting for Kubernetes clusters and hosted applications.
+    VictoriaMetrics replaces Prometheus to enable seamless live backups to S3, reducing operational complexity and ensuring resilience.
+    Combined with Grafana dashboards, Loki logs, and GitOps workflows via ArgoCD, the system offers real-time visibility, disaster recovery, and streamlined deployments.`,
+    features: [
+      'VictoriaMetrics metrics collection with live S3 backups',
+      'Autodiscovery of cluster metrics with kube-state-metrics and node-exporter',
+      'Loki for centralized logging aggregation',
+      'Grafana dashboards for system, cluster, and application insights',
+      'Grafana alerting for node and application health alerts',
+      'Kuma uptime integration for application health monitoring',
+      'Ingress-nginx observability (traffic, domains, error ratios)',
+      'Reusable lightweight helm chart',
+      'Stateful services with recurrent backup in S3'
+    ]
   },
   {
-    title: 'Task Management App',
+    id: 'nexus-kubernetes',
+    title: 'Nexus - Kubernetes & Compute Platform',
     description:
-      'A collaborative task management application with real-time updates, drag-and-drop functionality, and team collaboration features.',
-    tech: ['Angular', 'Firebase', 'TypeScript', 'RxJS'],
-    image: 'assets/images/task-manager.jpg',
-    longDescription:
-      'A real-time collaborative task management application that enables teams to organize, track, and complete projects efficiently. Features drag-and-drop functionality, real-time updates, and comprehensive team collaboration tools.',
-    features: [
-      'Real-time task updates and notifications',
-      'Drag-and-drop task organization',
-      'Team collaboration and sharing',
-      'Project templates and workflows',
-      'Progress tracking and analytics',
-      'Mobile-responsive design'
+      'A production-ready Kubernetes infrastructure built on Hetzner Cloud, featuring K3s cluster, Terraform automation, and comprehensive networking setup.',
+    tech: [
+      'Kubernetes',
+      'K3s',
+      'Terraform',
+      'Hetzner Cloud',
+      'Ingress-nginx',
+      'Cloudflared',
+      'ArgoCD',
+      'GitOps',
+      'Helm',
+      'YAML',
+      'Infrastructure as Code',
+      'Distributed system',
+      'Recovery strategy'
     ],
-    liveUrl: 'https://task-manager-demo.com',
-    githubUrl: 'https://github.com/username/task-manager'
+    logo: 'https://nbg1.your-objectstorage.com/nexus-public-statics/images/kubernetes-logo.svg',
+    images: [
+      'https://nbg1.your-objectstorage.com/nexus-public-statics/images/k3s-cluster-schema.png'
+    ],
+    longDescription: `Designed and implemented a scalable Kubernetes platform using K3s on Hetzner Cloud.
+      K3s was chosen because it's a lightweight kubernetes distribution and it comes with some batteries that makes its implementation easier.
+      The foundational infrastructure is fully automated with a terraform module based on a system of node-pools.
+      <br><br>
+      The cluster comes with a few batteries included like ArgoCD, ingress-nginx, the hetzner CSI and finally cloudflared to expose services to the internet.
+      The platform is following GitOps principles as much as possible to have a minimum recovery time in case of disaster.
+      Workloads are mostly stateless and for the stateful ones, an aggresive backup strategy is applied to avoid data loss in case of incident.`,
+    features: [
+      'K3s cluster with multi-node setup',
+      'Terraform module for minimal initialization',
+      'Cloudflared for secure tunneling and edge protection',
+      'Backup and disaster recovery automation',
+      'Gitops driven development with ArgoCD to minimize recovery while having flexibility',
+      'Standardized deployments'
+    ]
   },
   {
-    title: 'Portfolio Website',
+    id: 'portfolio-website',
+    title: 'Portfolio',
     description:
-      'A modern, responsive portfolio website built with Angular and SCSS, featuring smooth animations and dark/light theme switching.',
-    tech: ['Angular', 'SCSS', 'TypeScript', 'Nx'],
-    image: 'assets/images/portfolio.jpg',
-    longDescription:
-      'A modern, responsive portfolio website showcasing professional work and skills. Built with Angular and SCSS, featuring smooth animations, dark/light theme switching, and optimized for performance and accessibility.',
-    features: [
-      'Responsive design for all devices',
-      'Dark/light theme switching',
-      'Smooth scroll animations',
-      'Interactive project showcase',
-      'Contact form integration',
-      'SEO optimized'
+      'A modern, responsive portfolio website built with Angular to showcase my projects and experiences.',
+    tech: ['Angular', 'TypeScript', 'Nx', 'Tailwind CSS', 'RxJS', 'Pre-rendering', 'S3'],
+    logo: 'https://nbg1.your-objectstorage.com/nexus-public-statics/images/kt-logo.jpg',
+    images: [
+      'https://nbg1.your-objectstorage.com/nexus-public-statics/images/portfolio-cv.png',
+      'https://nbg1.your-objectstorage.com/nexus-public-statics/images/portfolio-experiences.png',
+      'https://nbg1.your-objectstorage.com/nexus-public-statics/images/portfolio-homepage.png',
+      'https://nbg1.your-objectstorage.com/nexus-public-statics/images/portfolio-projects-dark-mode.png',
+      'https://nbg1.your-objectstorage.com/nexus-public-statics/images/portfolio-projects-light-mode.png'
     ],
-    liveUrl: 'https://portfolio-demo.com',
-    githubUrl: 'https://github.com/username/portfolio'
-  },
-  {
-    title: 'Weather Dashboard',
-    description:
-      'A weather application that displays current conditions and forecasts using multiple weather APIs with interactive charts and maps.',
-    tech: ['Vue.js', 'Chart.js', 'OpenWeather API', 'Vite'],
-    image: 'assets/images/weather.jpg',
     longDescription:
-      'A comprehensive weather dashboard that provides current conditions, detailed forecasts, and historical weather data. Features interactive charts, maps, and multiple weather API integrations for accurate data.',
+      'A modern, responsive portfolio website showcasing my different projects and experiences. Built with Angular, it is featuring smooth animations, dark/light theme switching. It is was also optimized by using pre-rendering.',
     features: [
-      'Current weather conditions',
-      '7-day and hourly forecasts',
-      'Interactive weather maps',
-      'Historical weather data',
-      'Multiple location support',
-      'Weather alerts and notifications'
-    ],
-    liveUrl: 'https://weather-dashboard.com',
-    githubUrl: 'https://github.com/username/weather-app'
-  },
-  {
-    title: 'Social Media Analytics',
-    description:
-      'A dashboard for tracking social media metrics with data visualization, automated reporting, and trend analysis.',
-    tech: ['React', 'D3.js', 'Python', 'PostgreSQL'],
-    image: 'assets/images/analytics.jpg',
-    longDescription:
-      'A powerful social media analytics dashboard that provides comprehensive insights into social media performance. Features data visualization, automated reporting, trend analysis, and actionable recommendations.',
-    features: [
-      'Multi-platform social media integration',
-      'Real-time data visualization',
-      'Automated report generation',
-      'Trend analysis and predictions',
-      'Custom dashboard creation',
-      'Export and sharing capabilities'
-    ],
-    liveUrl: 'https://analytics-dashboard.com',
-    githubUrl: 'https://github.com/username/social-analytics'
-  },
-  {
-    title: 'Mobile Fitness App',
-    description:
-      'A cross-platform mobile application for tracking workouts, nutrition, and fitness goals with progress visualization.',
-    tech: ['React Native', 'Redux', 'Firebase', 'Expo'],
-    image: 'assets/images/fitness.jpg',
-    longDescription:
-      'A comprehensive fitness tracking application that helps users monitor workouts, nutrition, and progress toward their fitness goals. Features cross-platform compatibility, progress visualization, and social features.',
-    features: [
-      'Workout tracking and planning',
-      'Nutrition and calorie tracking',
-      'Progress visualization and charts',
-      'Social features and challenges',
-      'Offline functionality',
-      'Integration with fitness devices'
-    ],
-    liveUrl: 'https://fitness-app.com',
-    githubUrl: 'https://github.com/username/fitness-app'
+      'Dark/light theme support',
+      'Declarative content management to keep a low maintenance cost',
+      'Pre-rendering for performance optimization'
+    ]
   }
 ];

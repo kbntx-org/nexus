@@ -3,6 +3,7 @@ import { Route } from '@angular/router';
 import { CvComponent } from './pages/cv/cv.component';
 import { ExperiencesComponent } from './pages/experiences/experiences.component';
 import { HomeComponent } from './pages/home/home.component';
+import { ProjectsComponent } from './pages/projects/projects.component';
 
 export const ROUTES: Route[] = [
   {
@@ -18,10 +19,10 @@ export const ROUTES: Route[] = [
     path: 'experiences',
     component: ExperiencesComponent
   },
-  // {
-  //   path: 'projects',
-  //   component: ProjectsComponent
-  // },
+  {
+    path: 'projects',
+    component: ProjectsComponent
+  },
   {
     path: 'cv',
     component: CvComponent

@@ -91,6 +91,18 @@ export const SKILLS: Skill[] = [
     simpleIconName: 'kubernetes'
   },
   {
+    simpleIconName: 'grafana'
+  },
+  {
+    simpleIconName: 'victoriametrics'
+  },
+  {
+    simpleIconName: 'prometheus'
+  },
+  {
+    simpleIconName: 'cloudflare'
+  },
+  {
     simpleIconName: 'drone',
     color: '0095F7'
   },

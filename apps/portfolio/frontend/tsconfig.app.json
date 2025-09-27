@@ -2,9 +2,10 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../../dist/out-tsc",
-    "types": []
+    "target": "ES2022",
+    "useDefineForClassFields": false
   },
   "files": ["src/main.ts"],
-  "include": ["src/**/*.d.ts"],
-  "exclude": ["jest.config.ts", "src/**/*.test.ts", "src/**/*.spec.ts"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["jest.config.ts", "**/*.stories.ts", "**/*.spec.ts", "src/test-setup.ts"]
 }

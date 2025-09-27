@@ -20,7 +20,8 @@ export const EXPERIENCES: Experience[] = [
     company: 'PowerUs (YC S20)',
     location: 'Berlin, Germany',
     duration: '2022 - Present',
-    description: 'PowerUs helps workers find the best jobs, discover new companies & industries, connect with other workers and get further education. On the other side, PowerUs helps attractive employers find these workers to fulfill their projects and grow.',
+    description:
+      'PowerUs helps workers find the best jobs, discover new companies & industries, connect with other workers and get further education. On the other side, PowerUs helps attractive employers find these workers to fulfill their projects and grow.',
     roles: [
       {
         title: 'Senior Platform Engineer',
@@ -37,7 +38,41 @@ export const EXPERIENCES: Experience[] = [
           'Spearheaded infrastructure migration from DigitalOcean to AWS with zero downtime, providing broader range of services',
           'Implemented GitHub Actions integrated with Kubernetes to enhance developer experience and reliability'
         ],
-        technologies: ['Kubernetes', 'ArgoCD', 'AWS', 'GitHub Actions', 'Terraform', 'Angular', 'NestJS', 'Python']
+        technologies: [
+          'Sentry',
+          'Terraform',
+          'RabbitMQ',
+          'Continuous Integration and Continuous Delivery (CI/CD)',
+          'REST APIs',
+          'MongoDB',
+          'NoSQL',
+          'Node.js',
+          'Nginx',
+          'Agile Methodologies',
+          'Angular',
+          'Cypress',
+          'Observability',
+          'CapacitorJS',
+          'DigitalOcean',
+          'TypeScript',
+          'Github Actions',
+          'Bash',
+          'NestJS',
+          'Datadog',
+          'Infrastructure as code (IaC)',
+          'jsonnet',
+          'NX',
+          'Docker',
+          'DevOps',
+          'Software as a Service (SaaS)',
+          'GitHub',
+          'Linux',
+          'Monitoring',
+          'Mobile Application Development',
+          'Drone CI',
+          'HashiCorp Vault',
+          'Amazon S3'
+        ]
       },
       {
         title: 'Senior Full Stack & DevOps Engineer',
@@ -54,7 +89,35 @@ export const EXPERIENCES: Experience[] = [
           'Changed ETL process from MongoDB to BigQuery, reducing costs by switching to data-transferred pricing',
           'Introduced Terraform to automate environment provisioning and increase infrastructure visibility'
         ],
-        technologies: ['Angular', 'MongoDB', 'BigQuery', 'Terraform', 'Storybook', 'CapacitorJS']
+        technologies: [
+          'RabbitMQ',
+          'Continuous Integration and Continuous Delivery (CI/CD)',
+          'REST APIs',
+          'MongoDB',
+          'NoSQL',
+          'Node.js',
+          'Agile Methodologies',
+          'Progressive Web Applications (PWAs)',
+          'Angular',
+          'Cypress',
+          'Observability',
+          'CapacitorJS',
+          'DigitalOcean',
+          'TypeScript',
+          'Bash',
+          'NestJS',
+          'Datadog',
+          'NX',
+          'Docker',
+          'DevOps',
+          'Software as a Service (SaaS)',
+          'GitHub',
+          'Monitoring',
+          'Mobile Application Development',
+          'Drone CI',
+          'HashiCorp Vault',
+          'Fastlane'
+        ]
       },
       {
         title: 'Full Stack & DevOps Engineer',
@@ -72,7 +135,35 @@ export const EXPERIENCES: Experience[] = [
           'Automated mobile build process using GitHub Actions and Fastlane',
           'Upgraded Angular from 12 to 16 and NX monorepo management tool'
         ],
-        technologies: ['Angular', 'CapacitorJS', 'GitHub Actions', 'Fastlane', 'NX', 'iOS']
+        technologies: [
+          'RabbitMQ',
+          'Continuous Integration and Continuous Delivery (CI/CD)',
+          'REST APIs',
+          'MongoDB',
+          'NoSQL',
+          'Node.js',
+          'Agile Methodologies',
+          'Progressive Web Applications (PWAs)',
+          'Angular',
+          'Cypress',
+          'Observability',
+          'CapacitorJS',
+          'DigitalOcean',
+          'TypeScript',
+          'Bash',
+          'NestJS',
+          'Datadog',
+          'NX',
+          'Docker',
+          'DevOps',
+          'Software as a Service (SaaS)',
+          'GitHub',
+          'Monitoring',
+          'Mobile Application Development',
+          'Drone CI',
+          'HashiCorp Vault',
+          'Fastlane'
+        ]
       },
       {
         title: 'Junior Full Stack Engineer',
@@ -89,7 +180,24 @@ export const EXPERIENCES: Experience[] = [
           'Conducted frontend refactoring on various components/pages',
           'Actively participated in ideation and estimation meetings'
         ],
-        technologies: ['Angular', 'Google Ads', 'Frontend Architecture']
+        technologies: [
+          'RabbitMQ',
+          'Mixpanel',
+          'REST APIs',
+          'MongoDB',
+          'Node.js',
+          'Agile Methodologies',
+          'Angular',
+          'Cypress',
+          'Google Tag Manager',
+          'TypeScript',
+          'NestJS',
+          'Docker',
+          'Software as a Service (SaaS)',
+          'GitHub',
+          'Drone CI',
+          'Google Ads'
+        ]
       }
     ]
   },
@@ -97,7 +205,8 @@ export const EXPERIENCES: Experience[] = [
     company: 'APOLLO | CODING LIFE',
     location: 'Lyon, Auvergne-Rhône-Alpes, France',
     duration: '2020 - 2022',
-    description: 'Apollo is a Lyon-based IT consulting company specializing in both customer support services and custom software development from scratch. The company operates through an R&D department focused on full-cycle project development and continuous maintenance services.',
+    description:
+      'Apollo is a Lyon-based IT consulting company specializing in both customer support services and custom software development from scratch. The company operates through an R&D department focused on full-cycle project development and continuous maintenance services.',
     roles: [
       {
         title: 'Software Engineer',
@@ -114,7 +223,21 @@ export const EXPERIENCES: Experience[] = [
           'Developed SelectClim application for AC system selection with automated quote generation',
           'Conducted system enhancements and integration into REXEL marketplace'
         ],
-        technologies: ['React', '.NET 6', 'SQL Server', 'Azure', 'Docker', 'Angular 13', 'Cucumber.js']
+        technologies: [
+          'Continuous Integration and Continuous Delivery (CI/CD)',
+          'REST APIs',
+          'Microsoft Azure',
+          'NoSQL',
+          'Node.js',
+          'Agile Methodologies',
+          'Angular',
+          'TypeScript',
+          'Docker',
+          'DevOps',
+          '.NET Core',
+          'Azure DevOps',
+          'Entity Framework'
+        ]
       },
       {
         title: 'Software Engineer Intern',
@@ -131,7 +254,15 @@ export const EXPERIENCES: Experience[] = [
           'Operated within SCRUM framework with team collaboration',
           'Enhanced teamwork and project delivery'
         ],
-        technologies: ['Angular 10', '.NET Core 3.1', 'Microsoft SQL Server', 'NGRX']
+        technologies: [
+          'REST APIs',
+          'Agile Methodologies',
+          'Angular',
+          'TypeScript',
+          '.NET Core',
+          'Azure DevOps',
+          'Entity Framework'
+        ]
       }
     ]
   }
