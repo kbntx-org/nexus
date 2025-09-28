@@ -27,7 +27,7 @@ spec:
             - name: PG_META_DB_PORT
               value: "5432"
             - name: PG_META_DB_NAME
-              value: supabase-db
+              value: postgres
             - name: PG_META_DB_USER
               valueFrom:
                 secretKeyRef:
