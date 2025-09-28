@@ -27,15 +27,18 @@ spec:
             - name: DB_PORT
               value: "5432"
             - name: DB_USER
-              secretKeyRef:
+              valueFrom:
+                secretKeyRef:
                   name: supabase-secrets
                   key: dbUser
             - name: DB_PASSWORD
-              secretKeyRef:
+              valueFrom:
+                secretKeyRef:
                   name: supabase-secrets
                   key: dbPassword
             - name: DB_NAME
-              secretKeyRef:
+              valueFrom:
+                secretKeyRef:
                   name: supabase-secrets
                   key: dbName
             - name: DB_AFTER_CONNECT_QUERY
