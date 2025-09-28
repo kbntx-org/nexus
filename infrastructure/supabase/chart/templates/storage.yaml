@@ -70,11 +70,6 @@ spec:
               value: "52428800"
             - name: STORAGE_BACKEND
               value: "s3"
-            - name: REGION
-              valueFrom:
-                secretKeyRef:
-                  name: supabase-secrets
-                  key: AWS_DEFAULT_REGION
             # Optional image transformation
             - name: ENABLE_IMAGE_TRANSFORMATION
               value: "false"
