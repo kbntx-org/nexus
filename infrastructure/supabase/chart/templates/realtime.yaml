@@ -71,12 +71,19 @@ spec:
             - name: ERL_AFLAGS
               value: -proto_dist inet_tcp
           readinessProbe:
-            httpGet:
-              path: /api/tenants/realtime-dev/health
-              port: 4000
+            exec:
+              command:
+                - sh
+                - -c
+                - |
+                  curl -sSfL --head -o /dev/null \
+                    -H "Authorization: Bearer $ANON_KEY" \
+                    http://localhost:4000/api/tenants/realtime-dev/health
             initialDelaySeconds: 5
             periodSeconds: 5
+            timeoutSeconds: 5
             failureThreshold: 3
+
 
 ---
 apiVersion: v1
