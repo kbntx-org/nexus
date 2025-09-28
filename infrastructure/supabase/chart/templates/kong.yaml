@@ -102,7 +102,7 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: kong-config
+  name: supabase-kong-config
 data:
   kong.yml: |
     _format_version: '2.1'

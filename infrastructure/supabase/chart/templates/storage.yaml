@@ -20,27 +20,57 @@ spec:
           ports:
             - containerPort: 5000
           env:
-            # Supabase keys
+            - name: GLOBAL_S3_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: supabase-secrets
+                  key: s3Endpoint
+            - name: GLOBAL_S3_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: supabase-secrets
+                  key: s3Bucket
+            - name: GLOBAL_S3_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: supabase-secrets
+                  key: s3Bucket
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: supabase-secrets
+                  key: s3AccessKeyId
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: supabase-secrets
+                  key: s3SecretAccessKey
+            - name: AWS_REGION
+              value: stub
+            - name: GLOBAL_S3_PROTOCOL
+              value: https
+            - name: GLOBAL_S3_FORCE_PATH_STYLE
+              value: true
             - name: ANON_KEY
               valueFrom:
                 secretKeyRef:
                   name: supabase-secrets
-                  key: ANON_KEY
+                  key: anonKey
             - name: SERVICE_KEY
               valueFrom:
                 secretKeyRef:
                   name: supabase-secrets
-                  key: SERVICE_ROLE_KEY
+                  key: serviceRoleKey
             - name: PGRST_JWT_SECRET
               valueFrom:
                 secretKeyRef:
                   name: supabase-secrets
-                  key: JWT_SECRET
+                  key: jwtSecret
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
                   name: supabase-db-credentials
-                  key: url
+                  key: dbUrlStorage
 
             # Storage config
             - name: FILE_SIZE_LIMIT
@@ -50,12 +80,12 @@ spec:
             - name: REGION
               valueFrom:
                 secretKeyRef:
-                  name: supabase-s3-credentials
+                  name: supabase-secrets
                   key: AWS_DEFAULT_REGION
             - name: GLOBAL_S3_BUCKET
               valueFrom:
                 secretKeyRef:
-                  name: supabase-s3-credentials
+                  name: supabase-secrets
                   key: GLOBAL_S3_BUCKET
 
             # AWS creds

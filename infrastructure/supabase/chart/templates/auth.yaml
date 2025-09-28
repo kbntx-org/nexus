@@ -33,7 +33,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: supabase-secrets
-                  key: dbUrl
+                  key: dbUrlAuth
 
             - name: GOTRUE_SITE_URL
               value: "http://studio.example.com"  # Replace with your site URL

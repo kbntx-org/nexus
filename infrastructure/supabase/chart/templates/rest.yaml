@@ -24,7 +24,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: supabase-secrets
-                  key: dbUrl
+                  key: dbUrlRest
             - name: PGRST_DB_SCHEMAS
               value: "public"
             - name: PGRST_DB_ANON_ROLE
