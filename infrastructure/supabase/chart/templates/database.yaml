@@ -41,8 +41,6 @@ spec:
                 secretKeyRef:
                   name: supabase-secrets
                   key: dbName
-            - name: PGDATA
-              value: /var/lib/postgresql/data/pgdata
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
