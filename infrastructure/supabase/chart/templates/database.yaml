@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: supabase-db
+  labels:
+    app: supabase-db
+spec:
+  serviceName: supabase-db
+  replicas: 1
+  selector:
+    matchLabels:
+      app: supabase-db
+  template:
+    metadata:
+      labels:
+        app: supabase-db
+    spec:
+      containers:
+        - name: db
+          image: supabase/postgres:15.8.1.060
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: supabase-secrets
+                  key: dbPassword
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: supabase-secrets
+                  key: dbName
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: supabase-secrets
+                  key: dbPassword
+            - name: PGDATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: supabase-secrets
+                  key: dbName
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: supabase-secrets
+                  key: jwtSecret
+            - name: JWT_EXP
+              value: "3600"
+          command:
+            - "postgres"
+            - "-c"
+            - "config_file=/etc/postgresql/postgresql.conf"
+            - "-c"
+            - "log_min_messages=fatal"
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "postgres", "-h", "localhost"]
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 10
+          volumeMounts:
+            - name: db-data
+              mountPath: /var/lib/postgresql/data
+            - name: init-sql
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: init-sql
+          configMap:
+            name: supabase-db-init
+
+  volumeClaimTemplates:
+    - metadata:
+        name: db-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 20Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: supabase-db
+  labels:
+    app: supabase-db
+spec:
+  selector:
+    app: supabase-db
+  ports:
+    - port: 5432
+      targetPort: 5432
+      name: postgres

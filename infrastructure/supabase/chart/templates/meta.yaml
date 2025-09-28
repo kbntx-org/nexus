@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: supabase-meta
+  labels:
+    app: supabase-meta
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: supabase-meta
+  template:
+    metadata:
+      labels:
+        app: supabase-meta
+    spec:
+      containers:
+        - name: meta
+          image: supabase/postgres-meta:v0.91.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: PG_META_PORT
+              value: "8080"
+            - name: PG_META_DB_HOST
+              value: supabase-db
+            - name: PG_META_DB_PORT
+              value: "5432"
+            - name: PG_META_DB_NAME
+              value: supabase-db
+            - name: PG_META_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: supabase-secrets
+                  key: dbUser
+            - name: PG_META_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: supabase-secrets
+                  key: dbPassword
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 3
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: supabase-meta
+  labels:
+    app: supabase-meta
+spec:
+  selector:
+    app: supabase-meta
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: http
