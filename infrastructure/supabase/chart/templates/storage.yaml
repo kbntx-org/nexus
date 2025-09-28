@@ -75,11 +75,6 @@ spec:
                 secretKeyRef:
                   name: supabase-secrets
                   key: AWS_DEFAULT_REGION
-            - name: GLOBAL_S3_BUCKET
-              valueFrom:
-                secretKeyRef:
-                  name: supabase-secrets
-                  key: GLOBAL_S3_BUCKET
             # Optional image transformation
             - name: ENABLE_IMAGE_TRANSFORMATION
               value: "false"
