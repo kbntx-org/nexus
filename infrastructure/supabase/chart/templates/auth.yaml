@@ -25,7 +25,7 @@ spec:
             - name: GOTRUE_API_PORT
               value: "9999"
             - name: API_EXTERNAL_URL
-              value: "https://api-supabase.kbntx.com"
+              value: "https://supabase.kbntx.com"
             - name: GOTRUE_DB_DRIVER
               value: "postgres"
             - name: GOTRUE_DB_DATABASE_URL

@@ -88,7 +88,7 @@ metadata:
   name: supabase-kong
 spec:
   rules:
-    - host: api-supabase.kbntx.com
+    - host: supabase.kbntx.com
       http:
         paths:
           - path: /
