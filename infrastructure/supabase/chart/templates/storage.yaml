@@ -64,7 +64,7 @@ spec:
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: supabase-db-credentials
+                  name: supabase-secrets
                   key: dbUrlStorage
             - name: FILE_SIZE_LIMIT
               value: "52428800"
