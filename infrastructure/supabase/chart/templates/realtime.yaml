@@ -61,6 +61,12 @@ spec:
               value: "true"
             - name: RUN_JANITOR
               value: "true"
+            - name: RLIMIT_NOFILE
+              value: "10000"
+            - name: DNS_NODES
+              value:  "''"
+            - name: ERL_AFLAGS
+              value: -proto_dist inet_tcp
           readinessProbe:
             httpGet:
               path: /api/tenants/realtime-dev/health
