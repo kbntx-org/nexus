@@ -62,6 +62,7 @@ spec:
           volumeMounts:
             - name: kong-config
               mountPath: /home/kong/temp.yml
+              readOnly: true
               subPath: kong.yml
       volumes:
         - name: kong-config
