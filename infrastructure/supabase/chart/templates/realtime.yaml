@@ -43,6 +43,11 @@ spec:
                   key: dbName
             - name: DB_AFTER_CONNECT_QUERY
               value: "SET search_path TO _realtime"
+            - name: ANON_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: supabase-secrets
+                  key: anonKey
             - name: DB_ENC_KEY
               valueFrom:
                 secretKeyRef:
