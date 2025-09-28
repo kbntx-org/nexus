@@ -41,6 +41,8 @@ spec:
                 secretKeyRef:
                   name: supabase-secrets
                   key: dbName
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
@@ -57,6 +59,7 @@ spec:
           volumeMounts:
             - name: db-data
               mountPath: /var/lib/postgresql/data
+              subPath: postgres
             - name: init-sql
               mountPath: /docker-entrypoint-initdb.d
       volumes:
