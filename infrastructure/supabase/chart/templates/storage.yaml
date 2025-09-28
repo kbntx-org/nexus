@@ -42,6 +42,8 @@ spec:
                   key: s3SecretAccessKey
             - name: AWS_REGION
               value: stub
+            - name: region
+              value: stub
             - name: GLOBAL_S3_PROTOCOL
               value: https
             - name: GLOBAL_S3_FORCE_PATH_STYLE
