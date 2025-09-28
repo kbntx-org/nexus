@@ -44,7 +44,10 @@ spec:
             - name: DB_AFTER_CONNECT_QUERY
               value: "SET search_path TO _realtime"
             - name: DB_ENC_KEY
-              value: dbEncryptionKey
+              valueFrom:
+                secretKeyRef:
+                  name: supabase-secrets
+                  key: dbEncryptionKey
             - name: API_JWT_SECRET
               valueFrom:
                 secretKeyRef:
