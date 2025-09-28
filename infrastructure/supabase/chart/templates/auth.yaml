@@ -25,8 +25,7 @@ spec:
             - name: GOTRUE_API_PORT
               value: "9999"
             - name: API_EXTERNAL_URL
-              value: "http://api.example.com"   # Replace with your API domain
-
+              value: "https://api-supabase.kbntx.com"
             - name: GOTRUE_DB_DRIVER
               value: "postgres"
             - name: GOTRUE_DB_DATABASE_URL
@@ -34,14 +33,12 @@ spec:
                 secretKeyRef:
                   name: supabase-secrets
                   key: dbUrlAuth
-
             - name: GOTRUE_SITE_URL
-              value: "http://studio.example.com"  # Replace with your site URL
+              value: "https://supabase.kbntx.com"
             - name: GOTRUE_URI_ALLOW_LIST
               value: ""
             - name: GOTRUE_DISABLE_SIGNUP
               value: "false"
-
             - name: GOTRUE_JWT_ADMIN_ROLES
               value: "service_role"
             - name: GOTRUE_JWT_AUD

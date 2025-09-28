@@ -36,7 +36,7 @@ spec:
             - name: SUPABASE_URL
               value: "http://supabase-kong:8000"
             - name: SUPABASE_PUBLIC_URL
-              value: "http://supabase.kbntx.com"
+              value: "https://supabase.kbntx.com"
             - name: SUPABASE_ANON_KEY
               valueFrom:
                 secretKeyRef:
@@ -84,7 +84,7 @@ metadata:
     kubernetes.io/ingress.class: nginx
 spec:
   rules:
-    - host: studio-supabase.kbntx.com
+    - host: supabase.kbntx.com
       http:
         paths:
           - path: /
