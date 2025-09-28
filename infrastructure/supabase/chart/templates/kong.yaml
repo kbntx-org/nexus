@@ -17,6 +17,12 @@ spec:
       containers:
         - name: kong
           image: kong:2.8.1
+          command:
+            - bash
+            - -c
+            - >
+              eval "echo \"$(cat /home/kong/temp.yml)\"" > /home/kong/kong.yml &&
+              /docker-entrypoint.sh kong docker-start
           ports:
             - containerPort: 8000
             - containerPort: 8443
