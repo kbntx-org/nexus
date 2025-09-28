@@ -61,7 +61,7 @@ spec:
                   key: dashboardPassword
           volumeMounts:
             - name: kong-config
-              mountPath: /home/kong/kong.yml
+              mountPath: /home/kong/temp.yml
               subPath: kong.yml
       volumes:
         - name: kong-config
