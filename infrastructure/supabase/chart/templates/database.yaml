@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: db
-          image: supabase/postgres:15.8.1.060
+          image: supabase/postgres:17.6.1.0.11
           ports:
             - containerPort: 5432
           env:
@@ -48,12 +48,6 @@ spec:
                   key: jwtSecret
             - name: JWT_EXP
               value: "3600"
-          command:
-            - "postgres"
-            - "-c"
-            - "config_file=/etc/postgresql/postgresql.conf"
-            - "-c"
-            - "log_min_messages=fatal"
           readinessProbe:
             exec:
               command: ["pg_isready", "-U", "postgres", "-h", "localhost"]
