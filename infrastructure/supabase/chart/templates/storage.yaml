@@ -30,11 +30,6 @@ spec:
                 secretKeyRef:
                   name: supabase-secrets
                   key: s3Bucket
-            - name: GLOBAL_S3_BUCKET
-              valueFrom:
-                secretKeyRef:
-                  name: supabase-secrets
-                  key: s3Bucket
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
@@ -50,7 +45,7 @@ spec:
             - name: GLOBAL_S3_PROTOCOL
               value: https
             - name: GLOBAL_S3_FORCE_PATH_STYLE
-              value: true
+              value: "true"
             - name: ANON_KEY
               valueFrom:
                 secretKeyRef:
@@ -71,8 +66,6 @@ spec:
                 secretKeyRef:
                   name: supabase-db-credentials
                   key: dbUrlStorage
-
-            # Storage config
             - name: FILE_SIZE_LIMIT
               value: "52428800"
             - name: STORAGE_BACKEND
@@ -87,22 +80,9 @@ spec:
                 secretKeyRef:
                   name: supabase-secrets
                   key: GLOBAL_S3_BUCKET
-
-            # AWS creds
-            - name: AWS_ACCESS_KEY_ID
-              valueFrom:
-                secretKeyRef:
-                  name: supabase-s3-credentials
-                  key: AWS_ACCESS_KEY_ID
-            - name: AWS_SECRET_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: supabase-s3-credentials
-                  key: AWS_SECRET_ACCESS_KEY
-
             # Optional image transformation
             - name: ENABLE_IMAGE_TRANSFORMATION
-              value: "true"
+              value: "false"
             - name: IMGPROXY_URL
               value: "http://supabase-imgproxy:5001"
 
