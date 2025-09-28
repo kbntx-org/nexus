@@ -1,47 +1,63 @@
-kube-prometheus-stack:
-  prometheus:
-    prometheusSpec:
-      storageSpec:
-        volumeClaimTemplate:
-          spec:
-            storageClassName: hcloud-volumes
-            accessModes:
-              - ReadWriteOnce
-            resources:
-              requests:
-                storage: 10Gi
+victoria-metrics-single:
+  server:
+    scrape:
+      enabled: true
+      extraScrapeConfigs:
+        - job_name: node-exporter
+          kubernetes_sd_configs:
+            - role: pod
+          relabel_configs:
+            - source_labels: [__meta_kubernetes_pod_container_name]
+              regex: node-exporter
+              action: keep
+            - source_labels: [__meta_kubernetes_pod_node_name]
+              target_label: node
+        - job_name: kube-state-metrics
+          kubernetes_sd_configs:
+            - role: pod
+          relabel_configs:
+            - source_labels: [__meta_kubernetes_pod_container_name]
+              regex: kube-state-metrics
+              action: keep
+            - source_labels: [__meta_kubernetes_pod_container_port_number]
+              regex: '8080'
+              action: keep
 
-  grafana:
-    envValueFrom:
-      POSTGRES_USER:
-        secretKeyRef:
-          name: postgres-credentials
-          key: username
-      POSTGRES_PASSWORD:
-        secretKeyRef:
-          name: postgres-credentials
-          key: password
-    grafana.ini:
-      server:
-        domain: grafana.kbntx.com
-        root_url: 'https://%(domain)s/'
-      auth:
-        disable_login: true
-        disable_login_form: true
-      database:
-        type: postgres
-        host: postgres:5432
-        name: grafana
-        user: ${POSTGRES_USER}
-        password: ${POSTGRES_PASSWORD}
-        ssl_mode: disable
+grafana:
+  admin:
+    existingSecret: grafana-credentials
+    userKey: username
+    passwordKey: password
+  envValueFrom:
+    POSTGRES_USER:
+      secretKeyRef:
+        name: postgres-credentials
+        key: username
+    POSTGRES_PASSWORD:
+      secretKeyRef:
+        name: postgres-credentials
+        key: password
+  grafana.ini:
+    server:
+      domain: grafana.kbntx.com
+      root_url: 'https://%(domain)s/'
+    auth:
+      disable_login: true
+      disable_login_form: true
+    database:
+      type: postgres
+      host: postgres:5432
+      name: grafana
+      user: ${POSTGRES_USER}
+      password: ${POSTGRES_PASSWORD}
+      ssl_mode: disable
 
-    persistence:
-      enabled: false
-    sidecar:
-      dashboards:
-        provider:
-          allowUiUpdates: true
+  persistence:
+    enabled: false
+  sidecar:
+    dashboards:
+      provider:
+        allowUiUpdates: true
 
 loki:
   global:

@@ -1,12 +1,21 @@
 dependencies:
-- name: kube-prometheus-stack
-  repository: https://prometheus-community.github.io/helm-charts
-  version: 66.0.0
+- name: grafana
+  repository: https://grafana.github.io/helm-charts
+  version: 10.0.0
 - name: loki
   repository: https://grafana.github.io/helm-charts
   version: 6.40.0
 - name: promtail
   repository: https://grafana.github.io/helm-charts
   version: 6.17.0
-digest: sha256:986426c7edba60ea01e460a8da404f5f753fbf05f7ae83ad367961ca5a30fc70
-generated: "2025-09-23T23:41:24.227141+01:00"
+- name: kube-state-metrics
+  repository: https://prometheus-community.github.io/helm-charts
+  version: 6.3.0
+- name: prometheus-node-exporter
+  repository: https://prometheus-community.github.io/helm-charts
+  version: 4.48.0
+- name: victoria-metrics-single
+  repository: https://victoriametrics.github.io/helm-charts
+  version: 0.24.6
+digest: sha256:90293564d1bc9f4f310e6463e1dbc3c9994460c8c621878fb5c4fa5fa08100e3
+generated: "2025-09-24T19:56:34.54224+01:00"
