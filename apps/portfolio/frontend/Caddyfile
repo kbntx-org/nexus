@@ -24,7 +24,11 @@
     }
 
     @cv_png {
-      path_regexp cv_png_regexp .*cv.*\.png$
+      path_regexp .*cv.*\.png$
+    }
+
+    header @assets {
+        Cache-Control "public, max-age=31536000, immutable"
     }
 
     header @cv_png {
@@ -37,7 +41,4 @@
         Expires "0"
     }
 
-    header @assets {
-        Cache-Control "public, max-age=31536000, immutable"
-    }
 }
