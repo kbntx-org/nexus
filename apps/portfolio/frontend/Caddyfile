@@ -23,6 +23,15 @@
         path *.json
     }
 
+    @cv_png {
+      path_regexp cv_png_regexp .*cv.*\.png$
+    }
+
+    header @cv_png {
+      Cache-Control "no-store"
+      Expires "0"
+    }
+
     header @json {
         Cache-Control "no-cache, must-revalidate"
         Expires "0"
