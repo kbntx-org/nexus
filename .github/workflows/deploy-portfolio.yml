@@ -27,16 +27,6 @@ jobs:
         with:
           version: 8
 
-      - name: Check if portfolio changed
-        uses: dorny/paths-filter@v2
-        id: changes
-        with:
-          filters: |
-            portfolio:
-              - 'apps/portfolio/**'
-              - 'package.json'
-              - 'pnpm-lock.yaml'
-
       - name: Install dependencies
         run: pnpm install
 
