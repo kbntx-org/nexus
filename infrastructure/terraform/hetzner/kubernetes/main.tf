@@ -13,6 +13,8 @@ module "nexus_cluster" {
   vpc_name                = "main-vpc"
   hcloud_token            = var.hcloud_token
   cloudflare_tunnel_token = var.cloudflare_tunnel_token
+  docker_hub_username     = var.docker_hub_username
+  docker_hub_password     = var.docker_hub_password
 
   default_user = {
     name       = "kenny"
@@ -30,12 +32,12 @@ module "nexus_cluster" {
   }
 
   node_pools = {
-    "cx-32" = {
+    "cx-33" = {
       count       = 3
-      server_type = "cx32"
+      server_type = "cx33"
       location    = "fsn1"
       labels = {
-        "pool" = "cx-32"
+        "pool" = "cx-33"
       }
     }
   }

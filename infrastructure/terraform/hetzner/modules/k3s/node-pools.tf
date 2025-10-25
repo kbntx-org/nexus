@@ -67,9 +67,11 @@ data "cloudinit_config" "node_pool" {
     content_type = "text/cloud-config"
     filename     = "cloud-config.yml"
     content = templatefile("${path.module}/config/cloud-init.yml", merge(local.cloud_init_base, {
-      server_address = hcloud_server_network.control_plane_network.ip
-      taints         = coalesce(each.value.taints, local.node_pool_defaults.taints)
-      type           = "worker"
+      server_address      = hcloud_server_network.control_plane_network.ip
+      taints              = coalesce(each.value.taints, local.node_pool_defaults.taints)
+      type                = "worker"
+      docker_hub_username = var.docker_hub_username
+      docker_hub_password = var.docker_hub_password
     }))
   }
 }

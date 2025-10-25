@@ -12,6 +12,19 @@ users:
     ssh_authorized_keys:
       - ${default_ssh_key}
 
+%{ if docker_hub_username != "" && docker_hub_password != "" }
+write_files:
+  - path: /etc/rancher/k3s/registries.yaml
+    content: |
+      configs:
+        "docker.io":
+          auth:
+            username: ${docker_hub_username}
+            password: ${docker_hub_password}
+    owner: root:root
+    permissions: '0600'
+%{ endif }
+
 runcmd:
   - ufw disable
   %{ if type == "control-plane" }
