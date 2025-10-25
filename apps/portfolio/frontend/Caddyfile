@@ -10,7 +10,7 @@
     route {
         try_files {path} /index.html
         header /index.html {
-            Cache-Control "public, max-age=0, must-revalidate"
+            Cache-Control "no-store"
             Pragma "no-cache"
             Expires "0"
         }
