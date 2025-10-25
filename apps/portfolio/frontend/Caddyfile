@@ -11,7 +11,6 @@
         try_files {path} /index.html
         header /index.html {
             Cache-Control "no-store"
-            Pragma "no-cache"
             Expires "0"
         }
     }
