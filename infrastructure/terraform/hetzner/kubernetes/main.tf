@@ -30,12 +30,12 @@ module "nexus_cluster" {
   }
 
   node_pools = {
-    "default" = {
+    "cx-32" = {
       count       = 3
-      server_type = "cpx21"
+      server_type = "cx32"
       location    = "fsn1"
       labels = {
-        "pool" = "default"
+        "pool" = "cx-32"
       }
     }
   }

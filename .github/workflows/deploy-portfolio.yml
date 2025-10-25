@@ -1,4 +1,4 @@
-name: Deploy Portfolio
+name: Deploy portfolio
 
 on:
   push:
@@ -6,8 +6,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: deploy-portfolio
@@ -15,7 +13,6 @@ concurrency:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,12 +20,22 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: "22"
 
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
           version: 8
+
+      - name: Check if portfolio changed
+        uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            portfolio:
+              - 'apps/portfolio/**'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
 
       - name: Install dependencies
         run: pnpm install
@@ -36,17 +43,16 @@ jobs:
       - name: Build portfolio frontend
         run: pnpm nx build portfolio-frontend --configuration=production
 
-      # Github pages does not support wildcard routing
-      - name: Copy index.html to 404.html
-        run: cp ./dist/apps/portfolio/frontend/browser/index.html ./dist/apps/portfolio/frontend/browser/404.html
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Login to Docker registry
+        uses: docker/login-action@v3
         with:
-          path: ./dist/apps/portfolio/frontend/browser
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
-      - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v4
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/portfolio/frontend/Dockerfile
+          push: true
+          tags: kbntx/portfolio:latest

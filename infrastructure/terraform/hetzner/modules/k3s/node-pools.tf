@@ -40,7 +40,7 @@ resource "hcloud_server" "node_pool" {
     user    = "root"
     agent   = true
     timeout = "10m"
-    host    = self.ipv4_address
+    host    = tolist(self.network)[0].ip
   }
 
   provisioner "remote-exec" {

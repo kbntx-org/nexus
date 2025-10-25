@@ -32,7 +32,7 @@ resource "hcloud_server" "control_plane" {
     user    = "root"
     agent   = true
     timeout = "10m"
-    host    = self.ipv4_address
+    host    = tolist(self.network)[0].ip
   }
 
   provisioner "file" {
