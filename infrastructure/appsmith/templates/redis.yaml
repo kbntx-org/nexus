@@ -25,10 +25,7 @@ spec:
                 secretKeyRef:
                   name: appsmith-secrets
                   key: redisPassword
-          command:
-            - redis-server
-            - --appendonly
-            - "yes"
+          args:
             - --requirepass
             - $REDIS_PASSWORD
           volumeMounts:
