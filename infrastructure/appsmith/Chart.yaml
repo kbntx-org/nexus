@@ -1,7 +1,3 @@
 apiVersion: v2
 name: appsmith
 version: 1.0.0
-dependencies:
-  - name: appsmith
-    version: 3.6.5
-    repository: https://helm.appsmith.com
