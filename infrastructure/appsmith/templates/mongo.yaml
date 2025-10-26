@@ -13,6 +13,8 @@ spec:
       labels:
         app: mongodb
     spec:
+      securityContext:
+        fsGroup: 999
       volumes:
         - name: mongodb-key
           secret:
