@@ -13,6 +13,14 @@ spec:
       labels:
         app: mongodb
     spec:
+      volumes:
+        - name: mongodb-key
+          secret:
+            secretName: appsmith-secrets
+            items:
+              - key: mongoDbKey
+                path: mongoDbKey
+            defaultMode: 0400
       containers:
         - name: mongodb
           image: mongo:8.0
@@ -37,9 +45,15 @@ spec:
           args:
             - --replSet
             - rs0
+            - --keyFile
+            - /etc/mongodb-key/mongoDbKey
+            - --bind_ip_all
           volumeMounts:
             - name: mongodb-data
               mountPath: /data/db
+            - name: mongodb-key
+              mountPath: /etc/mongodb-key
+              readOnly: true
           resources:
             requests:
               memory: "512Mi"
