@@ -13,20 +13,29 @@ spec:
       labels:
         app: mongodb
     spec:
+      initContainers:
+        - name: mongo-permissions
+          image: busybox
+          command: ['sh', '-c']
+          args:
+            - |
+              cp /etc/mongodb-key-temp/mongoDbKey /var/lib/mongoKey/mongo.key
+              chown -R 999:999 /var/lib/mongoKey
+              chmod 400 /var/lib/mongoKey/mongo.key
+          volumeMounts:
+            - name: mongodb-key-temp
+              mountPath: /etc/mongodb-key-temp
+            - name: mongodb-key-storage
+              mountPath: /var/lib/mongoKey
       volumes:
-        - name: mongodb-key
+        - name: mongodb-key-temp
           secret:
             secretName: appsmith-secrets
             items:
               - key: mongoDbKey
                 path: mongoDbKey
-      initContainers:
-        - name: fix-permissions
-          image: busybox
-          command: ['sh', '-c', 'chown 999:999 /etc/mongodb-key/mongoDbKey && chmod 400 /etc/mongodb-key/mongoDbKey']
-          volumeMounts:
-            - name: mongodb-key
-              mountPath: /etc/mongodb-key
+        - name: mongodb-key-storage
+          emptyDir: {}
       containers:
         - name: mongodb
           image: mongo:8.0
@@ -52,14 +61,13 @@ spec:
             - --replSet
             - rs0
             - --keyFile
-            - /etc/mongodb-key/mongoDbKey
+            - /var/lib/mongoKey/mongo.key
             - --bind_ip_all
           volumeMounts:
             - name: mongodb-data
               mountPath: /data/db
-            - name: mongodb-key
-              mountPath: /etc/mongodb-key
-              readOnly: true
+            - name: mongodb-key-storage
+              mountPath: /var/lib/mongoKey
           resources:
             requests:
               memory: "512Mi"
