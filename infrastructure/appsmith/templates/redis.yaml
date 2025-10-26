@@ -25,9 +25,11 @@ spec:
                 secretKeyRef:
                   name: appsmith-secrets
                   key: redisPassword
+          command: ["/bin/sh"]
           args:
-            - --requirepass
-            - $(echo -n "$REDIS_PASSWORD")
+            - -c
+            - |
+              exec docker-entrypoint.sh --requirepass "$REDIS_PASSWORD"
           volumeMounts:
             - name: redis-data
               mountPath: /data
@@ -59,3 +61,5 @@ spec:
     - port: 6379
       targetPort: 6379
       protocol: TCP
+
+87875!ggzg&&vzrrz7&
