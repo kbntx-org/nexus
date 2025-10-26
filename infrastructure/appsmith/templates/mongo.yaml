@@ -15,6 +15,13 @@ spec:
     spec:
       securityContext:
         fsGroup: 999
+      initContainers:
+        - name: fix-key-permissions
+          image: busybox
+          command: ["sh", "-c", "chown 999:999 /etc/mongodb-key/mongoDbKey && chmod 600 /etc/mongodb-key/mongoDbKey"]
+          volumeMounts:
+            - name: mongodb-key
+              mountPath: /etc/mongodb-key
       volumes:
         - name: mongodb-key
           secret:
