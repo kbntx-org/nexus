@@ -90,6 +90,7 @@ kind: Service
 metadata:
   name: mongodb-service
 spec:
+  clusterIP: None
   selector:
     app: mongodb
   ports:
