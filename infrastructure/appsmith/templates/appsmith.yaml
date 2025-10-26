@@ -16,11 +16,10 @@ spec:
                   name: appsmith
 ---
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: appsmith
 spec:
-  serviceName: appsmith-service
   replicas: 1
   selector:
     matchLabels:
