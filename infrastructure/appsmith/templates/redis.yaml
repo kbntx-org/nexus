@@ -62,10 +62,3 @@ spec:
     - port: 6379
       targetPort: 6379
       protocol: TCP
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: redis-config
-data:
-  connection-string: "redis://:appsmith_password@redis-service:6379"

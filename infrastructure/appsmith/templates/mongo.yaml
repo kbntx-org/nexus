@@ -34,13 +34,9 @@ spec:
                 secretKeyRef:
                   name: appsmith-secrets
                   key: mongoDbName
-          command:
-            - mongod
+          args:
             - --replSet
             - rs0
-            - --bind_ip_all
-            - --port
-            - "27017"
           volumeMounts:
             - name: mongodb-data
               mountPath: /data/db
@@ -72,10 +68,3 @@ spec:
   - port: 27017
     targetPort: 27017
     protocol: TCP
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: mongodb-config
-data:
-  connection-string: "mongodb://root:appsmith_password@mongodb-service:27017/appsmith?replicaSet=rs0"

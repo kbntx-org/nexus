@@ -68,10 +68,3 @@ spec:
     - port: 5432
       targetPort: 5432
       protocol: TCP
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: postgresql-config
-data:
-  connection-string: "postgresql://postgres:appsmith_password@postgresql-service:5432/keycloak"
