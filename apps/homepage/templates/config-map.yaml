@@ -5,17 +5,49 @@ metadata:
   labels:
     app: homepage
 data:
+  bookmarks.yaml: ''
+  custom.css: |
+    #revalidate {
+      display: none;
+    }
+  custom.js: ''
+  docker.yaml: ''
   kubernetes.yaml: |
     mode: cluster
+  services.yaml: |
+    - Quick:
+        - Github:
+            icon: 'si-github-#000000'
+            href: https://github.com/kbntx-org/nexus
+        - Grafana:
+            icon: grafana.svg
+            href: https://grafana.kbntx.com
+        - ArgoCD:
+            icon: argo-cd.svg
+            href: https://argocd.kbntx.com
+        - Cloudflare:
+            icon: cloudflare.svg
+            href: https://dash.cloudflare.com/
+        - Hetzner:
+            icon: hetzner-h.svg
+            href: https://console.hetzner.com
+        - Appsmith:
+            icon: 'si-appsmith-#F38020'
+            href: https://appsmith.kbntx.com
+    - Calendar:
+        - Calendar:
+            widget:
+              type: calendar
+              firstDayInWeek: monday
+              view: monthly
+              maxEvents: 10
+              showTime: true
   settings.yaml: |
-    title: Person's Homepage # Replaced by widget in this example.
-    headerStyle: clean
+    title: Homepage
+    headerStyle: boxed
     background:
-      image: https://wallpapercave.com/wp/wp4565843.jpg
-      blur: md # sm, md, xl... see https://tailwindcss.com/docs/backdrop-blur
-      saturate: 50 # 0, 50, 100... see https://tailwindcss.com/docs/backdrop-saturate
-      brightness: 50 # 0, 50, 75... see https://tailwindcss.com/docs/backdrop-brightness
-      opacity: 70 # 0-100
+      image: https://nbg1.your-objectstorage.com/nexus-public-statics/images/wano-kuni.jpeg
+      brightness: 50
     theme: dark
     color: slate
     useEqualHeights: true
@@ -24,75 +56,40 @@ data:
       hideInternetSearch: true
       showSearchSuggestions: true
       hideVisitURL: true
-    hideVersion: false
+    hideVersion: true
     layout:
-      InitialSection:
+      Quick:
         header: false
-        style: row
-        columns: 2
-        Bookmarks:
-          header: false
-          style: row
-          columns: 2
-        Calendar:
-          header: false
-          style: row
-          columns: 2
-      Infrastructure:
-        header: true
-        style: row
-        columns: 4
-  custom.css: ""
-  custom.js: ""
-  bookmarks.yaml: |
-    - InitialSection:
-        - Bookmarks:
-            - YouTube:
-                - icon: youtube.svg
-                  href: https://youtube.com
-                  description: Video Monopoly
-  services.yaml: |
-    - InitialSection:
-        - Calendar:
-            - Media Calendar:
-                widget:
-                  type: calendar
-                  firstDayInWeek: monday
-                  view: monthly
-                  maxEvents: 10
-                  showTime: true
-    - Infrastructure:
-        - K3S Cluster:
-            widget:
-              type: kubernetes
-              cluster:
-                show: true
-                cpu: true
-                memory: true
-                showLabel: true
+        style: column
+      Calendar:
+        header: false
+        style: column
   widgets.yaml: |
-    - openmeteo:
-        label: Your City
-        lattitude: 00.123
-        longitude: 00.123
-        timezone: TZ # America/Chicago, UTC, etc.
-        units: imperial
-        cache: 5
-    - kubernetes:
-        cluster:
-          show: true
-          cpu: true
-          memory: true
-          showLabel: true
-          label: "K3S Cluster"
-        nodes:
-          show: false
-          cpu: true
-          memory: true
-          showLabel: true
     - search:
         provider: google
         target: _blank
         focus: false
         showSearchSuggestions: true
-  docker.yaml: ""
+    - openmeteo:
+        label: Current
+        timezone: Europe/London
+        units: metric
+        cache: 5
+        format:
+          maximumFractionDigits: 1
+    - datetime:
+      text_size: md
+      format:
+        timeStyle: medium
+    - kubernetes:
+        cluster:
+          show: false
+          cpu: false
+          memory: false
+          showLabel: false
+          label: "cluster"
+        nodes:
+          show: true
+          cpu: true
+          memory: true
+          showLabel: true
