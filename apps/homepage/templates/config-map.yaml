@@ -26,13 +26,17 @@ data:
       hideVisitURL: true
     hideVersion: false
     layout:
-      Bookmarks:
+      InitialSection:
         header: false
         style: row
         columns: 2
-      Calendar:
-        header: false
-        style: column
+        Bookmarks:
+          header: false
+          style: row
+          columns: 2
+        Calendar:
+          header: false
+          style: column
       Infrastructure:
         header: true
         style: row
@@ -40,20 +44,22 @@ data:
   custom.css: ""
   custom.js: ""
   bookmarks.yaml: |
-    - Bookmarks:
-        - YouTube:
-            - icon: youtube.svg
-              href: https://youtube.com
-              description: Video Monopoly
+    - InitialSection:
+        - Bookmarks:
+            - YouTube:
+                - icon: youtube.svg
+                  href: https://youtube.com
+                  description: Video Monopoly
   services.yaml: |
-    - Calendar:
-        - Media Calendar:
-            widget:
-              type: calendar
-              firstDayInWeek: monday
-              view: monthly
-              maxEvents: 10
-              showTime: true
+    - InitialSection:
+        - Calendar:
+            - Media Calendar:
+                widget:
+                  type: calendar
+                  firstDayInWeek: monday
+                  view: monthly
+                  maxEvents: 10
+                  showTime: true
     - Infrastructure:
         - K3S Cluster:
             widget:
@@ -84,8 +90,8 @@ data:
           memory: true
           showLabel: true
     - search:
-        provider: duckduckgo
+        provider: google
         target: _blank
-        focus: true
+        focus: false
         showSearchSuggestions: true
   docker.yaml: ""
