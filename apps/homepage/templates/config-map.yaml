@@ -36,7 +36,8 @@ data:
           columns: 2
         Calendar:
           header: false
-          style: column
+          style: row
+          columns: 2
       Infrastructure:
         header: true
         style: row
