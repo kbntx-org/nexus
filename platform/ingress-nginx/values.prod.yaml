@@ -17,7 +17,7 @@ ingress-nginx:
         '{"time": "$time_iso8601", "remote_addr": "$remote_addr", "x_forwarded_for": "$proxy_add_x_forwarded_for", "request_id": "$req_id",
         "bytes_sent": $bytes_sent, "request_time": $request_time, "status": $status, "vhost": "$host", "request_proto": "$server_protocol",
         "path": "$uri","duration": $request_time,"method": "$request_method", "http_referrer": "$http_referer", "country_code": "$http_cf_ipcountry",
-        "http_user_agent": "$http_user_agent" }'
+        "http_user_agent": "$http_user_agent", "http_x_forwarded_port": "$http_x_forwarded_port" }'
     replicaCount: 2
     ingressClassResource:
       default: true
