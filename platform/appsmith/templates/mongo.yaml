@@ -75,6 +75,50 @@ spec:
             limits:
               memory: "1Gi"
               cpu: "500m"
+        - name: mongo-replica-set-init
+          image: mongo:8.0
+          command:
+            - /bin/bash
+            - -c
+            - |
+              MONGO_USER="${MONGO_INITDB_ROOT_USERNAME}"
+              MONGO_PASS="${MONGO_INITDB_ROOT_PASSWORD}"
+
+              echo "Waiting for MongoDB to be ready..."
+              until mongosh --host localhost:27017 -u "$MONGO_USER" -p "$MONGO_PASS" --authenticationDatabase admin --eval "print('MongoDB is ready')" 2>/dev/null; do
+                echo "Still waiting for MongoDB..."
+                sleep 2
+              done
+
+              echo "Checking if replica set is already initialized..."
+              RS_STATUS=$(mongosh --host localhost:27017 -u "$MONGO_USER" -p "$MONGO_PASS" --authenticationDatabase admin --quiet --eval "try { rs.status().ok } catch(e) { 0 }" 2>/dev/null || echo "0")
+
+              if [ "$RS_STATUS" != "1" ]; then
+                echo "Initializing replica set..."
+                mongosh --host localhost:27017 -u "$MONGO_USER" -p "$MONGO_PASS" --authenticationDatabase admin --eval "
+                  rs.initiate({
+                    _id: 'rs0',
+                    members: [
+                      { _id: 0, host: 'mongodb-0.mongodb-service:27017' }
+                    ]
+                  })
+                "
+                echo "Replica set initialized successfully"
+              else
+                echo "Replica set already initialized"
+              fi
+              sleep infinity
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: appsmith-secrets
+                  key: mongoDbUser
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: appsmith-secrets
+                  key: mongoDbPassword
   volumeClaimTemplates:
     - metadata:
         name: mongodb-data
