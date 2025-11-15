@@ -33,7 +33,7 @@ data:
             href: https://console.hetzner.com
         - Appsmith:
             icon: 'si-appsmith-#F38020'
-            href: https://appsmith.kbntx.com
+            href: https://nexus-public-statics.nbg1.your-objectstorage.com/images/appsmith-logo.png
         - S3 Client:
             icon: https://nexus-public-statics.nbg1.your-objectstorage.com/images/s3-logo.svg
             href: https://appsmith.kbntx.com/app/s3-statics-client/page1-691860ad613acd5b6ba7e634
