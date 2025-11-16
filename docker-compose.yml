@@ -1,0 +1,11 @@
+name: nexus
+
+services:
+  docs:
+    build:
+      context: ./apps/documentation
+      dockerfile: Dockerfile.local
+    ports:
+      - 8000:8000
+    volumes:
+      - .:/workspace:ro

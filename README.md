@@ -1,3 +1,7 @@
+---
+title: Welcome
+---
+
 # Nexus 🚀
 
 > **Platform Engineering Hub** - From ideation to delivery and continuous monitoring

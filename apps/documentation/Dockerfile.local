@@ -1,0 +1,9 @@
+FROM squidfunk/mkdocs-material:9.6.20
+
+RUN apk add --no-cache inotify-tools bash rsync
+RUN pip install mkdocs-awesome-nav
+
+COPY ./docker-entrypoint.sh /entrypoint.sh
+
+ENTRYPOINT ["/sbin/tini", "--", "/entrypoint.sh"]
+CMD ["serve"]
