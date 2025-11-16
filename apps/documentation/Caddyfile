@@ -8,11 +8,16 @@
     file_server
 
     route {
-        try_files {path} /index.html
-        header /index.html {
-            Cache-Control "no-store"
-            Expires "0"
-        }
+        try_files {path} {path}/ index.html
+    }
+
+    @html {
+        not path */*.*
+    }
+
+    header @html {
+        Cache-Control "no-store"
+        Expires "0"
     }
 
     @assets {
@@ -31,5 +36,4 @@
         Cache-Control "no-cache, must-revalidate"
         Expires "0"
     }
-
 }
