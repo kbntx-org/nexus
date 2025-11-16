@@ -1,6 +1,7 @@
 FROM squidfunk/mkdocs-material:9.6.20 AS builder
 
 RUN apk add --no-cache bash rsync
+RUN pip install mkdocs-awesome-nav
 
 WORKDIR /workspace
 
@@ -23,10 +24,13 @@ RUN rm -rf /docs/* && \
             rsync -a "$docs_path"/ "$dest_path"/; \
         fi; \
     done && \
-    cp /workspace/mkdocs.yml /mkdocs.yml
+    cp /workspace/mkdocs.yml /mkdocs.yml && \
+    if [ -f /workspace/README.md ]; then \
+        cp /workspace/README.md /docs/README.md; \
+    fi
 
 WORKDIR /
-RUN mkdocs build
+RUN mkdocs build --verbose
 
 FROM caddy:2.10.2-alpine
 
