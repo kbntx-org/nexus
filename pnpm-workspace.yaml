@@ -1,2 +1,4 @@
 packages:
-  - 'apps/*' 
+  - 'apps/portfolio/frontend'
+
+injectWorkspacePackages: true

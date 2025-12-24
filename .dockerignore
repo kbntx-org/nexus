@@ -3,3 +3,5 @@ apps/**/node_modules
 .git
 .vscode
 tmp
+.angular
+.nx
