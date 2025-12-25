@@ -20,13 +20,6 @@ gha-runner-scale-set:
     spec:
       containers:
         - name: listener
-      nodeSelector:
-        pool: arc-runners-controller-pool
-      tolerations:
-        - key: 'runners-controller'
-          operator: 'Equal'
-          value: 'true'
-          effect: 'NoSchedule'
   template:
     spec:
       initContainers:
