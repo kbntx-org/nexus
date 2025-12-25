@@ -5,7 +5,7 @@ gha-runner-scale-set:
   githubConfigUrl: 'https://github.com/kbntx-org'
   githubConfigSecret: github-arc-runners-secret
   maxRunners: 3
-  minRunners: 1
+  minRunners: 0
   runnerGroup: 'default'
   runnerScaleSetName: 'nexus-runners'
   containerMode:
