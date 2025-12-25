@@ -11,7 +11,7 @@ data:
     spec:
       initContainers:
         - name: buildkitd
-          image: buildkit:v0.24.0-rootless
+          image: kbntx/buildkit:v0.24.0-rootless
           restartPolicy: Always
           env:
             - name: POD_NAME

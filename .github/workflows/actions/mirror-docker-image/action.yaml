@@ -1,0 +1,32 @@
+name: "Mirror Docker Image"
+description: "Pulls a Docker image from a source and pushes it to a destination registry with multi-platform support"
+inputs:
+  source-image:
+    description: "Source image to mirror (e.g. postgres:14-alpine)"
+    required: true
+  target-tags:
+    description: "List of tags to push to"
+    required: true
+  platforms:
+    description: "Platforms to build for (e.g. linux/amd64,linux/arm64)"
+    required: false
+    default: "linux/amd64"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Create Mirror Dockerfile
+      shell: bash
+      run: |
+        echo "FROM ${{ inputs.source-image }}" > Dockerfile.mirror
+        echo "Generated Dockerfile.mirror content:"
+        cat Dockerfile.mirror
+
+    - name: Build and Push
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        file: Dockerfile.mirror
+        push: true
+        tags: ${{ inputs.target-tags }}
+        platforms: ${{ inputs.platforms }}
