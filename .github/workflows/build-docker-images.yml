@@ -44,5 +44,5 @@ jobs:
           file: platform/custom-docker-images/kubernetes-cli-with-node/Dockerfile
           push: true
           tags: |
-            kbntx/kubernetes-with-node:22.16.0
+            kbntx/kubernetes-cli-with-node:22.16.0
           platforms: linux/amd64
