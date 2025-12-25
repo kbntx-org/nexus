@@ -1,6 +1,6 @@
 ui = true
 
-storage "postgres" {
+storage "postgresql" {
   connection_url = "${VAULT_POSTGRES_CONNECTION_URI}"
 }
 
