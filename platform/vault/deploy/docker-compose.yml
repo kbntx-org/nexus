@@ -12,6 +12,15 @@ services:
     cap_add:
       - IPC_LOCK
 
+  postgres:
+    image: postgres:18.1-alpine3.22
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${VAULT_POSTGRES_DB}
+      POSTGRES_USER: ${VAULT_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${VAULT_POSTGRES_PASSWORD}
+
   cloudflared:
     image: cloudflare/cloudflared:2025.8.1
     restart: always
@@ -22,3 +31,4 @@ services:
 volumes:
   vault-data:
   vault-logs:
+  postgres_data:

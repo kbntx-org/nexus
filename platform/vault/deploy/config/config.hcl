@@ -1,7 +1,7 @@
 ui = true
 
-storage "file" {
-  path = "/vault/file"
+storage "postgres" {
+  connection_url = "${VAULT_POSTGRES_CONNECTION_URI}"
 }
 
 listener "tcp" {

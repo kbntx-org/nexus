@@ -18,10 +18,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Replace environment variables in config
+        env:
+          VAULT_POSTGRES_CONNECTION_URI: postgres://${{ secrets.VAULT_POSTGRES_USER }}:${{ secrets.VAULT_POSTGRES_PASSWORD }}@postgres:5432/${{ secrets.VAULT_POSTGRES_DB }}
+        run: |
+          envsubst < platform/vault/deploy/config/config.hcl > platform/vault/deploy/config/config.hcl.tmp && mv platform/vault/deploy/config/config.hcl.tmp platform/vault/deploy/config/config.hcl
+
       - name: Deploy
         uses: ./.github/actions/deploy-with-compose
         env:
           CLOUDFLARE_TUNNEL_TOKEN: ${{ secrets.VAULT_CLOUDFLARE_TUNNEL_TOKEN }}
+          VAULT_POSTGRES_DB: ${{ secrets.VAULT_POSTGRES_DB }}
+          VAULT_POSTGRES_USER: ${{ secrets.VAULT_POSTGRES_USER }}
+          VAULT_POSTGRES_PASSWORD: ${{ secrets.VAULT_POSTGRES_PASSWORD }}
         with:
           user: ci
           server: "10.0.0.3"
