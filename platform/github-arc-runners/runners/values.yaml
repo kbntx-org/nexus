@@ -1,7 +1,7 @@
 gha-runner-scale-set:
   controllerServiceAccount: # Needs to be specified because live discovery doesn't work when applying this chart with Argo instead of Helm
     namespace: arc-systems # Reference here - https://github.com/actions/actions-runner-controller/issues/3043#issuecomment-2502263842
-    name: arc-controller-gha-rs-controller
+    name: github-arc-runners-controller-gha-rs-controller
   githubConfigUrl: 'https://github.com/kbntx-org'
   githubConfigSecret: github-arc-runners-secret
   maxRunners: 3
