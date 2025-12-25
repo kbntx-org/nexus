@@ -9,7 +9,7 @@ concurrency:
 jobs:
   deploy:
     name: Deploy Vault
-    runs-on: runners-deploy-k8s
+    runs-on: nexus-runners
     container:
       image: kbntx/docker-cli-with-node:22.16.0
     timeout-minutes: 60
