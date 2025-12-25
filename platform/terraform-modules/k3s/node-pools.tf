@@ -68,6 +68,7 @@ data "cloudinit_config" "node_pool" {
     filename     = "cloud-config.yml"
     content = templatefile("${path.module}/config/cloud-init.yml", merge(local.cloud_init_base, {
       server_address      = hcloud_server_network.control_plane_network.ip
+      labels              = merge(coalesce(each.value.labels, {}), local.node_pool_defaults.labels)
       taints              = coalesce(each.value.taints, local.node_pool_defaults.taints)
       type                = "worker"
       docker_hub_username = var.docker_hub_username

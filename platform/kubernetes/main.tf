@@ -37,8 +37,23 @@ module "nexus_cluster" {
       server_type = "cx33"
       location    = "fsn1"
       labels = {
-        "pool" = "cx-33"
+        "pool" = "default"
       }
+    }
+    "ci-runners" = {
+      count       = 1
+      server_type = "cx33"
+      location    = "nbg1"
+      labels = {
+        "pool" = "ci-runners"
+      }
+      taints = [
+        {
+          key    = "ci-runners"
+          value  = "true"
+          effect = "NoSchedule"
+        }
+      ]
     }
   }
 }

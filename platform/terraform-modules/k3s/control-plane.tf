@@ -95,6 +95,7 @@ data "cloudinit_config" "control_plane" {
       server_address = ""
       type           = "control-plane"
       taints         = []
+      labels         = {}
     }))
   }
 }

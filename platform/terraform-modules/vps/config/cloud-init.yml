@@ -1,0 +1,76 @@
+#cloud-config
+packages:
+  - ca-certificates
+  - curl
+
+groups:
+  - docker
+
+ssh_pwauth: false
+
+users:
+  - name: engineer
+    groups:
+      - sudo
+      - docker
+    sudo:
+      - ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    lock_passwd: true
+
+  - name: ci
+    groups:
+      - docker
+    shell: /bin/bash
+    lock_passwd: true
+    ssh_authorized_keys:
+      - ${ci_ssh_public_key}
+
+write_files:
+  - path: /etc/ssh/cloudflare-access-ca.pub
+    owner: root:root
+    permissions: '0644'
+    content: |
+      ${cloudflare_access_ssh_ca_public_key}
+
+  - path: /etc/ssh/sshd_config.d/disable-root.conf
+    owner: root:root
+    permissions: '0644'
+    content: |
+      PermitRootLogin no
+
+  - path: /etc/ssh/sshd_config.d/cloudflare-access.conf
+    owner: root:root
+    permissions: '0644'
+    content: |
+      TrustedUserCAKeys /etc/ssh/cloudflare-access-ca.pub
+
+  - path: /home/ci/docker-cleanup.sh
+    owner: ci:ci
+    permissions: '0700'
+    content: |
+      #!/bin/bash
+      docker system prune -af
+
+runcmd:
+  - ufw disable
+  - |
+    # Install Docker using official Docker repository
+    install -m 0755 -d /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+    chmod a+r /etc/apt/keyrings/docker.asc
+
+    # Add the repository to Apt sources (supports both ARM and AMD64)
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+    # Update and install Docker
+    apt-get update
+    apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+    # Verify installation
+    docker --version
+    docker compose version
+  - echo "0 23 * * * /home/ci/docker-cleanup.sh" | crontab -u ci -
+  - passwd -l root
+  - chage -E -1 -M -1 -I -1 -m 0 root
+  - systemctl restart ssh

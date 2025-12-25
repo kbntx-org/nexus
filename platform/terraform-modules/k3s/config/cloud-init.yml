@@ -49,6 +49,9 @@ runcmd:
     --node-name="$(hostname -f)" \
     --flannel-iface=enp7s0 \
     --kubelet-arg="cloud-provider=external" \
+    %{ for label_key, label_value in labels ~}
+    --node-label="${label_key}=${label_value}" \
+    %{ endfor ~}
     %{ for taint in taints ~}
     --node-taint="${taint.key}=${taint.value}:${taint.effect}" \
     %{ endfor ~}

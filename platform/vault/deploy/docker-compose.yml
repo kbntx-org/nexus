@@ -1,0 +1,24 @@
+name: vault
+
+services:
+  vault:
+    build:
+      context: .
+    restart: always
+    volumes:
+      - vault-data:/vault/file:rw
+      - vault-logs:/vault/logs:rw
+    command: server
+    cap_add:
+      - IPC_LOCK
+
+  cloudflared:
+    image: cloudflare/cloudflared:2025.8.1
+    restart: always
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
+    command: tunnel --no-autoupdate run
+
+volumes:
+  vault-data:
+  vault-logs:

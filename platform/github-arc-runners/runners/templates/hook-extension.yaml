@@ -1,0 +1,60 @@
+# Note: We only add buildkit to the main job container. For this, we check if the pod name does not contain "step" (e.g it's a docker action).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hook-extension
+data:
+  content: |
+    metadata:
+      labels:
+        github-job-pod: 'true'
+    spec:
+      initContainers:
+        - name: buildkitd
+          image: buildkit:v0.24.0-rootless
+          restartPolicy: Always
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          command: ['/bin/sh', '-c']
+          args:
+            - |
+              if echo "$POD_NAME" | grep -q "step"; then
+                echo "Skipping buildkitd in docker action pod"
+                sleep infinity &
+                SLEEP_PID=$!
+                trap "echo 'Received termination signal. Exiting cleanly...'; kill $SLEEP_PID; wait $SLEEP_PID; exit 0" SIGTERM SIGINT
+                wait $SLEEP_PID
+              else
+                echo "Starting buildkitd"
+                exec rootlesskit buildkitd --oci-worker-no-process-sandbox
+              fi
+          securityContext:
+            seccompProfile:
+              type: Unconfined
+            appArmorProfile:
+              type: Unconfined
+            # To change UID/GID, you need to rebuild the image
+            runAsUser: 1000
+            runAsGroup: 1000
+          volumeMounts:
+            - name: buildkit-socket
+              mountPath: /run/user/1000/buildkit
+      containers:
+        - name: "$job"
+          env:
+            - name: BUILDKIT_HOST
+              value: unix:///run/user/1000/buildkit/buildkitd.sock
+          volumeMounts:
+            - name: buildkit-socket
+              mountPath: /run/user/1000/buildkit
+            - name: tmpfs-tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmpfs-tmp
+          emptyDir:
+            medium: Memory
+        - name: buildkit-socket
+          emptyDir: {}

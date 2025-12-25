@@ -1,0 +1,68 @@
+gha-runner-scale-set:
+  controllerServiceAccount: # Needs to be specified because live discovery doesn't work when applying this chart with Argo instead of Helm
+    namespace: arc-systems # Reference here - https://github.com/actions/actions-runner-controller/issues/3043#issuecomment-2502263842
+    name: arc-controller-gha-rs-controller
+  githubConfigUrl: 'https://github.com/kbntx-org'
+  githubConfigSecret: github-arc-runners-secret
+  maxRunners: 3
+  minRunners: 1
+  runnerGroup: 'default'
+  runnerScaleSetName: 'nexus-runners'
+  containerMode:
+    type: 'kubernetes'
+    kubernetesModeWorkVolumeClaim:
+      accessModes: ['ReadWriteOnce']
+      storageClassName: hcloud-volumes
+      resources:
+        requests:
+          storage: 20Gi
+  listenerTemplate:
+    spec:
+      containers:
+        - name: listener
+      nodeSelector:
+        pool: arc-runners-controller-pool
+      tolerations:
+        - key: 'runners-controller'
+          operator: 'Equal'
+          value: 'true'
+          effect: 'NoSchedule'
+  template:
+    spec:
+      initContainers:
+        - name: fix-permissions
+          image: busybox:1.36
+          command:
+            [
+              'sh',
+              '-c',
+              'mkdir -p /home/runner/_work/_tool && chown -R 1001:1001 /home/runner/_work'
+            ]
+          volumeMounts:
+            - name: work
+              mountPath: /home/runner/_work
+      containers:
+        - name: runner
+          image: ghcr.io/actions/actions-runner:2.330.0
+          command: ['/home/runner/run.sh']
+          env:
+            - name: ACTIONS_RUNNER_CONTAINER_HOOK_TEMPLATE
+              value: /etc/config/github/actions-runner/hooks/hook-extension.yaml
+          volumeMounts:
+            - name: hook-extension-config
+              mountPath: /etc/config/github/actions-runner/hooks
+              readOnly: true
+      volumes:
+        - name: hook-extension-config
+          configMap:
+            name: hook-extension
+            items:
+              - key: content
+                path: hook-extension.yaml
+      nodeSelector:
+        pool: ci-runners
+      tolerations:
+        - key: 'ci-runners'
+          operator: 'Equal'
+          value: 'true'
+          effect: 'NoSchedule'
