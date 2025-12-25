@@ -1,0 +1,19 @@
+name: Deploy portfolio
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: nexus-runners
+    container:
+      image: node:22.16.0-alpine
+    timeout-minutes: 5
+    steps:
+      - name: Test
+        run: echo hello world
