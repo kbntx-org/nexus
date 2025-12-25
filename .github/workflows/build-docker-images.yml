@@ -27,22 +27,22 @@ jobs:
           target-tags: kbntx/buildkit:v0.24.0-rootless
           platforms: linux/amd64
 
-      - name: docker-cli-on-node - build and push
+      - name: docker-cli-with-node - build and push
         uses: docker/build-push-action@v6
         with:
           context: platform/custom-docker-images/docker-cli-with-node
           file: platform/custom-docker-images/docker-cli-with-node/Dockerfile
           push: true
           tags: |
-            kbntx/docker-cli-on-node:22.16.0
+            kbntx/docker-cli-with-node:22.16.0
           platforms: linux/amd64
 
-      - name: kubernetes-cli-on-node - build and push
+      - name: kubernetes-cli-with-node - build and push
         uses: docker/build-push-action@v6
         with:
           context: platform/custom-docker-images/kubernetes-cli-with-node
           file: platform/custom-docker-images/kubernetes-cli-with-node/Dockerfile
           push: true
           tags: |
-            kbntx/kubernetes-cli-on-node:22.16.0
+            kbntx/kubernetes-with-node:22.16.0
           platforms: linux/amd64
