@@ -4,11 +4,7 @@ ENV KUBECTL_VERSION=1.32.0
 ENV ARGOCD_VERSION=2.14.11
 ENV BUILDKIT_VERSION=v0.23.2
 
-RUN apt update && apt install -y curl unzip netcat-traditional jq gnupg git amazon-ecr-credential-helper gettext-base wget
-
-# Configure Docker to use Amazon ECR credential helper
-RUN mkdir -p ~/.docker && \
-    echo '{"credHelpers": {"717279713235.dkr.ecr.eu-central-1.amazonaws.com":"ecr-login"}}' > ~/.docker/config.json
+RUN apt update && apt install -y curl unzip netcat-traditional jq gnupg git gettext-base wget
 
 # Install mongodb-tools
 RUN curl "https://fastdl.mongodb.org/tools/db/mongodb-database-tools-debian12-x86_64-100.12.0.deb" -o "mongo.deb" && \

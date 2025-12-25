@@ -17,7 +17,3 @@ RUN apk update && \
     envsubst \
     mongodb-tools \
     coreutils
-
-# Configure Docker to use Amazon ECR credential helper
-RUN mkdir -p ~/.docker && \
-    echo '{"credHelpers": {"717279713235.dkr.ecr.eu-central-1.amazonaws.com":"ecr-login"}}' > ~/.docker/config.json
