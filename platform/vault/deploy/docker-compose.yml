@@ -4,6 +4,7 @@ services:
   vault:
     build:
       context: .
+      dockerfile: Dockerfile.vault
     restart: always
     volumes:
       - vault-data:/vault/file:rw
@@ -13,7 +14,9 @@ services:
       - IPC_LOCK
 
   postgres:
-    image: postgres:18.1-alpine3.22
+    build:
+      context: .
+      dockerfile: Dockerfile.postgresql
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
