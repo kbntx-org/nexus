@@ -1,0 +1,31 @@
+name: Deploy Vault
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-vault
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy Vault
+    runs-on: runners-deploy-k8s
+    container:
+      image: kbntx/docker-cli-with-node:22.16.0
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy
+        uses: ./.github/actions/deploy-with-compose
+        env:
+          CLOUDFLARE_TUNNEL_TOKEN: ${{ secrets.VAULT_CLOUDFLARE_TUNNEL_TOKEN }}
+        with:
+          user: ci
+          server: "10.0.0.3"
+          ssh-key: ${{ secrets.NEXUS_CI_PRIVATE_SSH_KEY }}
+          ssh-known-hosts: ${{ secrets.VAULT_KNOWN_HOSTS }}
+          files: >
+            platform/vault/deploy/docker-compose.yml
