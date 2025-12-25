@@ -1,2 +1,2 @@
-FROM hashicorp/vault:1.18.2
+FROM hashicorp/vault:1.21.1
 COPY config/config.hcl /vault/config/
