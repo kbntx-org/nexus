@@ -80,3 +80,8 @@ module "worker_nodes_firewall" {
 
   label_selector = "type=worker,cluster-name=nexus"
 }
+
+output "cluster_token" {
+  value     = module.nexus_cluster.cluster_token
+  sensitive = true
+}

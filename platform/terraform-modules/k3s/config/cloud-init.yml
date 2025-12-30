@@ -2,18 +2,33 @@
 ssh_pwauth: false
 
 users:
-  - name: ${default_user}
+  - name: engineer
     groups:
       - sudo
     sudo:
       - ALL=(ALL) NOPASSWD:ALL
     shell: /bin/bash
     lock_passwd: true
-    ssh_authorized_keys:
-      - ${default_ssh_key}
 
-%{ if docker_hub_username != "" && docker_hub_password != "" }
 write_files:
+  - path: /etc/ssh/cloudflare-access-ca.pub
+    owner: root:root
+    permissions: '0644'
+    content: |
+      ${cloudflare_access_ssh_ca_public_key}
+
+  - path: /etc/ssh/sshd_config.d/disable-root.conf
+    owner: root:root
+    permissions: '0644'
+    content: |
+      PermitRootLogin no
+
+  - path: /etc/ssh/sshd_config.d/cloudflare-access.conf
+    owner: root:root
+    permissions: '0644'
+    content: |
+      TrustedUserCAKeys /etc/ssh/cloudflare-access-ca.pub
+  %{ if docker_hub_username != "" && docker_hub_password != "" }
   - path: /etc/rancher/k3s/registries.yaml
     content: |
       configs:
@@ -23,10 +38,13 @@ write_files:
             password: ${docker_hub_password}
     owner: root:root
     permissions: '0600'
-%{ endif }
+  %{ endif }
 
 runcmd:
   - ufw disable
+  - passwd -l root
+  - chage -E -1 -M -1 -I -1 -m 0 root
+  - systemctl restart ssh
   %{ if type == "control-plane" }
   - |
     curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.33.3+k3s1 sh -s - server \
