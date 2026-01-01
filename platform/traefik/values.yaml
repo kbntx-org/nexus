@@ -1,0 +1,42 @@
+traefik:
+  ingressClass:
+    default: false
+    enabled: true
+    name: traefik
+  providers:
+    kubernetesCRD:
+      enabled: false
+    kubernetesIngress:
+      enabled: true
+
+  ports:
+    web:
+      forwadedHeaders:
+        insecure: false
+        trustedIPs: ['10.42.0.0/16']
+      expose:
+        default: true
+    websecure:
+      expose:
+        default: false
+
+  service:
+    type: ClusterIP
+
+  deployment:
+    replicas: 2
+
+  logs:
+    general:
+      format: json
+    access:
+      enabled: true
+      format: json
+      fields:
+        headers:
+          defaultMode: drop
+          names:
+            Referer: keep
+            User-Agent: keep
+            X-Forwarded-For: keep
+            CF-IPCountry: keep
