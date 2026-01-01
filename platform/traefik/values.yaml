@@ -1,6 +1,6 @@
 traefik:
   ingressClass:
-    default: false
+    isDefaultClass: false
     enabled: true
     name: traefik
   providers:
@@ -11,7 +11,7 @@ traefik:
 
   ports:
     web:
-      forwadedHeaders:
+      forwardedHeaders:
         insecure: false
         trustedIPs: ['10.42.0.0/16']
       expose:
