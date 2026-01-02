@@ -23,15 +23,11 @@ Components: stable
 Signed-By: /etc/apt/keyrings/docker.asc
 EOF
 RUN apt update && \
-    apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    apt install -y docker-ce-cli docker-buildx-plugin docker-compose-plugin
 
 # Install mongodb-tools
 RUN curl "https://fastdl.mongodb.org/tools/db/mongodb-database-tools-debian12-x86_64-100.12.0.deb" -o "mongo.deb" && \
     apt install -y ./mongo.deb && rm mongo.deb
-
-# Install mongodb-cli
-RUN curl "https://fastdl.mongodb.org/mongocli/mongodb-atlas-cli_1.45.1_linux_x86_64.deb" -o "mongocli.deb" && \
-    apt install -y ./mongocli.deb && rm mongocli.deb
 
 # Install AWS-cli v2
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
