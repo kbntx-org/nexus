@@ -4,15 +4,15 @@ on:
   push:
     branches: [main]
 
-permissions:
-  contents: read
-
 concurrency:
   group: deploy-portfolio
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: nexus-runners
+    container:
+      image: kbntx/nexus-ci-toolkit:1.0
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,7 +25,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: "10.14.0"
 
       - name: Install dependencies
         run: pnpm install
@@ -40,7 +40,7 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v6
+        uses: ./.github/actions/buildkit-and-push
         with:
           context: .
           file: apps/portfolio/frontend/Dockerfile

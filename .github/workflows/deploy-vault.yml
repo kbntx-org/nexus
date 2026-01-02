@@ -4,15 +4,14 @@ on:
 
 concurrency:
   group: deploy-vault
-  cancel-in-progress: true
 
 jobs:
   deploy:
     name: Deploy Vault
     runs-on: nexus-runners
     container:
-      image: kbntx/docker-cli-with-node:22.16.0
-    timeout-minutes: 60
+      image: kbntx/nexus-ci-toolkit:1.0
+    timeout-minutes: 10
 
     steps:
       - name: Checkout code

@@ -1,0 +1,23 @@
+name: 'Buildkit and push'
+description: 'Build and push Docker images using buildctl in Kubernetes'
+inputs:
+  tag:
+    description: 'Image tag'
+    required: true
+  file:
+    description: 'Path to Dockerfile'
+    required: true
+  context:
+    description: 'Build context path'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - name: Build with buildctl
+      shell: bash
+      run: |
+        buildctl build \
+          --frontend=dockerfile.v0 \
+          --local context="${{ inputs.context }}" \
+          --local dockerfile="${{ inputs.file }}" \
+          --output type=image,name="${{ inputs.tag }}",push=true
