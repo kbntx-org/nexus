@@ -28,4 +28,4 @@ jobs:
         with:
           context: .
           file: apps/documentation/Dockerfile
-          tags: kbntx/documentation:latest
+          tag: kbntx/documentation:latest

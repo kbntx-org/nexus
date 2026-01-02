@@ -16,8 +16,11 @@ runs:
     - name: Build with buildctl
       shell: bash
       run: |
+        DOCKERFILE_DIR=$(dirname "${{ inputs.file }}")
+        DOCKERFILE_NAME=$(basename "${{ inputs.file }}")
         buildctl build \
           --frontend=dockerfile.v0 \
           --local context="${{ inputs.context }}" \
-          --local dockerfile="${{ inputs.file }}" \
+          --local dockerfile="$DOCKERFILE_DIR" \
+          --opt filename="$DOCKERFILE_NAME" \
           --output type=image,name="${{ inputs.tag }}",push=true

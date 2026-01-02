@@ -6,6 +6,9 @@ ENV BUILDKIT_VERSION=v0.23.2
 
 RUN apt update && apt install -y curl unzip netcat-traditional jq gnupg git gettext-base wget ca-certificates
 
+# Install PNPM
+RUN npm install -g pnpm@10.14.0
+
 # Install Docker CLI
 RUN apt remove $(dpkg --get-selections docker.io docker-compose docker-doc podman-docker containerd runc | cut -f1) && \
     apt update && \
