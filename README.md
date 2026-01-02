@@ -88,7 +88,7 @@ Nexus represents the evolution from my previous homelab repository. While homela
 
    ```bash
    # Start the portfolio frontend
-   pnpm nx serve portfolio-frontend
+   pnpm nx serve portfolio
 
    # Or run all applications
    pnpm nx run-many --target=serve --all
@@ -98,10 +98,10 @@ Nexus represents the evolution from my previous homelab repository. While homela
 
 ```bash
 # Development
-pnpm nx serve portfolio-frontend    # Start portfolio frontend
-pnpm nx build portfolio-frontend    # Build portfolio frontend
-pnpm nx test portfolio-frontend     # Run tests
-pnpm nx lint portfolio-frontend     # Lint code
+pnpm nx serve portfolio    # Start portfolio frontend
+pnpm nx build portfolio    # Build portfolio frontend
+pnpm nx test portfolio     # Run tests
+pnpm nx lint portfolio     # Lint code
 
 # Platform operations
 pnpm nx graph                       # View project dependency graph

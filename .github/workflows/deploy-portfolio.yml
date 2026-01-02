@@ -21,7 +21,7 @@ jobs:
         run: pnpm install
 
       - name: Build portfolio frontend
-        run: pnpm nx build portfolio-frontend --configuration=production
+        run: pnpm nx build portfolio --configuration=production
 
       - name: Login to Docker registry
         uses: docker/login-action@v3

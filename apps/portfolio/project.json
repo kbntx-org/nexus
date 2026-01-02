@@ -1,5 +1,5 @@
 {
-  "name": "portfolio-frontend",
+  "name": "portfolio",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "prefix": "app",
@@ -48,10 +48,10 @@
       "executor": "@nx/angular:dev-server",
       "configurations": {
         "production": {
-          "buildTarget": "portfolio-frontend:build:production"
+          "buildTarget": "portfolio:build:production"
         },
         "development": {
-          "buildTarget": "portfolio-frontend:build:development",
+          "buildTarget": "portfolio:build:development",
           "host": "0.0.0.0"
         }
       },
