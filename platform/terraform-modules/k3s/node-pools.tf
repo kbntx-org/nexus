@@ -106,7 +106,7 @@ resource "null_resource" "deploy_core_cluster_charts" {
   }
 
   provisioner "file" {
-    source      = "${path.root}/../../../kubernetes/ingress-nginx"
+    source      = "${path.root}/../../../kubernetes/traefik"
     destination = "/tmp"
   }
 
