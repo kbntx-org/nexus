@@ -1,6 +1,6 @@
 traefik:
   ingressClass:
-    isDefaultClass: false
+    isDefaultClass: true
     enabled: true
     name: traefik
   providers:

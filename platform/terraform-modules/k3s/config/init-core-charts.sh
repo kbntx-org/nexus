@@ -9,10 +9,10 @@ install_chart_repos() {
 
 cloudflare_tunnel_token=$1
 
-# Install ingress-nginx
-install_chart_repos /tmp/ingress-nginx
-helm dependency build /tmp/ingress-nginx
-helm install ingress-nginx /tmp/ingress-nginx -n ingress-nginx -f /tmp/ingress-nginx/values.prod.yaml --create-namespace
+# Install traefik
+install_chart_repos /tmp/traefik-ingress
+helm dependency build /tmp/traefik-ingress
+helm install traefik-ingress /tmp/traefik-ingress -n traefik-ingress -f /tmp/traefik-ingress/values.prod.yaml --create-namespace
 
 # Install argocd
 install_chart_repos /tmp/argocd
@@ -27,4 +27,4 @@ helm dependency build /tmp/cloudflared
 helm install cloudflared /tmp/cloudflared -n cloudflare --create-namespace
 
 # Remove charts from the server
-rm -rf /tmp/ingress-nginx /tmp/argocd
+rm -rf /tmp/traefik-ingress /tmp/argocd
