@@ -44,6 +44,7 @@ data:
               mountPath: /run/user/1000/buildkit
       containers:
         - name: "$job"
+          imagePullPolicy: Always
           env:
             - name: BUILDKIT_HOST
               value: unix:///run/user/1000/buildkit/buildkitd.sock
