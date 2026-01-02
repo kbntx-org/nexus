@@ -4,7 +4,21 @@ ENV KUBECTL_VERSION=1.32.0
 ENV ARGOCD_VERSION=2.14.11
 ENV BUILDKIT_VERSION=v0.23.2
 
-RUN apt update && apt install -y curl unzip netcat-traditional jq gnupg git gettext-base wget
+RUN apt update && apt install -y curl unzip netcat-traditional jq gnupg git gettext-base wget ca-certificates
+
+# Install Docker CLI
+RUN install -m 0755 -d /etc/apt/keyrings && \
+    curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc && \
+    chmod a+r /etc/apt/keyrings/docker.asc && \
+    tee /etc/apt/sources.list.d/docker.sources <<EOF
+    Types: deb
+    URIs: https://download.docker.com/linux/debian
+    Suites: $(. /etc/os-release && echo "$VERSION_CODENAME")
+    Components: stable
+    Signed-By: /etc/apt/keyrings/docker.asc
+EOF
+RUN apt update && \
+    apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 # Install mongodb-tools
 RUN curl "https://fastdl.mongodb.org/tools/db/mongodb-database-tools-debian12-x86_64-100.12.0.deb" -o "mongo.deb" && \
