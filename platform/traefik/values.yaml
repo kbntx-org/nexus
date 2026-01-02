@@ -20,6 +20,9 @@ traefik:
       expose:
         default: false
 
+  additionalArguments:
+    - '--api.insecure=true'
+
   service:
     type: ClusterIP
 
