@@ -29,10 +29,8 @@ RUN apt update && \
 RUN curl "https://fastdl.mongodb.org/tools/db/mongodb-database-tools-debian12-x86_64-100.12.0.deb" -o "mongo.deb" && \
     apt install -y ./mongo.deb && rm mongo.deb
 
-# Install AWS-cli v2
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
-    unzip awscliv2.zip && \
-	./aws/install && rm awscliv2.zip
+# Install s5cmd
+COPY --from=peakcom/s5cmd:v2.3.0 /s5cmd /usr/local/bin/s5cmd
 
 # Install ArgoCD CLI (latest stable version)
 RUN curl -sSL -o argocd-linux-amd64 "https://github.com/argoproj/argo-cd/releases/download/v${ARGOCD_VERSION}/argocd-linux-amd64"; \
