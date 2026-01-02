@@ -4,7 +4,8 @@ ENV KUBECTL_VERSION=1.32.0
 ENV ARGOCD_VERSION=2.14.11
 ENV BUILDKIT_VERSION=v0.23.2
 
-RUN apt update && apt install -y curl unzip netcat-traditional jq gnupg git gettext-base wget ca-certificates
+RUN apt update && apt install --no-install-recommends -y curl unzip netcat-traditional jq gnupg git gettext-base wget ca-certificates && \
+    rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
 # Install PNPM
 RUN npm install -g pnpm@10.14.0
@@ -15,19 +16,21 @@ RUN apt remove $(dpkg --get-selections docker.io docker-compose docker-doc podma
     install -m 0755 -d /etc/apt/keyrings && \
     curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc && \
     chmod a+r /etc/apt/keyrings/docker.asc && \
-    tee /etc/apt/sources.list.d/docker.sources <<EOF
-Types: deb
-URIs: https://download.docker.com/linux/debian
-Suites: $(. /etc/os-release && echo "$VERSION_CODENAME")
-Components: stable
-Signed-By: /etc/apt/keyrings/docker.asc
-EOF
-RUN apt update && \
-    apt install -y docker-ce-cli docker-buildx-plugin docker-compose-plugin
+    printf '%s\n' \
+      "Types: deb" \
+      "URIs: https://download.docker.com/linux/debian" \
+      "Suites: $(. /etc/os-release && echo "$VERSION_CODENAME")" \
+      "Components: stable" \
+      "Signed-By: /etc/apt/keyrings/docker.asc" \
+    > /etc/apt/sources.list.d/docker.sources && \
+    apt update && \
+    apt install --no-install-recommends -y docker-ce-cli docker-buildx-plugin docker-compose-plugin && \
+    rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
 # Install mongodb-tools
 RUN curl "https://fastdl.mongodb.org/tools/db/mongodb-database-tools-debian12-x86_64-100.12.0.deb" -o "mongo.deb" && \
-    apt install -y ./mongo.deb && rm mongo.deb
+    apt update && apt install --no-install-recommends -y ./mongo.deb && rm mongo.deb && \
+    rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
 # Install s5cmd
 COPY --from=peakcom/s5cmd:v2.3.0 /s5cmd /usr/local/bin/s5cmd
@@ -47,7 +50,8 @@ RUN curl -LO "https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kube
 RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | tee /usr/share/keyrings/githubcli-archive-keyring.gpg > /dev/null && \
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null && \
     apt update && \
-    apt install -y gh
+    apt install --no-install-recommends -y gh && \
+    rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
 # Install buildctl
 RUN mkdir -p /tmp/buildkit && \
@@ -62,3 +66,8 @@ RUN mkdir -p /tmp/buildkit && \
 # Fix checkout code for privileged users (when using this image as github runner container)
 # https://github.com/actions/runner-images/issues/6775#issuecomment-1410270956
 RUN git config --system --add safe.directory '*'
+
+# Cleanup docs and man
+RUN rm -rf \
+    /usr/share/doc/* \
+    /usr/share/man/*
