@@ -50,6 +50,14 @@ argo-cd:
               clientSecret: $github-oauth-secret:clientSecret
               orgs:
                 - name: kbntx-org
+      # Mock ingress healthcheck until https://github.com/traefik/traefik/pull/12134 is merged.
+      resource.customizations: |
+        networking.k8s.io/Ingress:
+          health.lua: |
+            return {
+              status = "Healthy",
+              message = "Mock ingress to be healthy until traefik fix reporting for clusterIPs services."
+            }
     rbac:
       policy.default: ''
       policy.csv: |
