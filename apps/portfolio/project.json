@@ -3,7 +3,7 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "prefix": "app",
-  "sourceRoot": "apps/portfolio/frontend/src",
+  "sourceRoot": "apps/portfolio/src",
   "tags": [],
   "targets": {
     "build": {
@@ -11,13 +11,13 @@
       "outputs": ["{options.outputPath}"],
       "options": {
         "aot": true,
-        "outputPath": "dist/apps/portfolio/frontend",
-        "index": "apps/portfolio/frontend/src/index.html",
-        "browser": "apps/portfolio/frontend/src/main.ts",
+        "outputPath": "dist/apps/portfolio",
+        "index": "apps/portfolio/src/index.html",
+        "browser": "apps/portfolio/src/main.ts",
         "polyfills": ["zone.js"],
-        "tsConfig": "apps/portfolio/frontend/tsconfig.app.json",
-        "assets": ["apps/portfolio/frontend/src/favicon.ico", "apps/portfolio/frontend/src/assets"],
-        "styles": ["apps/portfolio/frontend/src/styles.scss"],
+        "tsConfig": "apps/portfolio/tsconfig.app.json",
+        "assets": ["apps/portfolio/src/favicon.ico", "apps/portfolio/src/assets"],
+        "styles": ["apps/portfolio/src/styles.scss"],
         "scripts": []
       },
       "configurations": {
@@ -61,7 +61,7 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "apps/portfolio/frontend/jest.config.ts"
+        "jestConfig": "apps/portfolio/jest.config.ts"
       }
     }
   }
