@@ -50,6 +50,7 @@ traefik:
   logs:
     general:
       format: json
+      level: DEBUG
     access:
       enabled: true
       format: json
