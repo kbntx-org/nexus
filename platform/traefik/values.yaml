@@ -19,6 +19,7 @@ traefik:
       http:
         encodedCharacters:
           allowEncodedSlash: true
+          allowEncodedPercent: true
     websecure:
       expose:
         default: false
