@@ -28,15 +28,6 @@ traefik:
     websecure:
       expose:
         default: false
-      http:
-        encodedCharacters:
-          allowEncodedSlash: true
-          allowEncodedBackSlash: true
-          allowEncodedNullCharacter: true
-          allowEncodedSemicolon: true
-          allowEncodedPercent: true
-          allowEncodedQuestionMark: true
-          allowEncodedHash: true
 
   additionalArguments:
     - '--api.insecure=true'
