@@ -25,18 +25,18 @@ victoria-metrics-single:
 
 grafana:
   admin:
-    existingSecret: grafana-credentials
-    userKey: username
-    passwordKey: password
+    existingSecret: monitoring-secret
+    userKey: grafanaUser
+    passwordKey: grafanaPassword
   envValueFrom:
     POSTGRES_USER:
       secretKeyRef:
-        name: postgres-credentials
-        key: username
+        name: monitoring-secret
+        key: postgresUser
     POSTGRES_PASSWORD:
       secretKeyRef:
-        name: postgres-credentials
-        key: password
+        name: monitoring-secret
+        key: postgresPassword
   grafana.ini:
     server:
       domain: grafana.kbntx.com
@@ -67,23 +67,23 @@ loki:
       - name: S3_ACCESS_KEY_ID
         valueFrom:
           secretKeyRef:
-            name: s3-loki-credentials
-            key: accessKeyId
+            name: monitoring-secret
+            key: lokiAccessKeyId
       - name: S3_SECRET_ACCESS_KEY
         valueFrom:
           secretKeyRef:
-            name: s3-loki-credentials
-            key: secretAccessKey
+            name: monitoring-secret
+            key: lokiSecretAccessKey
       - name: S3_ENDPOINT
         valueFrom:
           secretKeyRef:
-            name: s3-loki-credentials
-            key: endpoint
+            name: monitoring-secret
+            key: lokiEndpoint
       - name: CHUNKS_BUCKET_NAME
         valueFrom:
           secretKeyRef:
-            name: s3-loki-credentials
-            key: bucketName
+            name: monitoring-secret
+            key: lokiBucketName
   chunksCache:
     enabled: false
   loki:
