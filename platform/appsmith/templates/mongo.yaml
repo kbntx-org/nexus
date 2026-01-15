@@ -30,7 +30,7 @@ spec:
       volumes:
         - name: mongodb-key-temp
           secret:
-            secretName: appsmith-secrets
+            secretName: appsmith-secret
             items:
               - key: mongoDbKey
                 path: mongoDbKey
@@ -45,17 +45,17 @@ spec:
             - name: MONGO_INITDB_ROOT_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: appsmith-secrets
+                  name: appsmith-secret
                   key: mongoDbUser
             - name: MONGO_INITDB_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: appsmith-secrets
+                  name: appsmith-secret
                   key: mongoDbPassword
             - name: MONGO_INITDB_DATABASE
               valueFrom:
                 secretKeyRef:
-                  name: appsmith-secrets
+                  name: appsmith-secret
                   key: mongoDbName
           args:
             - --replSet

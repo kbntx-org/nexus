@@ -28,7 +28,7 @@ spec:
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: appsmith-secrets
+                  name: appsmith-secret
                   key: redisPassword
           command: ["/bin/sh"]
           args:

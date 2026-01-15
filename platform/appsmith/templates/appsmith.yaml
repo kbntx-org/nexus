@@ -44,37 +44,37 @@ spec:
             - name: APPSMITH_OAUTH2_GITHUB_CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  name: appsmith-secrets
+                  name: appsmith-secret
                   key: githubClientId
             - name: APPSMITH_OAUTH2_GITHUB_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: appsmith-secrets
+                  name: appsmith-secret
                   key: githubClientSecret
             - name: APPSMITH_ADMIN_EMAILS
               valueFrom:
                 secretKeyRef:
-                  name: appsmith-secrets
+                  name: appsmith-secret
                   key: adminEmails
             - name: APPSMITH_MONGODB_URI
               valueFrom:
                 secretKeyRef:
-                  name: appsmith-secrets
+                  name: appsmith-secret
                   key: mongoDbUrl
             - name: APPSMITH_REDIS_URL
               valueFrom:
                 secretKeyRef:
-                  name: appsmith-secrets
+                  name: appsmith-secret
                   key: redisDbUrl
             - name: APPSMITH_ENCRYPTION_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: appsmith-secrets
+                  name: appsmith-secret
                   key: encryptionPassword
             - name: APPSMITH_ENCRYPTION_SALT
               valueFrom:
                 secretKeyRef:
-                  name: appsmith-secrets
+                  name: appsmith-secret
                   key: encryptionSalt
             - name: APPSMITH_DISABLE_TELEMETRY
               value: "true"
