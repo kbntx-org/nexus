@@ -24,8 +24,8 @@ spec:
             - name: TUNNEL_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: cloudflare-tunnel-token
-                  key: token
+                  name: cloudflare-secret
+                  key: tunnelToken
           command:
             - cloudflared
             - tunnel
