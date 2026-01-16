@@ -1,0 +1,12 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", "schedule:nonOfficeHours", "schedule:automergeNonOfficeHours"],
+  "prConcurrentLimit": 5,
+  "minimumReleaseAge": "14 days",
+  "internalChecksFilter": "strict",
+  "labels": ["dependencies"],
+  "postUpdateOptions": ["pnpmDedupe"],
+  "automergeType": "pr",
+  "separateMultipleMajor": true,
+  "timezone": "Europe/Berlin"
+}
