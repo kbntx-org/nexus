@@ -51,6 +51,9 @@ charts/
 # Local .terraform directories
 **/.terraform/*
 
+# Generated terraform artifacts
+**/.generated/*
+
 # .tfstate files
 *.tfstate
 *.tfstate.*

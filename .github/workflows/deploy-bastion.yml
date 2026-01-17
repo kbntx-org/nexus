@@ -1,0 +1,30 @@
+name: Deploy Vault
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-vault
+
+jobs:
+  deploy:
+    name: Deploy Vault
+    runs-on: nexus-runners
+    container:
+      image: kbntx/nexus-ci-toolkit:1.0
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy
+        uses: ./.github/actions/deploy-with-compose
+        env:
+          CLOUDFLARE_TUNNEL_TOKEN: ${{ secrets.BASTION_CLOUDFLARE_TUNNEL_TOKEN }}
+        with:
+          user: ci
+          server: "10.0.0.3"
+          ssh-key: ${{ secrets.NEXUS_CI_PRIVATE_SSH_KEY }}
+          ssh-known-hosts: ${{ secrets.BASTION_KNOWN_HOSTS }}
+          files: >
+            platform/bastion/deploy/docker-compose.yml

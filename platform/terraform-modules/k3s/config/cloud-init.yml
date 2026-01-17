@@ -28,6 +28,25 @@ write_files:
     permissions: '0644'
     content: |
       TrustedUserCAKeys /etc/ssh/cloudflare-access-ca.pub
+  %{ if type == "control-plane" }
+  - path: /opt/scripts/init-core-cluster-dependencies.sh
+    owner: root:root
+    permissions: '0755'
+    encoding: b64
+    content: ${init_script_b64}
+
+  - path: /tmp/charts/hetzner-cloud-controller.tar.gz
+    owner: root:root
+    permissions: '0644'
+    encoding: b64
+    content: ${chart_hetzner_cloud_controller_b64}
+
+  - path: /tmp/charts/argocd.tar.gz
+    owner: root:root
+    permissions: '0644'
+    encoding: b64
+    content: ${chart_argocd_b64}
+  %{ endif }
   %{ if docker_hub_username != "" && docker_hub_password != "" }
   - path: /etc/rancher/k3s/registries.yaml
     content: |
@@ -60,6 +79,7 @@ runcmd:
       --node-taint="node-role.kubernetes.io/control-plane=true:NoSchedule" \
       --node-label="node.kubernetes.io/exclude-from-external-load-balancers=true" \
       --token=${cluster_token}
+  - /opt/scripts/init-core-cluster-dependencies.sh "${hcloud_token}" "${vpc_name}" "${cloudflare_tunnel_token}"
   %{ else }
   - |
     curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.33.3+k3s1 sh -s - agent \

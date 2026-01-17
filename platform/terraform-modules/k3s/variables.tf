@@ -32,15 +32,6 @@ variable "vpc_name" {
   type        = string
 }
 
-variable "default_user" {
-  description = "Default SSH key to use for the servers"
-  type = object({
-    name       = string
-    ssh_key    = string
-    ssh_key_id = string
-  })
-}
-
 variable "control_plane" {
   description = "Control plane node configuration"
   type = object({
@@ -61,7 +52,7 @@ variable "node_pools" {
     count       = number
     server_type = string
     location    = string
-    labels      = map(string)
+    labels      = optional(map(string), {})
     taints = optional(list(object({
       key    = string
       value  = string

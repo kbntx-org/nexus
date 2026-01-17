@@ -1,7 +1,3 @@
-data "hcloud_ssh_key" "default_ssh_key" {
-  with_selector = "default=true"
-}
-
 data "hcloud_network" "main_network" {
   name = "main-vpc"
 }
@@ -16,12 +12,6 @@ module "nexus_cluster" {
   docker_hub_username     = var.docker_hub_username
   docker_hub_password     = var.docker_hub_password
 
-  default_user = {
-    name       = "kenny"
-    ssh_key_id = data.hcloud_ssh_key.default_ssh_key.id
-    ssh_key    = data.hcloud_ssh_key.default_ssh_key.public_key
-  }
-
   control_plane = {
     server_type = "cpx31"
     location    = "fsn1"
@@ -32,13 +22,10 @@ module "nexus_cluster" {
   }
 
   node_pools = {
-    "cx-33" = {
+    "default" = {
       count       = 3
       server_type = "cx33"
       location    = "fsn1"
-      labels = {
-        "pool" = "default"
-      }
     }
     "ci-runners" = {
       count       = 1
