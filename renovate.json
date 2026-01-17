@@ -8,5 +8,6 @@
   "postUpdateOptions": ["pnpmDedupe"],
   "automergeType": "pr",
   "separateMultipleMajor": true,
-  "timezone": "Europe/Berlin"
+  "timezone": "Europe/Berlin",
+  "npmrc": "frozen-lockfile=false"
 }
