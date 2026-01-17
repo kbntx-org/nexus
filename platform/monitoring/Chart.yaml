@@ -9,7 +9,7 @@ dependencies:
     version: 6.40.0
     repository: https://grafana.github.io/helm-charts
   - name: promtail
-    version: 6.17.0
+    version: 6.17.1
     repository: https://grafana.github.io/helm-charts
   - name: kube-state-metrics
     version: 6.3.0
