@@ -10,5 +10,13 @@
   "automergeType": "pr",
   "separateMultipleMajor": true,
   "timezone": "Europe/Berlin",
-  "npmrc": "frozen-lockfile=false"
+  "npmrc": "frozen-lockfile=false",
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": ["templates/.*\\.yaml$"],
+      "matchStrings": ["image:\\s*(?<depName>[^:]+):(?<currentValue>[^\\s\"]+)"],
+      "datasourceTemplate": "docker"
+    }
+  ]
 }
