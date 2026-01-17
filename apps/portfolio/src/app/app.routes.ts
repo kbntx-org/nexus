@@ -1,5 +1,7 @@
 import { Route } from '@angular/router';
 
+import { CodeViewerComponent } from './pages/code-viewer/code-viewer.component';
+import { codeSourceGuard } from './pages/code-viewer/guards/code-source.guard';
 import { CvComponent } from './pages/cv/cv.component';
 import { ExperiencesComponent } from './pages/experiences/experiences.component';
 import { HomeComponent } from './pages/home/home.component';
@@ -26,5 +28,10 @@ export const ROUTES: Route[] = [
   {
     path: 'cv',
     component: CvComponent
+  },
+  {
+    path: 'code-source/:id',
+    component: CodeViewerComponent,
+    canActivate: [codeSourceGuard]
   }
 ];

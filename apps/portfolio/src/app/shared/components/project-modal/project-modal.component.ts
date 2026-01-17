@@ -1,12 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import {
   LucideAngularModule,
   X,
   ChevronLeft,
   ChevronRight,
   ExternalLink,
-  Github
+  Github,
+  Code2
 } from 'lucide-angular';
 
 export interface Project {
@@ -17,13 +19,14 @@ export interface Project {
   features?: string[];
   liveUrl?: string;
   githubUrl?: string;
+  codeSourceUrl?: string;
   images?: string[];
   logo?: string;
 }
 
 @Component({
   selector: 'app-project-modal',
-  imports: [CommonModule, LucideAngularModule],
+  imports: [CommonModule, RouterModule, LucideAngularModule],
   template: `
     <div
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
@@ -137,7 +140,7 @@ export interface Project {
 
         <div
           class="border-border bg-muted/30 border-t p-8 pt-6"
-          *ngIf="project.liveUrl || project.githubUrl"
+          *ngIf="project.liveUrl || project.githubUrl || project.codeSourceUrl"
         >
           <div class="flex w-full flex-wrap gap-4">
             <a
@@ -157,6 +160,15 @@ export interface Project {
             >
               <lucide-angular [img]="GithubIcon" class="h-4 w-4"></lucide-angular>
               View Code
+            </a>
+            <a
+              *ngIf="project.codeSourceUrl"
+              [routerLink]="project.codeSourceUrl"
+              (click)="closeModal()"
+              class="text-foreground border-border hover:bg-accent hover:text-accent-foreground inline-flex items-center gap-2 rounded-md border bg-transparent px-6 py-3 font-medium transition-all duration-200 hover:-translate-y-0.5"
+            >
+              <lucide-angular [img]="Code2Icon" class="h-4 w-4"></lucide-angular>
+              Browse Source
             </a>
           </div>
         </div>
@@ -271,9 +283,9 @@ export interface Project {
 
         <div
           class="border-border bg-card sticky bottom-0 border-t p-6 pt-4"
-          *ngIf="project.liveUrl || project.githubUrl"
+          *ngIf="project.liveUrl || project.githubUrl || project.codeSourceUrl"
         >
-          <div class="flex gap-3">
+          <div class="flex flex-wrap gap-3">
             <a
               *ngIf="project.liveUrl"
               [href]="project.liveUrl"
@@ -291,6 +303,15 @@ export interface Project {
             >
               <lucide-angular [img]="GithubIcon" class="h-4 w-4"></lucide-angular>
               View Code
+            </a>
+            <a
+              *ngIf="project.codeSourceUrl"
+              [routerLink]="project.codeSourceUrl"
+              (click)="closeModal()"
+              class="text-foreground border-border hover:bg-accent hover:text-accent-foreground inline-flex flex-1 items-center justify-center gap-2 rounded-md border bg-transparent px-4 py-3 font-medium transition-all duration-200 active:scale-95"
+            >
+              <lucide-angular [img]="Code2Icon" class="h-4 w-4"></lucide-angular>
+              Browse Source
             </a>
           </div>
         </div>
@@ -331,12 +352,12 @@ export class ProjectModalComponent implements OnInit, OnDestroy {
   public currentImageIndex = 0;
   public isOpening = false;
 
-  // Lucide icons
   public readonly XIcon = X;
   public readonly ChevronLeftIcon = ChevronLeft;
   public readonly ChevronRightIcon = ChevronRight;
   public readonly ExternalLinkIcon = ExternalLink;
   public readonly GithubIcon = Github;
+  public readonly Code2Icon = Code2;
 
   public ngOnInit(): void {
     document.body.style.overflow = 'hidden';

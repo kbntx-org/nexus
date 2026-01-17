@@ -7,6 +7,7 @@ export interface Project {
   features?: string[];
   liveUrl?: string;
   githubUrl?: string;
+  codeSourceUrl?: string;
   images?: string[];
   logo?: string;
 }
@@ -51,7 +52,8 @@ export const PROJECTS: Project[] = [
       'Ingress-nginx observability (traffic, domains, error ratios)',
       'Reusable lightweight helm chart',
       'Stateful services with recurrent backup in S3'
-    ]
+    ],
+    codeSourceUrl: '/code-source/nexus'
   },
   {
     id: 'nexus-kubernetes',
@@ -91,7 +93,8 @@ export const PROJECTS: Project[] = [
       'Backup and disaster recovery automation',
       'Gitops driven development with ArgoCD to minimize recovery while having flexibility',
       'Standardized deployments'
-    ]
+    ],
+    codeSourceUrl: '/code-source/nexus'
   },
   {
     id: 'internal-tooling-with-appsmith',
@@ -120,7 +123,8 @@ export const PROJECTS: Project[] = [
       'Possibility to create custom components with react/vue.js and custom datasources (like a cloudflare api integration)',
       'Application 1: Self-service Cloudflare tunnel creation - engineers can create their own locally-managed tunnels, allowing them to share development environments with teammates',
       'Application 2: S3 static asset management - upload public static assets for portfolio and other applications'
-    ]
+    ],
+    codeSourceUrl: '/code-source/nexus'
   },
   {
     id: 'portfolio-website',
@@ -142,6 +146,7 @@ export const PROJECTS: Project[] = [
       'Dark/light theme support',
       'Declarative content management to keep a low maintenance cost',
       'Pre-rendering for performance optimization'
-    ]
+    ],
+    codeSourceUrl: '/code-source/nexus'
   }
 ];
