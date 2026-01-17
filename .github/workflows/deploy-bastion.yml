@@ -1,13 +1,13 @@
-name: Deploy Vault
+name: Deploy bastion
 on:
   workflow_dispatch:
 
 concurrency:
-  group: deploy-vault
+  group: deploy-bastion
 
 jobs:
   deploy:
-    name: Deploy Vault
+    name: Deploy bastion
     runs-on: nexus-runners
     container:
       image: kbntx/nexus-ci-toolkit:1.0
