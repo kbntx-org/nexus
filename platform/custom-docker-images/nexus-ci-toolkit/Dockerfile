@@ -4,7 +4,7 @@ ENV KUBECTL_VERSION=1.32.0
 ENV ARGOCD_VERSION=2.14.11
 ENV BUILDKIT_VERSION=v0.23.2
 
-RUN apt update && apt install --no-install-recommends -y curl unzip netcat-traditional jq gnupg git gettext-base wget ca-certificates && \
+RUN apt update && apt install --no-install-recommends -y curl unzip netcat-traditional jq gnupg git gettext-base wget openssh-client ca-certificates && \
     rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
 # Install PNPM
