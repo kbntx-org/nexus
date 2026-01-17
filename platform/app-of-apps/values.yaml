@@ -1,0 +1,183 @@
+argocd-apps:
+  applications:
+    traefik-ingress:
+      project: default
+      source:
+        repoURL: https://github.com/kbntx/nexus.git
+        path: platform/traefik
+        targetRevision: main
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: traefik-ingress
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+
+    argocd:
+      project: default
+      source:
+        repoURL: https://github.com/kbntx/nexus.git
+        path: platform/argocd
+        targetRevision: main
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: argocd
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+
+    external-secrets:
+      project: default
+      source:
+        repoURL: https://github.com/kbntx/nexus.git
+        path: platform/external-secrets
+        targetRevision: main
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: external-secrets
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+
+    cloudflared:
+      project: default
+      source:
+        repoURL: https://github.com/kbntx/nexus.git
+        path: platform/cloudflared
+        targetRevision: main
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: cloudflared
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+
+    hetzner-cloud-controller:
+      project: default
+      source:
+        repoURL: https://github.com/kbntx/nexus.git
+        path: platform/hetzner-cloud-controller
+        targetRevision: main
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: kube-system
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+
+    monitoring:
+      project: default
+      source:
+        repoURL: https://github.com/kbntx/nexus.git
+        path: platform/monitoring
+        targetRevision: main
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: monitoring
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+
+    appsmith:
+      project: default
+      source:
+        repoURL: https://github.com/kbntx/nexus.git
+        path: platform/appsmith
+        targetRevision: main
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: appsmith
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+
+    github-arc-runners-controller:
+      project: default
+      source:
+        repoURL: https://github.com/kbntx/nexus.git
+        path: platform/github-arc-runners/controller
+        targetRevision: main
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: arc-systems
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+
+    github-arc-runners:
+      project: default
+      source:
+        repoURL: https://github.com/kbntx/nexus.git
+        path: platform/github-arc-runners/runners
+        targetRevision: main
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: arc-runners
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+
+    k3s-system-upgrade-controller:
+      project: default
+      source:
+        repoURL: https://github.com/kbntx/nexus.git
+        path: platform/k3s-upgrades/system-upgrade-controller
+        targetRevision: main
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: system-upgrade
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+
+    k3s-upgrade-plans:
+      project: default
+      source:
+        repoURL: https://github.com/kbntx/nexus.git
+        path: platform/k3s-upgrades/plans
+        targetRevision: main
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: system-upgrade
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+
+    documentation:
+      project: default
+      source:
+        repoURL: https://github.com/kbntx/nexus.git
+        path: apps/documentation/helm
+        targetRevision: main
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: documentation
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+
+    homepage:
+      project: default
+      source:
+        repoURL: https://github.com/kbntx/nexus.git
+        path: apps/homepage
+        targetRevision: main
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: homepage
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+
+    portfolio:
+      project: default
+      source:
+        repoURL: https://github.com/kbntx/nexus.git
+        path: apps/portfolio/chart
+        targetRevision: main
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: portfolio
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
