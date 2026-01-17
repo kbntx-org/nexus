@@ -2,7 +2,7 @@ name: bastion
 
 services:
   cloudflared:
-    image: cloudflare/cloudflared:2025.8.1
+    image: cloudflare/cloudflared:2025.11.1
     restart: always
     environment:
       TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
