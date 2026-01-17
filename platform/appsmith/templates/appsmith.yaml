@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
         - name: appsmith
-          image: appsmith/appsmith-ce:v1.89
+          image: appsmith/appsmith-ce:v1.94
           ports:
             - containerPort: 80
           env:
