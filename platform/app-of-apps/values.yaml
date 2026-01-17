@@ -3,7 +3,7 @@ argocd-apps:
     traefik-ingress:
       project: default
       source:
-        repoURL: https://github.com/kbntx/nexus.git
+        repoURL: https://github.com/kbntx-org/nexus.git
         path: platform/traefik
         targetRevision: main
       destination:
@@ -16,7 +16,7 @@ argocd-apps:
     argocd:
       project: default
       source:
-        repoURL: https://github.com/kbntx/nexus.git
+        repoURL: https://github.com/kbntx-org/nexus.git
         path: platform/argocd
         targetRevision: main
       destination:
@@ -29,7 +29,7 @@ argocd-apps:
     external-secrets:
       project: default
       source:
-        repoURL: https://github.com/kbntx/nexus.git
+        repoURL: https://github.com/kbntx-org/nexus.git
         path: platform/external-secrets
         targetRevision: main
       destination:
@@ -42,7 +42,7 @@ argocd-apps:
     cloudflared:
       project: default
       source:
-        repoURL: https://github.com/kbntx/nexus.git
+        repoURL: https://github.com/kbntx-org/nexus.git
         path: platform/cloudflared
         targetRevision: main
       destination:
@@ -55,7 +55,7 @@ argocd-apps:
     hetzner-cloud-controller:
       project: default
       source:
-        repoURL: https://github.com/kbntx/nexus.git
+        repoURL: https://github.com/kbntx-org/nexus.git
         path: platform/hetzner-cloud-controller
         targetRevision: main
       destination:
@@ -68,7 +68,7 @@ argocd-apps:
     monitoring:
       project: default
       source:
-        repoURL: https://github.com/kbntx/nexus.git
+        repoURL: https://github.com/kbntx-org/nexus.git
         path: platform/monitoring
         targetRevision: main
       destination:
@@ -81,7 +81,7 @@ argocd-apps:
     appsmith:
       project: default
       source:
-        repoURL: https://github.com/kbntx/nexus.git
+        repoURL: https://github.com/kbntx-org/nexus.git
         path: platform/appsmith
         targetRevision: main
       destination:
@@ -94,7 +94,7 @@ argocd-apps:
     github-arc-runners-controller:
       project: default
       source:
-        repoURL: https://github.com/kbntx/nexus.git
+        repoURL: https://github.com/kbntx-org/nexus.git
         path: platform/github-arc-runners/controller
         targetRevision: main
       destination:
@@ -107,7 +107,7 @@ argocd-apps:
     github-arc-runners:
       project: default
       source:
-        repoURL: https://github.com/kbntx/nexus.git
+        repoURL: https://github.com/kbntx-org/nexus.git
         path: platform/github-arc-runners/runners
         targetRevision: main
       destination:
@@ -117,10 +117,10 @@ argocd-apps:
         syncOptions:
           - CreateNamespace=true
 
-    k3s-system-upgrade-controller:
+    system-upgrade-controller:
       project: default
       source:
-        repoURL: https://github.com/kbntx/nexus.git
+        repoURL: https://github.com/kbntx-org/nexus.git
         path: platform/k3s-upgrades/system-upgrade-controller
         targetRevision: main
       destination:
@@ -130,10 +130,10 @@ argocd-apps:
         syncOptions:
           - CreateNamespace=true
 
-    k3s-upgrade-plans:
+    k3s-upgrades:
       project: default
       source:
-        repoURL: https://github.com/kbntx/nexus.git
+        repoURL: https://github.com/kbntx-org/nexus.git
         path: platform/k3s-upgrades/plans
         targetRevision: main
       destination:
@@ -146,7 +146,7 @@ argocd-apps:
     documentation:
       project: default
       source:
-        repoURL: https://github.com/kbntx/nexus.git
+        repoURL: https://github.com/kbntx-org/nexus.git
         path: apps/documentation/helm
         targetRevision: main
       destination:
@@ -159,7 +159,7 @@ argocd-apps:
     homepage:
       project: default
       source:
-        repoURL: https://github.com/kbntx/nexus.git
+        repoURL: https://github.com/kbntx-org/nexus.git
         path: apps/homepage
         targetRevision: main
       destination:
@@ -172,7 +172,7 @@ argocd-apps:
     portfolio:
       project: default
       source:
-        repoURL: https://github.com/kbntx/nexus.git
+        repoURL: https://github.com/kbntx-org/nexus.git
         path: apps/portfolio/chart
         targetRevision: main
       destination:
