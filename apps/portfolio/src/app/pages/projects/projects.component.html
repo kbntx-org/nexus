@@ -1,3 +1,4 @@
+
 <div class="bg-background text-foreground min-h-screen py-8 md:py-12">
   <div class="mx-auto max-w-6xl px-4">
     <div
@@ -14,7 +15,7 @@
 
     <section class="space-y-8">
       <div class="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8 lg:grid-cols-3">
-        @for (project of projects; track project.id; let i = $index) {
+        @for (project of projectsService.projects$ | async; track project.title; let i = $index) {
           <div
             class="bg-card animate-slide-in-up border-border flex flex-col overflow-hidden rounded-lg border opacity-0 shadow-lg transition-all duration-300 hover:shadow-xl"
             [class]="getCardVariation(i)"
@@ -75,7 +76,7 @@
   </div>
 </div>
 
-@if (showModal && selectedProject) {
+@if (selectedProject) {
   <app-project-modal [project]="selectedProject" (modalClose)="closeProjectModal()">
   </app-project-modal>
 }

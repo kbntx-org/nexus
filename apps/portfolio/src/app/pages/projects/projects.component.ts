@@ -1,30 +1,27 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 
 import {
   ProjectModalComponent,
-  Project
-} from '../../shared/components/project-modal/project-modal.component';
-import { PROJECTS } from './data/projects.data';
+} from './components/project-modal/project-modal.component';
+import { Project, ProjectsService } from './services/projects.service';
 
 @Component({
   selector: 'app-projects',
   imports: [CommonModule, ProjectModalComponent],
+  providers: [ProjectsService],
   templateUrl: './projects.component.html'
 })
 export class ProjectsComponent {
-  public projects = PROJECTS;
+  public projectsService = inject(ProjectsService);
 
-  public showModal = false;
   public selectedProject: Project | null = null;
 
   public openProjectModal(project: Project): void {
     this.selectedProject = project;
-    this.showModal = true;
   }
 
   public closeProjectModal(): void {
-    this.showModal = false;
     this.selectedProject = null;
   }
 
@@ -34,24 +31,24 @@ export class ProjectsComponent {
 
   public getCardVariation(index: number): string {
     const variations = [
-      'hover:border-blue-500/50', // Blue accent
-      'hover:border-green-500/50', // Green accent
-      'hover:border-purple-500/50', // Purple accent
-      'hover:border-orange-500/50', // Orange accent
-      'hover:border-pink-500/50', // Pink accent
-      'hover:border-cyan-500/50' // Cyan accent
+      'hover:border-blue-500/50',
+      'hover:border-green-500/50',
+      'hover:border-purple-500/50',
+      'hover:border-orange-500/50',
+      'hover:border-pink-500/50',
+      'hover:border-cyan-500/50'
     ];
     return variations[index % variations.length];
   }
 
   public getLogoGradient(index: number): string {
     const gradients = [
-      'bg-gradient-to-br from-blue-500 to-purple-600', // Blue to purple
-      'bg-gradient-to-br from-green-500 to-teal-600', // Green to teal
-      'bg-gradient-to-br from-purple-500 to-pink-600', // Purple to pink
-      'bg-gradient-to-br from-orange-500 to-red-600', // Orange to red
-      'bg-gradient-to-br from-pink-500 to-rose-600', // Pink to rose
-      'bg-gradient-to-br from-cyan-500 to-blue-600' // Cyan to blue
+      'bg-gradient-to-br from-blue-500 to-purple-600',
+      'bg-gradient-to-br from-green-500 to-teal-600',
+      'bg-gradient-to-br from-purple-500 to-pink-600',
+      'bg-gradient-to-br from-orange-500 to-red-600',
+      'bg-gradient-to-br from-pink-500 to-rose-600',
+      'bg-gradient-to-br from-cyan-500 to-blue-600'
     ];
     return gradients[index % gradients.length];
   }

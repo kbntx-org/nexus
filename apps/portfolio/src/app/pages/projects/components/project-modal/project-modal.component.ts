@@ -11,18 +11,7 @@ import {
   Code2
 } from 'lucide-angular';
 
-export interface Project {
-  title: string;
-  description: string;
-  tech: string[];
-  longDescription?: string;
-  features?: string[];
-  liveUrl?: string;
-  githubUrl?: string;
-  codeSourceUrl?: string;
-  images?: string[];
-  logo?: string;
-}
+import { Project } from '../../services/projects.service';
 
 @Component({
   selector: 'app-project-modal',
@@ -107,11 +96,10 @@ export interface Project {
             <div>
               <h3 class="text-foreground mb-4 text-xl font-semibold">About this project</h3>
               <p
-                [innerHTML]="project.longDescription || project.description"
+                [innerHTML]="project.content"
                 class="text-muted-foreground leading-relaxed"
               ></p>
             </div>
-
             <div *ngIf="project.features && project.features.length > 0">
               <h3 class="text-foreground mb-4 text-xl font-semibold">Key Features</h3>
               <ul class="space-y-2">
@@ -250,7 +238,7 @@ export interface Project {
             <div>
               <h3 class="text-foreground mb-3 text-lg font-semibold">About this project</h3>
               <p
-                [innerHTML]="project.longDescription || project.description"
+                [innerHTML]="project.content"
                 class="text-muted-foreground text-sm leading-relaxed"
               ></p>
             </div>

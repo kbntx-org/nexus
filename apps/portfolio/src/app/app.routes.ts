@@ -1,11 +1,6 @@
 import { Route } from '@angular/router';
 
-import { CodeViewerComponent } from './pages/code-viewer/code-viewer.component';
 import { codeSourceGuard } from './pages/code-viewer/guards/code-source.guard';
-import { CvComponent } from './pages/cv/cv.component';
-import { ExperiencesComponent } from './pages/experiences/experiences.component';
-import { HomeComponent } from './pages/home/home.component';
-import { ProjectsComponent } from './pages/projects/projects.component';
 
 export const ROUTES: Route[] = [
   {
@@ -15,23 +10,19 @@ export const ROUTES: Route[] = [
   },
   {
     path: 'home',
-    component: HomeComponent
+    loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent)
   },
   {
     path: 'experiences',
-    component: ExperiencesComponent
+    loadComponent: () => import('./pages/experiences/experiences.component').then(m => m.ExperiencesComponent)
   },
   {
     path: 'projects',
-    component: ProjectsComponent
-  },
-  {
-    path: 'cv',
-    component: CvComponent
+    loadComponent: () => import('./pages/projects/projects.component').then(m => m.ProjectsComponent)
   },
   {
     path: 'code-source/:id',
-    component: CodeViewerComponent,
+    loadComponent: () => import('./pages/code-viewer/code-viewer.component').then(m => m.CodeViewerComponent),
     canActivate: [codeSourceGuard]
   }
 ];

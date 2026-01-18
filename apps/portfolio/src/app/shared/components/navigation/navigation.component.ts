@@ -5,7 +5,6 @@ import {
   Home,
   Briefcase,
   Rocket,
-  FileText,
   Laptop,
   X,
   Menu
@@ -22,8 +21,7 @@ export class NavigationComponent {
   public navigationItems = [
     { path: '/home', label: 'Home', icon: 'HomeIcon' },
     { path: '/experiences', label: 'Experiences', icon: 'BriefcaseIcon' },
-    { path: '/projects', label: 'Projects', icon: 'RocketIcon' },
-    { path: '/cv', label: 'CV', icon: 'FileTextIcon' }
+    { path: '/projects', label: 'Projects', icon: 'RocketIcon' }
   ];
 
   public isMenuOpen = false;
@@ -32,7 +30,6 @@ export class NavigationComponent {
   public readonly HomeIcon = Home;
   public readonly BriefcaseIcon = Briefcase;
   public readonly RocketIcon = Rocket;
-  public readonly FileTextIcon = FileText;
   public readonly LaptopIcon = Laptop;
   public readonly XIcon = X;
   public readonly MenuIcon = Menu;

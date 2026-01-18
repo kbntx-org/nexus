@@ -36,9 +36,15 @@ importers:
       fflate:
         specifier: ^0.8.2
         version: 0.8.2
+      front-matter:
+        specifier: ^4.0.2
+        version: 4.0.2
       lucide-angular:
         specifier: ^0.562.0
         version: 0.562.0(@angular/common@20.3.15(@angular/core@20.3.15(@angular/compiler@20.3.15)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@20.3.15(@angular/compiler@20.3.15)(rxjs@7.8.2)(zone.js@0.16.0))
+      marked:
+        specifier: ^17.0.1
+        version: 17.0.1
       rxjs:
         specifier: ~7.8.0
         version: 7.8.2
@@ -220,9 +226,15 @@ importers:
       fflate:
         specifier: ^0.8.2
         version: 0.8.2
+      front-matter:
+        specifier: ^4.0.2
+        version: 4.0.2
       lucide-angular:
         specifier: ^0.562.0
         version: 0.562.0(@angular/common@20.3.15(@angular/core@20.3.15(@angular/compiler@20.3.15)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@20.3.15(@angular/compiler@20.3.15)(rxjs@7.8.2)(zone.js@0.16.0))
+      marked:
+        specifier: ^17.0.1
+        version: 17.0.1
       rxjs:
         specifier: ~7.8.0
         version: 7.8.2
@@ -6356,6 +6368,11 @@ packages:
 
   makeerror@1.0.12:
     resolution: {integrity: sha512-JmqCvUhmt43madlpFzG4BQzG2Z3m6tvQDNKdClZnO3VbIudJYmxsT0FNJMeiB2+JTSlTQTSbU8QdesVmwJcmLg==}
+
+  marked@17.0.1:
+    resolution: {integrity: sha512-boeBdiS0ghpWcSwoNm/jJBwdpFaMnZWRzjA6SkUMYb40SVaN1x7mmfGKp0jvexGcx+7y2La5zRZsYFZI6Qpypg==}
+    engines: {node: '>= 20'}
+    hasBin: true
 
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
@@ -17286,6 +17303,8 @@ snapshots:
   makeerror@1.0.12:
     dependencies:
       tmpl: 1.0.5
+
+  marked@17.0.1: {}
 
   math-intrinsics@1.1.0: {}
 
