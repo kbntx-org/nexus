@@ -36,6 +36,10 @@ jobs:
           ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_TOKEN }}
           ARGOCD_OPTS: '--grpc-web'
         run: |
+          echo hello1
           argocd app sync documentation --prune
+          echo hello2
           argocd app wait documentation --sync --health --operation --timeout 500
+          echo hello3
           argocd app actions run documentation restart --kind Deployment --resource-name documentation --namespace documentation
+          echo hello4
