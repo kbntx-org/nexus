@@ -1,8 +1,8 @@
 name: Deploy documentation
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
+  workflow_call:
 
 concurrency:
   group: deploy-documentation
@@ -34,7 +34,7 @@ jobs:
         env:
           ARGOCD_SERVER: argocd.kbntx.com
           ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_TOKEN }}
-          ARGOCD_OPTS: '--grpc-web'
+          ARGOCD_OPTS: "--grpc-web"
         run: |
           argocd app sync documentation --prune
           argocd app wait documentation --sync --health --operation --timeout 500

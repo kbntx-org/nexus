@@ -13,3 +13,15 @@ jobs:
     name: Lint & Format
     uses: ./.github/workflows/lint-and-format-main.yaml
     secrets: inherit
+
+  deploy-portfolio:
+    name: Deploy Portfolio
+    needs: lint-and-format
+    uses: ./.github/workflows/deploy-portfolio.yml
+    secrets: inherit
+
+  deploy-documentation:
+    name: Deploy Documentation
+    needs: lint-and-format
+    uses: ./.github/workflows/deploy-documentation.yml
+    secrets: inherit
