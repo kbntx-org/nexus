@@ -1,22 +1,38 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { LucideAngularModule, PanelLeftClose, PanelLeft } from 'lucide-angular';
+import {
+  LucideAngularModule,
+  LUCIDE_ICONS,
+  LucideIconProvider,
+  PanelLeftClose,
+  PanelLeft,
+  FolderOpen
+} from 'lucide-angular';
+import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
 
 import { CodePreviewComponent } from './components/code-preview/code-preview.component';
 import { FileTreeComponent } from './components/file-tree/file-tree.component';
+import { FileTreeModalComponent } from './components/file-tree-modal/file-tree-modal.component';
 import { getCodeSourceById } from './data/data';
-import { FileTreeNode } from './models/file-tree.model';
 import { FileTreeService } from './services/file-tree.service';
 
 @Component({
   selector: 'app-code-viewer',
   standalone: true,
+  providers: [
+    {
+      provide: LUCIDE_ICONS,
+      multi: true,
+      useValue: new LucideIconProvider({ PanelLeftClose, PanelLeft, FolderOpen })
+    }
+  ],
   imports: [
     CommonModule,
     LucideAngularModule,
     FileTreeComponent,
-    CodePreviewComponent
+    CodePreviewComponent,
+    FileTreeModalComponent
   ],
   styles: `
     :host {
@@ -48,7 +64,7 @@ import { FileTreeService } from './services/file-tree.service';
     }
   `,
   template: `
-    <div class="bg-background text-foreground min-h-screen py-8 md:py-12">
+    <div class="bg-background text-foreground min-h-screen pt-4 pb-8 md:pt-6 md:pb-12">
       <div class="mx-auto max-w-7xl px-4">
         <div
           class="animate-slide-in-up opacity-0"
@@ -58,117 +74,128 @@ import { FileTreeService } from './services/file-tree.service';
             class="bg-card border-border overflow-hidden rounded-lg border shadow-lg"
           >
             <div class="flex flex-col lg:hidden">
-              <div class="border-b border-border p-2">
-                <button
-                  class="inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                  (click)="toggleSidebar()"
-                >
-                  <lucide-angular
-                    [img]="isSidebarOpen() ? PanelLeftCloseIcon : PanelLeftIcon"
-                    class="h-4 w-4"
-                  ></lucide-angular>
-                  {{ isSidebarOpen() ? 'Hide Files' : 'Show Files' }}
-                </button>
-              </div>
-
-              @if (isSidebarOpen()) {
-                <div class="h-[300px] border-b border-border">
-                  <app-file-tree
-                    [tree]="fileTree()"
-                    [repoName]="codeSource()?.name || ''"
-                    [isLoading]="isLoading()"
-                    (fileSelected)="onFileSelected($event)"
-                  ></app-file-tree>
-                </div>
-              }
-
-              <div class="h-[500px]">
-                <app-code-preview [file]="selectedFile()"></app-code-preview>
+              <div class="h-[calc(100vh-8rem)] flex flex-col">
+                @if ((service.selectedNode$ | async) === null) {
+                  <div class="flex flex-1 flex-col items-center justify-center gap-6 p-8">
+                    <div
+                      class="flex h-24 w-24 items-center justify-center rounded-full bg-muted"
+                    >
+                      <lucide-angular
+                        name="folder-open"
+                        class="h-12 w-12 text-muted-foreground"
+                      ></lucide-angular>
+                    </div>
+                    <div class="text-center">
+                      <h3 class="text-xl font-medium text-foreground mb-2">
+                        Browse Source Code
+                      </h3>
+                      <p class="text-sm text-muted-foreground mb-6">
+                        Select a file from the repository to view its contents
+                      </p>
+                      <button
+                        class="inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                        (click)="openFileTreeModal()"
+                      >
+                        <lucide-angular name="folder-open" class="h-4 w-4"></lucide-angular>
+                        Browse Files
+                      </button>
+                    </div>
+                  </div>
+                } @else {
+                  <div class="flex-1 overflow-hidden">
+                    <app-code-preview></app-code-preview>
+                  </div>
+                  <div class="border-t border-border p-3">
+                    <button
+                      class="w-full inline-flex items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                      (click)="openFileTreeModal()"
+                    >
+                      <lucide-angular name="folder-open" class="h-4 w-4"></lucide-angular>
+                      Browse Files
+                    </button>
+                  </div>
+                }
               </div>
             </div>
 
             <div class="hidden lg:flex">
               <div
                 class="h-[800px] border-r border-border transition-all duration-300"
-                [class.w-72]="isSidebarOpen()"
-                [class.w-0]="!isSidebarOpen()"
-                [class.overflow-hidden]="!isSidebarOpen()"
+                [class.w-72]="isSidebarOpen$ | async"
+                [class.w-0]="(isSidebarOpen$ | async) === false"
+                [class.overflow-hidden]="(isSidebarOpen$ | async) === false"
               >
-                <app-file-tree
-                  [tree]="fileTree()"
-                  [repoName]="codeSource()?.name || ''"
-                  [isLoading]="isLoading()"
-                  (fileSelected)="onFileSelected($event)"
-                ></app-file-tree>
+                <app-file-tree></app-file-tree>
               </div>
 
               <button
                 class="flex h-[800px] w-6 items-center justify-center border-r border-border bg-muted/30 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                 (click)="toggleSidebar()"
-                [title]="isSidebarOpen() ? 'Hide sidebar' : 'Show sidebar'"
+                [title]="(isSidebarOpen$ | async) ? 'Hide sidebar' : 'Show sidebar'"
               >
                 <lucide-angular
-                  [img]="isSidebarOpen() ? PanelLeftCloseIcon : PanelLeftIcon"
+                  [name]="(isSidebarOpen$ | async) ? 'panel-left-close' : 'panel-left'"
                   class="h-4 w-4"
                 ></lucide-angular>
               </button>
 
               <div class="h-[800px] flex-1">
-                <app-code-preview [file]="selectedFile()"></app-code-preview>
+                <app-code-preview></app-code-preview>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <app-file-tree-modal
+      [isOpen]="(isFileTreeModalOpen$ | async) ?? false"
+      (closed)="closeFileTreeModal()"
+    ></app-file-tree-modal>
   `
 })
-export class CodeViewerComponent {
+export class CodeViewerComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
-  private readonly fileTreeService = inject(FileTreeService);
+  public readonly service = inject(FileTreeService);
+  private readonly destroy$ = new Subject<void>();
 
-  public codeSource = computed(() => {
+  private isSidebarOpenSubject = new BehaviorSubject<boolean>(true);
+  public isSidebarOpen$ = this.isSidebarOpenSubject.asObservable();
+
+  private isFileTreeModalOpenSubject = new BehaviorSubject<boolean>(false);
+  public isFileTreeModalOpen$ = this.isFileTreeModalOpenSubject.asObservable();
+
+  public ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
-    return id ? getCodeSourceById(id) : undefined;
-  });
+    const source = id ? getCodeSourceById(id) : undefined;
 
-  public fileTree = signal<FileTreeNode | null>(null);
-  public selectedFile = signal<FileTreeNode | null>(null);
-  public isLoading = signal(true);
-  public isSidebarOpen = signal(true);
+    if (source?.zipUrl) {
+      this.service.loadRepository(source.zipUrl, source.name);
+    }
 
-  public readonly PanelLeftCloseIcon = PanelLeftClose;
-  public readonly PanelLeftIcon = PanelLeft;
-
-  constructor() {
-    effect(() => {
-      const source = this.codeSource();
-      if (source?.zipUrl) {
-        this.loadRepository(source.zipUrl);
-      }
-    });
+    this.service.selectedNode$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(node => {
+        if (node && window.innerWidth < 1024) {
+          this.closeFileTreeModal();
+        }
+      });
   }
 
-  private async loadRepository(zipUrl: string): Promise<void> {
-    this.isLoading.set(true);
-    try {
-      const tree = await this.fileTreeService.loadFromZipUrl(zipUrl);
-      this.fileTree.set(tree);
-    } catch (error) {
-      console.error('Failed to load repository:', error);
-    } finally {
-      this.isLoading.set(false);
-    }
+  public ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
-  public onFileSelected(file: FileTreeNode): void {
-    this.selectedFile.set(file);
-    if (window.innerWidth < 1024) {
-      this.isSidebarOpen.set(false);
-    }
+  public openFileTreeModal(): void {
+    this.isFileTreeModalOpenSubject.next(true);
+  }
+
+  public closeFileTreeModal(): void {
+    this.isFileTreeModalOpenSubject.next(false);
   }
 
   public toggleSidebar(): void {
-    this.isSidebarOpen.update(open => !open);
+    this.isSidebarOpenSubject.next(!this.isSidebarOpenSubject.value);
   }
 }

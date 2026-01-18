@@ -1,4 +1,5 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 
 export type Theme = 'light' | 'dark';
 
@@ -6,11 +7,15 @@ export type Theme = 'light' | 'dark';
   providedIn: 'root'
 })
 export class ThemeService {
-  private themeSignal = signal<Theme>('light');
-  public theme = this.themeSignal.asReadonly();
+  private themeSubject = new BehaviorSubject<Theme>('light');
+  public theme$ = this.themeSubject.asObservable();
 
   constructor() {
     this.initializeTheme();
+  }
+
+  public theme(): Theme {
+    return this.themeSubject.value;
   }
 
   public toggleTheme(): void {
@@ -28,7 +33,7 @@ export class ThemeService {
   }
 
   private setTheme(theme: Theme): void {
-    this.themeSignal.set(theme);
+    this.themeSubject.next(theme);
     localStorage.setItem('theme', theme);
 
     if (theme === 'dark') {

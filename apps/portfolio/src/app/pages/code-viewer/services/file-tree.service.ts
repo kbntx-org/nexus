@@ -1,30 +1,183 @@
-import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { unzipSync } from 'fflate';
+import { BehaviorSubject, combineLatest, map } from 'rxjs';
+import { codeToHtml } from 'shiki';
 
-import { FileTreeNode, RepoMetadata } from '../models/file-tree.model';
+import { ThemeService } from '../../../shared/services/theme.service';
+import { getLanguage, isImageFile } from '../models/file-mappings.model';
+import { FileTreeNode } from '../models/file-tree.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FileTreeService {
-  private cachedTree: FileTreeNode | null = null;
-  private cachedMetadata: RepoMetadata | null = null;
+  private readonly http = inject(HttpClient);
+  private readonly sanitizer = inject(DomSanitizer);
+  private readonly themeService = inject(ThemeService);
 
-  public async loadFromZipUrl(zipUrl: string): Promise<FileTreeNode> {
-    const response = await fetch(zipUrl);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch zip: ${response.statusText}`);
-    }
+  private treeSubject = new BehaviorSubject<FileTreeNode | null>(null);
+  private selectedNodeSubject = new BehaviorSubject<FileTreeNode | null>(null);
+  private searchQuerySubject = new BehaviorSubject<string>('');
+  private repoNameSubject = new BehaviorSubject<string>('');
+  private isLoadingSubject = new BehaviorSubject<boolean>(false);
+  private codeHtmlSubject = new BehaviorSubject<SafeHtml>('');
+  private isCodeLoadingSubject = new BehaviorSubject<boolean>(false);
 
-    const buffer = await response.arrayBuffer();
-    return this.parseZipBuffer(new Uint8Array(buffer));
+  public tree$ = this.treeSubject.asObservable();
+  public selectedNode$ = this.selectedNodeSubject.asObservable();
+  public searchQuery$ = this.searchQuerySubject.asObservable();
+  public repoName$ = this.repoNameSubject.asObservable();
+  public isLoading$ = this.isLoadingSubject.asObservable();
+  public codeHtml$ = this.codeHtmlSubject.asObservable();
+  public isCodeLoading$ = this.isCodeLoadingSubject.asObservable();
+
+  public filteredTree$ = combineLatest([this.tree$, this.searchQuery$]).pipe(
+    map(([tree, query]) => {
+      if (!tree) {
+        return null;
+      }
+      const trimmedQuery = query.trim().toLowerCase();
+      if (!trimmedQuery) {
+        return tree;
+      }
+      return this.filterTreeNode(tree, trimmedQuery);
+    })
+  );
+
+  public isImage$ = this.selectedNode$.pipe(
+    map(node => (node ? isImageFile(node.path) : false))
+  );
+
+  public isBinaryFile$ = this.selectedNode$.pipe(
+    map(node => node?.content === '[Binary file - cannot display]')
+  );
+
+  public areAllExpanded$ = this.tree$.pipe(
+    map(tree => tree ? this.areAllExpanded(tree) : false)
+  );
+
+  public loadRepository(url: string, name: string): void {
+    this.repoNameSubject.next(name);
+    this.selectedNodeSubject.next(null);
+    this.searchQuerySubject.next('');
+    this.isLoadingSubject.next(true);
+
+    this.http.get(url, { responseType: 'arraybuffer' }).subscribe({
+      next: buffer => {
+        const tree = this.parseZipBuffer(new Uint8Array(buffer));
+        this.treeSubject.next(tree);
+        this.isLoadingSubject.next(false);
+      },
+      error: () => {
+        this.isLoadingSubject.next(false);
+      }
+    });
   }
 
-  public parseZipBuffer(buffer: Uint8Array): FileTreeNode {
+  public toggleExpand(node: FileTreeNode): void {
+    node.expanded = !node.expanded;
+    this.treeSubject.next(this.treeSubject.value);
+  }
+
+  public selectFile(node: FileTreeNode): void {
+    this.selectedNodeSubject.next(node);
+    if (node.content && !isImageFile(node.path) && node.content !== '[Binary file - cannot display]') {
+      this.loadCodeHighlighting(node.content, node.path);
+    }
+  }
+
+  public setSearchQuery(query: string): void {
+    this.searchQuerySubject.next(query);
+    if (query.trim()) {
+      this.expandAll();
+    }
+  }
+
+  public async reloadCodeHighlighting(): Promise<void> {
+    const node = this.selectedNodeSubject.value;
+    if (node?.content && !isImageFile(node.path) && node.content !== '[Binary file - cannot display]') {
+      await this.loadCodeHighlighting(node.content, node.path);
+    }
+  }
+
+  public toggleExpandAll(): void {
+    const tree = this.treeSubject.value;
+    if (!tree) {
+      return;
+    }
+
+    const allExpanded = this.areAllExpanded(tree);
+    this.setExpandedRecursive(tree, !allExpanded);
+    this.treeSubject.next(tree);
+  }
+
+  public areAllExpanded(node: FileTreeNode): boolean {
+    if (node.type === 'directory') {
+      if (!node.expanded) {
+        return false;
+      }
+      return node.children?.every(child => this.areAllExpanded(child)) ?? true;
+    }
+    return true;
+  }
+
+  private expandAll(): void {
+    const tree = this.treeSubject.value;
+    if (tree) {
+      this.setExpandedRecursive(tree, true);
+      this.treeSubject.next(tree);
+    }
+  }
+
+  private setExpandedRecursive(node: FileTreeNode, expanded: boolean): void {
+    if (node.type === 'directory') {
+      node.expanded = expanded;
+      node.children?.forEach(child => this.setExpandedRecursive(child, expanded));
+    }
+  }
+
+  private async loadCodeHighlighting(content: string, path: string): Promise<void> {
+    this.isCodeLoadingSubject.next(true);
+    try {
+      const language = getLanguage(path);
+      const theme = this.themeService.theme() === 'dark' ? 'github-dark' : 'github-light';
+      const result = await codeToHtml(content, { lang: language, theme });
+      this.codeHtmlSubject.next(this.sanitizer.bypassSecurityTrustHtml(result));
+    } finally {
+      this.isCodeLoadingSubject.next(false);
+    }
+  }
+
+  private filterTreeNode(node: FileTreeNode, query: string): FileTreeNode | null {
+    if (node.type === 'file') {
+      return node.name.toLowerCase().includes(query) ? node : null;
+    }
+
+    const nodeMatches = node.name.toLowerCase().includes(query);
+    const filteredChildren = node.children
+      ?.map(child => this.filterTreeNode(child, query))
+      .filter((child): child is FileTreeNode => child !== null);
+
+    if (!filteredChildren?.length && !nodeMatches) {
+      return null;
+    }
+
+    if (nodeMatches) {
+      return {
+        ...node,
+        expanded: true,
+        children: node.children
+      };
+    }
+
+    return { ...node, children: filteredChildren };
+  }
+
+  private parseZipBuffer(buffer: Uint8Array): FileTreeNode {
     const files = unzipSync(buffer);
-    const tree = this.buildTree(files);
-    this.cachedTree = tree;
-    return tree;
+    return this.buildTree(files);
   }
 
   private buildTree(files: Record<string, Uint8Array>): FileTreeNode {
@@ -32,7 +185,8 @@ export class FileTreeService {
       name: 'root',
       path: '',
       type: 'directory',
-      children: []
+      children: [],
+      expanded: false
     };
 
     for (const [filePath, content] of Object.entries(files)) {
@@ -54,11 +208,9 @@ export class FileTreeService {
             name: part,
             path: currentPath,
             type: isFile ? 'file' : 'directory',
+            expanded: false,
             ...(isFile
-              ? {
-                  content: this.decodeContent(content),
-                  size: content.length
-                }
+              ? { content: this.decodeContent(content) }
               : { children: [] })
           };
           current.children!.push(child);
@@ -73,15 +225,8 @@ export class FileTreeService {
   }
 
   private unwrapSingleRootFolder(root: FileTreeNode): FileTreeNode {
-    if (
-      root.children?.length === 1 &&
-      root.children[0].type === 'directory'
-    ) {
-      const unwrapped = root.children[0];
-      return {
-        ...root,
-        children: unwrapped.children
-      };
+    if (root.children?.length === 1 && root.children[0].type === 'directory') {
+      return { ...root, children: root.children[0].children };
     }
     return root;
   }
@@ -102,88 +247,5 @@ export class FileTreeService {
       return a.name.localeCompare(b.name);
     });
     node.children?.forEach(child => this.sortTree(child));
-  }
-
-  public getFileExtension(path: string): string {
-    const parts = path.split('.');
-    return parts.length > 1 ? parts[parts.length - 1].toLowerCase() : '';
-  }
-
-  public getFileIconType(path: string): string {
-    const ext = this.getFileExtension(path);
-    const filename = path.split('/').pop()?.toLowerCase() || '';
-
-    if (filename === 'dockerfile') {
-      return 'docker';
-    }
-    if (filename === '.gitignore') {
-      return 'git';
-    }
-    if (filename === 'package.json') {
-      return 'npm';
-    }
-    if (filename === 'tsconfig.json') {
-      return 'typescript';
-    }
-    if (filename === 'readme.md') {
-      return 'readme';
-    }
-
-    const iconMap: Record<string, string> = {
-      ts: 'typescript',
-      tsx: 'typescript',
-      js: 'javascript',
-      jsx: 'javascript',
-      json: 'json',
-      html: 'html',
-      css: 'css',
-      scss: 'css',
-      less: 'css',
-      py: 'python',
-      go: 'go',
-      rs: 'rust',
-      java: 'java',
-      rb: 'ruby',
-      php: 'php',
-      sh: 'shell',
-      bash: 'shell',
-      zsh: 'shell',
-      yml: 'yaml',
-      yaml: 'yaml',
-      tf: 'terraform',
-      md: 'markdown',
-      mdx: 'markdown',
-      lock: 'lock',
-      toml: 'config',
-      ini: 'config',
-      env: 'config',
-      png: 'image',
-      jpg: 'image',
-      jpeg: 'image',
-      gif: 'image',
-      svg: 'image',
-      ico: 'image',
-      webp: 'image',
-      pdf: 'document',
-      doc: 'document',
-      docx: 'document',
-      gitignore: 'git',
-      dockerignore: 'docker',
-      dockerfile: 'docker'
-    };
-
-    return iconMap[ext] || 'file';
-  }
-
-  public getCachedTree(): FileTreeNode | null {
-    return this.cachedTree;
-  }
-
-  public setMetadata(metadata: RepoMetadata): void {
-    this.cachedMetadata = metadata;
-  }
-
-  public getMetadata(): RepoMetadata | null {
-    return this.cachedMetadata;
   }
 }
