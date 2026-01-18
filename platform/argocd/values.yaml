@@ -39,6 +39,7 @@ argo-cd:
   configs:
     cm:
       admin.enabled: false
+      accounts.ci: apiKey
       exec.enabled: true
       dex.config: |
         connectors:
@@ -62,6 +63,12 @@ argo-cd:
       policy.default: ''
       policy.csv: |
         g, kbntx-org:platform, role:admin
+
+        g, ci, role:ci
+        p, role:ci, applications, get, default/*, allow
+        p, role:ci, applications, sync, default/*, allow
+        p, role:ci, applications, update, default/*, allow
+        p, role:ci, applications, action/apps/Deployment/restart, default/*, allow
     params:
       server.insecure: true
       server.dex.server: http://argocd-dex-server:5556
