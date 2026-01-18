@@ -22,6 +22,7 @@ features:
   - 'Application 1: Self-service Cloudflare tunnel creation - engineers can create their own locally-managed tunnels, allowing them to share development environments with teammates'
   - 'Application 2: S3 static asset management - upload public static assets for portfolio and other applications'
 ---
+
 The goal of this project is to provide a platform to build internal tools with a low-code approach.
 It enables engineers for quick experimentation with 3rd party services like MongoDB, Redis, S3, custom APIs, etc.It also allows all departments to build their own tools to improve their daily workflow with pre-created components and datasources.The balance of javascript usage and low-code approach really widen the possibilities of what can be built with the platform.
 

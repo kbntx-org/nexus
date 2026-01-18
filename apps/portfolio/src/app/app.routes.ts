@@ -14,15 +14,18 @@ export const ROUTES: Route[] = [
   },
   {
     path: 'experiences',
-    loadComponent: () => import('./pages/experiences/experiences.component').then(m => m.ExperiencesComponent)
+    loadComponent: () =>
+      import('./pages/experiences/experiences.component').then(m => m.ExperiencesComponent)
   },
   {
     path: 'projects',
-    loadComponent: () => import('./pages/projects/projects.component').then(m => m.ProjectsComponent)
+    loadComponent: () =>
+      import('./pages/projects/projects.component').then(m => m.ProjectsComponent)
   },
   {
     path: 'code-source/:id',
-    loadComponent: () => import('./pages/code-viewer/code-viewer.component').then(m => m.CodeViewerComponent),
+    loadComponent: () =>
+      import('./pages/code-viewer/code-viewer.component').then(m => m.CodeViewerComponent),
     canActivate: [codeSourceGuard]
   }
 ];

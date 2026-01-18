@@ -1,0 +1,37 @@
+name: Lint & Format PR
+
+on:
+  workflow_call:
+
+jobs:
+  lint-and-format:
+    name: Lint & Format
+    runs-on: nexus-runners
+    container:
+      image: kbntx/nexus-ci-toolkit:1.0
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch base branch
+        run: |
+          git fetch origin ${{ github.base_ref }}
+        shell: bash
+
+      - name: Install dependencies
+        run: |
+          pnpm install
+        shell: bash
+
+      - name: Check formatting
+        run: npx nx format:check --base remotes/origin/${{ github.base_ref }}
+        shell: bash
+
+      - name: Lint
+        run: |
+          pnpm run lint --base remotes/origin/${{ github.base_ref }}
+        shell: bash

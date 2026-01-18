@@ -15,4 +15,3 @@ export const CODE_SOURCES: CodeSource[] = [
 export function getCodeSourceById(id: string): CodeSource | undefined {
   return CODE_SOURCES.find(source => source.id === id);
 }
-

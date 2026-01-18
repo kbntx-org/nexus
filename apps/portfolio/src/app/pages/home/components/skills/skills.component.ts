@@ -17,7 +17,7 @@ interface Particle {
     <section class="relative py-12 md:py-8" #skillsSection>
       <div class="mx-auto max-w-6xl px-4">
         <h2
-          class="text-foreground animate-slide-in-up relative mb-12 text-center text-3xl font-bold sm:text-4xl"
+          class="relative mb-12 animate-slide-in-up text-center text-3xl font-bold text-foreground sm:text-4xl"
         >
           Skills & Technologies
           <div
@@ -26,12 +26,12 @@ interface Particle {
         </h2>
 
         <div
-          class="skills-particles animate-slide-in-up relative h-[300px] w-full max-w-full overflow-visible md:h-[400px]"
+          class="skills-particles relative h-[300px] w-full max-w-full animate-slide-in-up overflow-visible md:h-[400px]"
           style="animation-delay: 0.2s"
         >
           @for (skill of skills; track skill; let i = $index) {
             <div
-              class="particle bg-card/60 border-border/40 hover:scale-130 hover:bg-card/80 hover:border-primary/50 absolute flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border opacity-90 shadow-lg backdrop-blur-sm transition-all duration-300 hover:z-10 hover:opacity-100 hover:shadow-xl md:h-12 md:w-12"
+              class="particle hover:scale-130 absolute flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-border/40 bg-card/60 opacity-90 shadow-lg backdrop-blur-sm transition-all duration-300 hover:z-10 hover:border-primary/50 hover:bg-card/80 hover:opacity-100 hover:shadow-xl md:h-12 md:w-12"
               [style.animation-delay]="i * 0.5 + 's'"
               [style.animation-duration]="8 + i * 2 + 's'"
             >

@@ -8,7 +8,7 @@ import { ThemeService } from '../../services/theme.service';
   imports: [LucideAngularModule],
   template: `
     <button
-      class="bg-card border-border text-foreground hover:bg-accent flex h-10 w-10 cursor-pointer items-center justify-center rounded-md border transition-all duration-200 hover:scale-105 active:scale-95"
+      class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-md border border-border bg-card text-foreground transition-all duration-200 hover:scale-105 hover:bg-accent active:scale-95"
       (click)="themeService.toggleTheme()"
       [attr.aria-label]="
         'Switch to ' + (themeService.theme() === 'light' ? 'dark' : 'light') + ' mode'

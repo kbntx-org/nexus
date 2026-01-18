@@ -1,11 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import {
-  LucideAngularModule,
-  LUCIDE_ICONS,
-  LucideIconProvider,
-  X
-} from 'lucide-angular';
+import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, X } from 'lucide-angular';
 
 import { FileTreeComponent } from '../file-tree/file-tree.component';
 
@@ -36,13 +31,10 @@ import { FileTreeComponent } from '../file-tree/file-tree.component';
   `,
   template: `
     @if (isOpen) {
-      <div
-        class="fixed inset-0 z-50 lg:hidden"
-        (click)="onClose()"
-      >
+      <div class="fixed inset-0 z-50 lg:hidden" (click)="onClose()">
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
         <div
-          class="absolute bottom-0 left-0 right-0 max-h-[85vh] rounded-t-lg border-t border-border bg-card shadow-lg animate-slide-up"
+          class="animate-slide-up absolute bottom-0 left-0 right-0 max-h-[85vh] rounded-t-lg border-t border-border bg-card shadow-lg"
           (click)="$event.stopPropagation()"
         >
           <div class="flex items-center justify-between border-b border-border px-4 py-3">
@@ -70,4 +62,3 @@ export class FileTreeModalComponent {
     this.closed.emit();
   }
 }
-

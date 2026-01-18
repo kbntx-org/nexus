@@ -1,14 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import {
-  LucideAngularModule,
-  Home,
-  Briefcase,
-  Rocket,
-  Laptop,
-  X,
-  Menu
-} from 'lucide-angular';
+import { LucideAngularModule, Home, Briefcase, Rocket, Laptop, X, Menu } from 'lucide-angular';
 
 import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
 

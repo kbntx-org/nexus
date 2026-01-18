@@ -27,9 +27,7 @@ import { FileTreeNodeComponent } from '../file-tree-node/file-tree-node.componen
   ],
   template: `
     <div class="flex h-full flex-col">
-      <div
-        class="flex items-center justify-between border-b border-border bg-muted/30 px-4 py-3"
-      >
+      <div class="flex items-center justify-between border-b border-border bg-muted/30 px-4 py-3">
         <div class="flex items-center gap-2">
           <lucide-angular
             name="folder-git-2"
@@ -77,9 +75,7 @@ import { FileTreeNodeComponent } from '../file-tree-node/file-tree-node.componen
             <app-file-tree-node [node]="child" [depth]="0"></app-file-tree-node>
           }
         } @else {
-          <div class="py-8 text-center text-sm text-muted-foreground">
-            No files found
-          </div>
+          <div class="py-8 text-center text-sm text-muted-foreground">No files found</div>
         }
       </div>
     </div>

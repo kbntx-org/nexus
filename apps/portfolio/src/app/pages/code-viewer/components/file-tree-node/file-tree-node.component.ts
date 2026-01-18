@@ -52,7 +52,7 @@ import { FileTreeService } from '../../services/file-tree.service';
   template: `
     <div class="select-none">
       <div
-        class="group flex cursor-pointer items-center gap-1 rounded-md px-2 py-1 my-0.5 transition-all duration-150"
+        class="group my-0.5 flex cursor-pointer items-center gap-1 rounded-md px-2 py-1 transition-all duration-150"
         [class.bg-accent]="isSelected$ | async"
         [class.text-accent-foreground]="isSelected$ | async"
         [class.hover:bg-muted]="(isSelected$ | async) === false"
@@ -100,13 +100,9 @@ export class FileTreeNodeComponent {
   @Input() public node!: FileTreeNode;
   @Input() public depth = 0;
 
-  public isExpanded$ = this.service.tree$.pipe(
-    map(() => this.node?.expanded ?? false)
-  );
+  public isExpanded$ = this.service.tree$.pipe(map(() => this.node?.expanded ?? false));
 
-  public isSelected$ = this.service.selectedNode$.pipe(
-    map(selected => selected === this.node)
-  );
+  public isSelected$ = this.service.selectedNode$.pipe(map(selected => selected === this.node));
 
   public iconName$ = this.service.tree$.pipe(
     map(() => {

@@ -32,7 +32,7 @@ jobs:
           VAULT_POSTGRES_PASSWORD: ${{ secrets.VAULT_POSTGRES_PASSWORD }}
         with:
           user: ci
-          server: "10.0.0.3"
+          server: '10.0.0.3'
           ssh-key: ${{ secrets.NEXUS_CI_PRIVATE_SSH_KEY }}
           ssh-known-hosts: ${{ secrets.VAULT_KNOWN_HOSTS }}
           files: >

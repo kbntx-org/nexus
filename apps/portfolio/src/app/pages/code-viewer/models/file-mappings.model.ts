@@ -234,4 +234,3 @@ export function isImageFile(path: string): boolean {
   const ext = getFileExtension(path);
   return IMAGE_EXTENSIONS.includes(ext);
 }
-

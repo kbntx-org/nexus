@@ -1,11 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import {
-  LucideAngularModule,
-  LUCIDE_ICONS,
-  LucideIconProvider,
-  FileCode
-} from 'lucide-angular';
+import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, FileCode } from 'lucide-angular';
 import { Subject, takeUntil } from 'rxjs';
 
 import { ThemeService } from '../../../../shared/services/theme.service';
@@ -25,9 +20,7 @@ import { FileTreeService } from '../../services/file-tree.service';
   template: `
     <div class="flex h-full flex-col bg-card">
       @if (service.selectedNode$ | async; as selectedNode) {
-        <div
-          class="flex items-center justify-between border-b border-border bg-muted/30 px-4 py-3"
-        >
+        <div class="flex items-center justify-between border-b border-border bg-muted/30 px-4 py-3">
           <div class="flex items-center gap-2 overflow-hidden">
             <lucide-angular
               name="file-code"
@@ -61,23 +54,22 @@ import { FileTreeService } from '../../services/file-tree.service';
               ></div>
             </div>
           } @else {
-            <div class="min-h-full [&>pre]:min-h-full [&>pre]:m-0 [&>pre]:p-4 [&>pre]:font-mono [&>pre]:text-sm [&>pre]:!bg-transparent" [innerHTML]="service.codeHtml$ | async"></div>
+            <div
+              class="min-h-full [&>pre]:m-0 [&>pre]:min-h-full [&>pre]:!bg-transparent [&>pre]:p-4 [&>pre]:font-mono [&>pre]:text-sm"
+              [innerHTML]="service.codeHtml$ | async"
+            ></div>
           }
         </div>
       } @else {
         <div class="flex h-full flex-col items-center justify-center gap-4 p-8">
-          <div
-            class="flex h-20 w-20 items-center justify-center rounded-full bg-muted"
-          >
+          <div class="flex h-20 w-20 items-center justify-center rounded-full bg-muted">
             <lucide-angular
               name="file-code"
               class="h-10 w-10 text-muted-foreground"
             ></lucide-angular>
           </div>
           <div class="text-center">
-            <h3 class="text-lg font-medium text-foreground">
-              Select a file to view
-            </h3>
+            <h3 class="text-lg font-medium text-foreground">Select a file to view</h3>
             <p class="mt-1 text-sm text-muted-foreground">
               Click on any file in the tree to view its contents
             </p>

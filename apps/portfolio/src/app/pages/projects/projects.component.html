@@ -1,14 +1,13 @@
-
-<div class="bg-background text-foreground min-h-screen py-8 md:py-12">
+<div class="min-h-screen bg-background py-8 text-foreground md:py-12">
   <div class="mx-auto max-w-6xl px-4">
     <div
       class="animate-slide-in-up opacity-0 will-change-transform"
       style="animation-delay: 0.1s; animation-fill-mode: forwards"
     >
-      <h1 class="text-foreground mb-4 text-center text-4xl font-bold sm:text-5xl lg:text-6xl">
+      <h1 class="mb-4 text-center text-4xl font-bold text-foreground sm:text-5xl lg:text-6xl">
         My Projects
       </h1>
-      <p class="text-muted-foreground mb-12 text-center text-lg sm:text-xl">
+      <p class="mb-12 text-center text-lg text-muted-foreground sm:text-xl">
         A showcase of my recent work and technical expertise
       </p>
     </div>
@@ -17,7 +16,7 @@
       <div class="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8 lg:grid-cols-3">
         @for (project of projectsService.projects$ | async; track project.title; let i = $index) {
           <div
-            class="bg-card animate-slide-in-up border-border flex flex-col overflow-hidden rounded-lg border opacity-0 shadow-lg transition-all duration-300 hover:shadow-xl"
+            class="flex animate-slide-in-up flex-col overflow-hidden rounded-lg border border-border bg-card opacity-0 shadow-lg transition-all duration-300 hover:shadow-xl"
             [class]="getCardVariation(i)"
             [style.animation-delay]="'0.5s'"
             style="animation-fill-mode: forwards"
@@ -40,9 +39,9 @@
                     {{ project.title.charAt(0) }}
                   </div>
                 }
-                <h3 class="text-foreground text-xl font-semibold">{{ project.title }}</h3>
+                <h3 class="text-xl font-semibold text-foreground">{{ project.title }}</h3>
               </div>
-              <p class="text-muted-foreground mb-4 leading-relaxed">{{ project.description }}</p>
+              <p class="mb-4 leading-relaxed text-muted-foreground">{{ project.description }}</p>
               <div class="mb-6 flex flex-wrap gap-2">
                 @for (tech of project.tech.slice(0, 6); track tech; let techIndex = $index) {
                   <span
@@ -54,14 +53,14 @@
               </div>
               <div class="mt-auto flex justify-start gap-3">
                 <button
-                  class="text-foreground border-border hover:bg-accent hover:text-accent-foreground rounded-md border bg-transparent px-4 py-2 font-medium transition-all duration-200"
+                  class="rounded-md border border-border bg-transparent px-4 py-2 font-medium text-foreground transition-all duration-200 hover:bg-accent hover:text-accent-foreground"
                   (click)="openProjectModal(project)"
                 >
                   View Project
                 </button>
                 @if (project.githubUrl) {
                   <button
-                    class="text-muted-foreground border-border hover:bg-accent hover:text-accent-foreground rounded-md border bg-transparent px-4 py-2 font-medium transition-all duration-200"
+                    class="rounded-md border border-border bg-transparent px-4 py-2 font-medium text-muted-foreground transition-all duration-200 hover:bg-accent hover:text-accent-foreground"
                     (click)="openSourceCode(project.githubUrl!)"
                   >
                     Source Code

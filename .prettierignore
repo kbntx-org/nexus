@@ -4,8 +4,11 @@
 /.nx/cache
 /node_modules
 .angular
+pnpm-lock.yaml
 
 /.nx/workspace-data
 
 **/templates/**/*.yaml
 **/templates/**/*.yml
+
+**/cloud-init.yml

@@ -3,6 +3,7 @@ name: Deploy portfolio
 on:
   push:
     branches: [main]
+  workflow_call:
 
 concurrency:
   group: deploy-portfolio
@@ -35,3 +36,13 @@ jobs:
           context: .
           file: apps/portfolio/Dockerfile
           tag: kbntx/portfolio:latest
+
+      - name: Deploy
+        env:
+          ARGOCD_SERVER: argocd.kbntx.com
+          ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_TOKEN }}
+          ARGOCD_OPTS: '--grpc-web'
+        run: |
+          argocd app sync portfolio --prune
+          argocd app wait portfolio --sync --health --operation --timeout 500
+          argocd app actions run portfolio restart --kind Deployment --resource-name portfolio --namespace portfolio

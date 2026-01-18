@@ -1,9 +1,9 @@
-<div class="bg-background text-foreground font-roboto overflow-x-hidden">
+<div class="font-roboto overflow-x-hidden bg-background text-foreground">
   <section
-    class="from-background via-muted/20 to-background relative overflow-hidden bg-gradient-to-br py-10 md:py-8"
+    class="relative overflow-hidden bg-gradient-to-br from-background via-muted/20 to-background py-10 md:py-8"
   >
     <div
-      class="bg-gradient-radial from-primary/8 via-primary/3 animate-pulse-slow absolute inset-0 to-transparent opacity-50"
+      class="from-primary/8 via-primary/3 absolute inset-0 animate-pulse-slow bg-gradient-radial to-transparent opacity-50"
       style="
         background: radial-gradient(
           ellipse at center,
@@ -24,34 +24,34 @@
             >
               {{ heroData.name }}
               <div
-                class="animate-expand-width absolute -bottom-2 left-0 h-1 w-full scale-x-0 transform bg-gradient-to-r from-[#667eea] to-[#764ba2]"
+                class="absolute -bottom-2 left-0 h-1 w-full scale-x-0 transform animate-expand-width bg-gradient-to-r from-[#667eea] to-[#764ba2]"
               ></div>
             </span>
           </h1>
           <p
-            class="text-muted-foreground mb-8 text-lg leading-relaxed sm:text-xl"
+            class="mb-8 text-lg leading-relaxed text-muted-foreground sm:text-xl"
             style="animation-delay: 0.2s"
           >
             {{ heroData.subtitle }}
           </p>
           <div class="flex flex-wrap gap-4" style="animation-delay: 0.4s">
             <button
-              class="from-primary to-primary/80 text-primary-foreground group relative inline-flex items-center gap-2 overflow-hidden rounded-lg bg-gradient-to-r px-6 py-3 font-medium shadow-lg transition-all duration-300 hover:shadow-xl"
+              class="group relative inline-flex items-center gap-2 overflow-hidden rounded-lg bg-gradient-to-r from-primary to-primary/80 px-6 py-3 font-medium text-primary-foreground shadow-lg transition-all duration-300 hover:shadow-xl"
               (click)="navigateToExperiences()"
             >
               <span class="relative z-10">View Experiences</span>
               <div
-                class="from-primary/80 to-primary absolute inset-0 -translate-x-full transform bg-gradient-to-r transition-transform duration-500 group-hover:translate-x-0"
+                class="absolute inset-0 -translate-x-full transform bg-gradient-to-r from-primary/80 to-primary transition-transform duration-500 group-hover:translate-x-0"
               ></div>
             </button>
             <a
               href="assets/pdfs/cv-kenny-talbi.pdf"
               download="cv-kenny-talbi.pdf"
-              class="from-secondary to-secondary/80 text-secondary-foreground group relative inline-flex items-center gap-2 overflow-hidden rounded-lg bg-gradient-to-r px-6 py-3 font-medium shadow-lg transition-all duration-300 hover:shadow-xl"
+              class="group relative inline-flex items-center gap-2 overflow-hidden rounded-lg bg-gradient-to-r from-secondary to-secondary/80 px-6 py-3 font-medium text-secondary-foreground shadow-lg transition-all duration-300 hover:shadow-xl"
             >
               <span class="relative z-10">Download CV</span>
               <div
-                class="from-secondary/80 to-secondary absolute inset-0 -translate-x-full transform bg-gradient-to-r transition-transform duration-500 group-hover:translate-x-0"
+                class="absolute inset-0 -translate-x-full transform bg-gradient-to-r from-secondary/80 to-secondary transition-transform duration-500 group-hover:translate-x-0"
               ></div>
             </a>
           </div>
@@ -61,14 +61,14 @@
           class="animate-slide-in-up"
           style="animation-delay: 0.3s; opacity: 0; animation-fill-mode: forwards"
         >
-          <div class="bg-card border-border rounded-xl border p-8 text-center shadow-2xl">
+          <div class="rounded-xl border border-border bg-card p-8 text-center shadow-2xl">
             <div class="mb-6">
               <div
                 class="mx-auto mb-4 h-32 w-32 overflow-hidden rounded-full border-4 border-transparent bg-gradient-to-br from-[#667eea] to-[#764ba2] bg-clip-border shadow-lg"
               >
                 <img src="assets/images/kenny.png" alt="Kenny" class="h-full w-full object-cover" />
               </div>
-              <h3 class="text-foreground mb-2 text-2xl font-semibold">{{ heroData.name }}</h3>
+              <h3 class="mb-2 text-2xl font-semibold text-foreground">{{ heroData.name }}</h3>
               <p class="text-muted-foreground">{{ heroData.title }}</p>
             </div>
 
@@ -99,14 +99,14 @@
   <section class="bg-muted/20 py-12 md:py-8">
     <div class="mx-auto max-w-6xl px-4">
       <div class="animate-slide-in-up">
-        <h2 class="text-foreground relative mb-12 text-center text-3xl font-bold sm:text-4xl">
+        <h2 class="relative mb-12 text-center text-3xl font-bold text-foreground sm:text-4xl">
           About Me
           <div
             class="absolute -bottom-3 left-1/2 h-1 w-16 -translate-x-1/2 transform rounded-full bg-gradient-to-r from-[#667eea] to-[#764ba2]"
           ></div>
         </h2>
         <div class="mx-auto max-w-4xl">
-          <div class="text-muted-foreground space-y-6 text-lg leading-relaxed">
+          <div class="space-y-6 text-lg leading-relaxed text-muted-foreground">
             <div [innerHTML]="heroData.description"></div>
           </div>
         </div>

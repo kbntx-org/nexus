@@ -22,4 +22,5 @@ features:
   - Declarative content management to keep a low maintenance cost
   - Pre-rendering for performance optimization
 ---
+
 A modern, responsive portfolio website showcasing my different projects and experiences. Built with Angular, it is featuring smooth animations, dark/light theme switching. It is was also optimized by using pre-rendering.

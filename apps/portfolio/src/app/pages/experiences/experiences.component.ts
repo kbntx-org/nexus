@@ -7,23 +7,23 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
   selector: 'app-experiences',
   imports: [LucideAngularModule],
   template: `
-    <div class="bg-background text-foreground py-8 md:py-12">
+    <div class="bg-background py-8 text-foreground md:py-12">
       <div class="mx-auto max-w-6xl px-4">
         <div
           class="animate-slide-in-up opacity-0 will-change-transform"
           style="animation-delay: 0.1s; animation-fill-mode: forwards;"
         >
-          <h1 class="text-foreground mb-4 text-center text-4xl font-bold sm:text-5xl lg:text-6xl">
+          <h1 class="mb-4 text-center text-4xl font-bold text-foreground sm:text-5xl lg:text-6xl">
             My Experiences
           </h1>
-          <p class="text-muted-foreground mb-12 text-center text-lg sm:text-xl">
+          <p class="mb-12 text-center text-lg text-muted-foreground sm:text-xl">
             My professional journey and career progression
           </p>
         </div>
 
         <div class="relative">
           <div
-            class="animate-fade-in absolute bottom-0 left-4 top-8 w-0.5 -translate-x-1/2 transform bg-gradient-to-b from-[#667eea] to-[#764ba2] opacity-0 md:left-1/2"
+            class="absolute bottom-0 left-4 top-8 w-0.5 -translate-x-1/2 transform animate-fade-in bg-gradient-to-b from-[#667eea] to-[#764ba2] opacity-0 md:left-1/2"
             style="animation-delay: 1.2s; animation-fill-mode: forwards;"
           ></div>
 
@@ -31,13 +31,13 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
             @for (experience of experiences; track experience; let i = $index) {
               <div class="relative">
                 <div
-                  class="bg-card border-border animate-slide-in-up relative z-10 mb-8 rounded-lg border p-6 opacity-0 shadow-lg md:p-8"
+                  class="relative z-10 mb-8 animate-slide-in-up rounded-lg border border-border bg-card p-6 opacity-0 shadow-lg md:p-8"
                   [style.animation-delay]="0.5 + i * 0.1 + 's'"
                   style="animation-fill-mode: forwards;"
                 >
                   <div class="mb-4 flex flex-col md:flex-row md:items-center md:justify-between">
                     <div>
-                      <h2 class="text-foreground mb-2 text-2xl font-bold md:text-3xl">
+                      <h2 class="mb-2 text-2xl font-bold text-foreground md:text-3xl">
                         {{ experience.company }}
                       </h2>
                       <p class="text-muted-foreground">{{ experience.location }}</p>
@@ -51,7 +51,7 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
                     </div>
                   </div>
                   <div class="mb-6">
-                    <p class="text-muted-foreground leading-relaxed">
+                    <p class="leading-relaxed text-muted-foreground">
                       {{ experience.description }}
                     </p>
                   </div>
@@ -62,8 +62,8 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
                           class="mb-4 flex flex-col md:flex-row md:items-center md:justify-between"
                         >
                           <div class="flex-1">
-                            <h3 class="text-foreground text-xl font-semibold">{{ role.title }}</h3>
-                            <span class="text-muted-foreground mt-1 block text-sm">{{
+                            <h3 class="text-xl font-semibold text-foreground">{{ role.title }}</h3>
+                            <span class="mt-1 block text-sm text-muted-foreground">{{
                               role.duration
                             }}</span>
                           </div>
@@ -88,7 +88,7 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
                         >
                           <div class="space-y-6 pb-4">
                             <div>
-                              <h4 class="text-foreground mb-3 text-lg font-medium">
+                              <h4 class="mb-3 text-lg font-medium text-foreground">
                                 Key Responsibilities
                               </h4>
                               <ul class="space-y-2">
@@ -96,7 +96,7 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
                                   responsibility of role.responsibilities;
                                   track responsibility
                                 ) {
-                                  <li class="text-muted-foreground flex items-start gap-3">
+                                  <li class="flex items-start gap-3 text-muted-foreground">
                                     <span
                                       class="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-[#667eea]"
                                     ></span>
@@ -106,12 +106,12 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
                               </ul>
                             </div>
                             <div>
-                              <h4 class="text-foreground mb-3 text-lg font-medium">
+                              <h4 class="mb-3 text-lg font-medium text-foreground">
                                 Major Achievements
                               </h4>
                               <ul class="space-y-2">
                                 @for (achievement of role.achievements; track achievement) {
-                                  <li class="text-muted-foreground flex items-start gap-3">
+                                  <li class="flex items-start gap-3 text-muted-foreground">
                                     <span
                                       class="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-[#764ba2]"
                                     ></span>
@@ -121,13 +121,13 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
                               </ul>
                             </div>
                             <div>
-                              <h4 class="text-foreground mb-3 text-lg font-medium">
+                              <h4 class="mb-3 text-lg font-medium text-foreground">
                                 Technologies Used
                               </h4>
                               <div class="flex flex-wrap gap-2">
                                 @for (tech of role.technologies; track tech) {
                                   <span
-                                    class="bg-secondary text-secondary-foreground rounded-full px-3 py-1 text-sm font-medium"
+                                    class="rounded-full bg-secondary px-3 py-1 text-sm font-medium text-secondary-foreground"
                                   >
                                     {{ tech }}
                                   </span>

@@ -1,0 +1,14 @@
+name: Checks PR
+
+on:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-format:
+    name: Lint & Format
+    uses: ./.github/workflows/lint-and-format-pr.yml
+    secrets: inherit

@@ -64,32 +64,26 @@ import { FileTreeService } from './services/file-tree.service';
     }
   `,
   template: `
-    <div class="bg-background text-foreground min-h-screen pt-4 pb-8 md:pt-6 md:pb-12">
+    <div class="min-h-screen bg-background pb-8 pt-4 text-foreground md:pb-12 md:pt-6">
       <div class="mx-auto max-w-7xl px-4">
         <div
           class="animate-slide-in-up opacity-0"
           style="animation-delay: 0.1s; animation-fill-mode: forwards"
         >
-          <div
-            class="bg-card border-border overflow-hidden rounded-lg border shadow-lg"
-          >
+          <div class="overflow-hidden rounded-lg border border-border bg-card shadow-lg">
             <div class="flex flex-col lg:hidden">
-              <div class="h-[calc(100vh-8rem)] flex flex-col">
+              <div class="flex h-[calc(100vh-8rem)] flex-col">
                 @if ((service.selectedNode$ | async) === null) {
                   <div class="flex flex-1 flex-col items-center justify-center gap-6 p-8">
-                    <div
-                      class="flex h-24 w-24 items-center justify-center rounded-full bg-muted"
-                    >
+                    <div class="flex h-24 w-24 items-center justify-center rounded-full bg-muted">
                       <lucide-angular
                         name="folder-open"
                         class="h-12 w-12 text-muted-foreground"
                       ></lucide-angular>
                     </div>
                     <div class="text-center">
-                      <h3 class="text-xl font-medium text-foreground mb-2">
-                        Browse Source Code
-                      </h3>
-                      <p class="text-sm text-muted-foreground mb-6">
+                      <h3 class="mb-2 text-xl font-medium text-foreground">Browse Source Code</h3>
+                      <p class="mb-6 text-sm text-muted-foreground">
                         Select a file from the repository to view its contents
                       </p>
                       <button
@@ -107,7 +101,7 @@ import { FileTreeService } from './services/file-tree.service';
                   </div>
                   <div class="border-t border-border p-3">
                     <button
-                      class="w-full inline-flex items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                      class="inline-flex w-full items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
                       (click)="openFileTreeModal()"
                     >
                       <lucide-angular name="folder-open" class="h-4 w-4"></lucide-angular>
@@ -173,13 +167,11 @@ export class CodeViewerComponent implements OnInit, OnDestroy {
       this.service.loadRepository(source.zipUrl, source.name);
     }
 
-    this.service.selectedNode$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(node => {
-        if (node && window.innerWidth < 1024) {
-          this.closeFileTreeModal();
-        }
-      });
+    this.service.selectedNode$.pipe(takeUntil(this.destroy$)).subscribe(node => {
+      if (node && window.innerWidth < 1024) {
+        this.closeFileTreeModal();
+      }
+    });
   }
 
   public ngOnDestroy(): void {

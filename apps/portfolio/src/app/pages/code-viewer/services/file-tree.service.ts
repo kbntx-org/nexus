@@ -46,17 +46,13 @@ export class FileTreeService {
     })
   );
 
-  public isImage$ = this.selectedNode$.pipe(
-    map(node => (node ? isImageFile(node.path) : false))
-  );
+  public isImage$ = this.selectedNode$.pipe(map(node => (node ? isImageFile(node.path) : false)));
 
   public isBinaryFile$ = this.selectedNode$.pipe(
     map(node => node?.content === '[Binary file - cannot display]')
   );
 
-  public areAllExpanded$ = this.tree$.pipe(
-    map(tree => tree ? this.areAllExpanded(tree) : false)
-  );
+  public areAllExpanded$ = this.tree$.pipe(map(tree => (tree ? this.areAllExpanded(tree) : false)));
 
   public loadRepository(url: string, name: string): void {
     this.repoNameSubject.next(name);
@@ -83,7 +79,11 @@ export class FileTreeService {
 
   public selectFile(node: FileTreeNode): void {
     this.selectedNodeSubject.next(node);
-    if (node.content && !isImageFile(node.path) && node.content !== '[Binary file - cannot display]') {
+    if (
+      node.content &&
+      !isImageFile(node.path) &&
+      node.content !== '[Binary file - cannot display]'
+    ) {
       this.loadCodeHighlighting(node.content, node.path);
     }
   }
@@ -97,7 +97,11 @@ export class FileTreeService {
 
   public async reloadCodeHighlighting(): Promise<void> {
     const node = this.selectedNodeSubject.value;
-    if (node?.content && !isImageFile(node.path) && node.content !== '[Binary file - cannot display]') {
+    if (
+      node?.content &&
+      !isImageFile(node.path) &&
+      node.content !== '[Binary file - cannot display]'
+    ) {
       await this.loadCodeHighlighting(node.content, node.path);
     }
   }
@@ -209,9 +213,7 @@ export class FileTreeService {
             path: currentPath,
             type: isFile ? 'file' : 'directory',
             expanded: false,
-            ...(isFile
-              ? { content: this.decodeContent(content) }
-              : { children: [] })
+            ...(isFile ? { content: this.decodeContent(content) } : { children: [] })
           };
           current.children!.push(child);
         }

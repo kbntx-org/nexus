@@ -27,6 +27,7 @@ features:
   - Gitops driven development with ArgoCD to minimize recovery while having flexibility
   - Standardized deployments
 ---
+
 Designed and implemented a scalable Kubernetes platform using K3s on Hetzner Cloud. K3s was chosen because it's a lightweight kubernetes distribution and it comes with some batteries that makes its implementation easier. The foundational infrastructure is fully automated with a terraform module based on a system of node-pools.
 
 <br>

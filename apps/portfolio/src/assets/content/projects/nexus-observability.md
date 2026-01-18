@@ -31,7 +31,8 @@ features:
   - Reusable lightweight helm chart
   - Stateful services with recurrent backup in S3
 ---
-Nexus is my homelab project where I experiment with building a production-grade observability platform. 
+
+Nexus is my homelab project where I experiment with building a production-grade observability platform.
 
 <br>
 

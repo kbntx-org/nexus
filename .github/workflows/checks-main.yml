@@ -1,0 +1,15 @@
+name: Checks main
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-format:
+    name: Lint & Format
+    uses: ./.github/workflows/lint-and-format-main.yaml
+    secrets: inherit

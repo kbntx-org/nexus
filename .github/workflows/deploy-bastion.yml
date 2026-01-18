@@ -23,7 +23,7 @@ jobs:
           CLOUDFLARE_TUNNEL_TOKEN: ${{ secrets.BASTION_CLOUDFLARE_TUNNEL_TOKEN }}
         with:
           user: ci
-          server: "10.0.0.5"
+          server: '10.0.0.5'
           ssh-key: ${{ secrets.NEXUS_CI_PRIVATE_SSH_KEY }}
           ssh-known-hosts: ${{ secrets.BASTION_KNOWN_HOSTS }}
           files: >
