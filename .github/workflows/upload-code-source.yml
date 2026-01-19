@@ -20,6 +20,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Download code source
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh api \
           -H "Accept: application/vnd.github+json" \
