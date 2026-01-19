@@ -228,9 +228,19 @@ export class FileTreeService {
 
   private unwrapSingleRootFolder(root: FileTreeNode): FileTreeNode {
     if (root.children?.length === 1 && root.children[0].type === 'directory') {
-      return { ...root, children: root.children[0].children };
+      const rootFolderName = root.children[0].name;
+      const unwrapped = { ...root, children: root.children[0].children };
+      this.stripPathPrefix(unwrapped, rootFolderName + '/');
+      return unwrapped;
     }
     return root;
+  }
+
+  private stripPathPrefix(node: FileTreeNode, prefix: string): void {
+    if (node.path.startsWith(prefix)) {
+      node.path = node.path.substring(prefix.length);
+    }
+    node.children?.forEach(child => this.stripPathPrefix(child, prefix));
   }
 
   private decodeContent(content: Uint8Array): string {
