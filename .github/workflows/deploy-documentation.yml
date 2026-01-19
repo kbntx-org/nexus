@@ -37,6 +37,7 @@ jobs:
           ARGOCD_OPTS: '--grpc-web'
         run: |
           echo hello1
+          sleep infinity
           argocd app sync documentation --prune
           echo hello2
           argocd app wait documentation --sync --health --operation --timeout 500
