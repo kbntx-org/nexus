@@ -8,7 +8,7 @@ export const CODE_SOURCES: CodeSource[] = [
   {
     id: 'nexus',
     name: 'nexus',
-    zipUrl: 'https://nbg1.your-objectstorage.com/nexus-public-statics/code-sources/nexus.zip'
+    zipUrl: 'https://fsn1.your-objectstorage.com/nexus-public-statics/code-sources/nexus.zip'
   }
 ];
 

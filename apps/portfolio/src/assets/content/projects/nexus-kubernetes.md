@@ -15,9 +15,9 @@ tech:
   - Infrastructure as Code
   - Distributed system
   - Recovery strategy
-logo: https://nbg1.your-objectstorage.com/nexus-public-statics/images/kubernetes-logo.svg
+logo: https://fsn1.your-objectstorage.com/nexus-public-statics/images/kubernetes-logo.svg
 images:
-  - https://nbg1.your-objectstorage.com/nexus-public-statics/images/k3s-cluster-schema.png
+  - https://fsn1.your-objectstorage.com/nexus-public-statics/images/k3s-cluster-schema.png
 codeSourceUrl: /code-source/nexus
 features:
   - K3s cluster with multi-node setup

@@ -8,11 +8,11 @@ tech:
   - Kubernetes
   - Cloudflare
   - S3
-logo: https://nbg1.your-objectstorage.com/nexus-public-statics/images/appsmith-logo.png
+logo: https://fsn1.your-objectstorage.com/nexus-public-statics/images/appsmith-logo.png
 images:
-  - https://nbg1.your-objectstorage.com/nexus-public-statics/images/cloudflare-tunnel-1.png
-  - https://nbg1.your-objectstorage.com/nexus-public-statics/images/cloudflare-tunnel-2.png
-  - https://nbg1.your-objectstorage.com/nexus-public-statics/images/s3-statics-client-1.png
+  - https://fsn1.your-objectstorage.com/nexus-public-statics/images/cloudflare-tunnel-1.png
+  - https://fsn1.your-objectstorage.com/nexus-public-statics/images/cloudflare-tunnel-2.png
+  - https://fsn1.your-objectstorage.com/nexus-public-statics/images/s3-statics-client-1.png
 codeSourceUrl: /code-source/nexus
 features:
   - Easy platform to build internal tools with a low-code approach

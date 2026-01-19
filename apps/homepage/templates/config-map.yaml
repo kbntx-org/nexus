@@ -32,10 +32,10 @@ data:
             icon: hetzner-h.svg
             href: https://console.hetzner.com
         - Appsmith:
-            icon: https://nexus-public-statics.nbg1.your-objectstorage.com/images/appsmith-logo.png
+            icon: https://nexus-public-statics.fsn1.your-objectstorage.com/images/appsmith-logo.png
             href: https://appsmith.kbntx.com
         - S3 Client:
-            icon: https://nexus-public-statics.nbg1.your-objectstorage.com/images/s3-logo.svg
+            icon: https://nexus-public-statics.fsn1.your-objectstorage.com/images/s3-logo.svg
             href: https://appsmith.kbntx.com/app/s3-statics-client/page1-691860ad613acd5b6ba7e634
     - Calendar:
         - Calendar:
@@ -49,7 +49,7 @@ data:
     title: Homepage
     headerStyle: boxed
     background:
-      image: https://nbg1.your-objectstorage.com/nexus-public-statics/images/wano-kuni.jpeg
+      image: https://fsn1.your-objectstorage.com/nexus-public-statics/images/wano-kuni.jpeg
       brightness: 50
     theme: dark
     color: slate

@@ -14,11 +14,11 @@ tech:
   - Helm
   - GitOps
   - ArgoCD
-logo: https://nbg1.your-objectstorage.com/nexus-public-statics/images/grafana-logo.svg
+logo: https://fsn1.your-objectstorage.com/nexus-public-statics/images/grafana-logo.svg
 images:
-  - https://nbg1.your-objectstorage.com/nexus-public-statics/images/ingress-nginx-dashboard.png
-  - https://nbg1.your-objectstorage.com/nexus-public-statics/images/node-k8s-dashboard.png
-  - https://nbg1.your-objectstorage.com/nexus-public-statics/images/api-server-dashboard.png
+  - https://fsn1.your-objectstorage.com/nexus-public-statics/images/ingress-nginx-dashboard.png
+  - https://fsn1.your-objectstorage.com/nexus-public-statics/images/node-k8s-dashboard.png
+  - https://fsn1.your-objectstorage.com/nexus-public-statics/images/api-server-dashboard.png
 codeSourceUrl: /code-source/nexus
 features:
   - VictoriaMetrics metrics collection with live S3 backups

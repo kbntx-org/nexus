@@ -10,7 +10,7 @@ markdown_extensions: []
 
 theme:
   name: material
-  logo: https://nbg1.your-objectstorage.com/nexus-public-statics/images/kt-logo.jpg
+  logo: https://fsn1.your-objectstorage.com/nexus-public-statics/images/kt-logo.jpg
   features:
     - tabs
     - instant

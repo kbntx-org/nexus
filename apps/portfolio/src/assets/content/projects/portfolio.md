@@ -9,13 +9,13 @@ tech:
   - RxJS
   - Pre-rendering
   - S3
-logo: https://nbg1.your-objectstorage.com/nexus-public-statics/images/kt-logo.jpg
+logo: https://fsn1.your-objectstorage.com/nexus-public-statics/images/kt-logo.jpg
 images:
-  - https://nbg1.your-objectstorage.com/nexus-public-statics/images/portfolio-cv.png
-  - https://nbg1.your-objectstorage.com/nexus-public-statics/images/portfolio-experiences.png
-  - https://nbg1.your-objectstorage.com/nexus-public-statics/images/portfolio-homepage.png
-  - https://nbg1.your-objectstorage.com/nexus-public-statics/images/portfolio-projects-dark-mode.png
-  - https://nbg1.your-objectstorage.com/nexus-public-statics/images/portfolio-projects-light-mode.png
+  - https://fsn1.your-objectstorage.com/nexus-public-statics/images/portfolio-cv.png
+  - https://fsn1.your-objectstorage.com/nexus-public-statics/images/portfolio-experiences.png
+  - https://fsn1.your-objectstorage.com/nexus-public-statics/images/portfolio-homepage.png
+  - https://fsn1.your-objectstorage.com/nexus-public-statics/images/portfolio-projects-dark-mode.png
+  - https://fsn1.your-objectstorage.com/nexus-public-statics/images/portfolio-projects-light-mode.png
 codeSourceUrl: /code-source/nexus
 features:
   - Dark/light theme support
