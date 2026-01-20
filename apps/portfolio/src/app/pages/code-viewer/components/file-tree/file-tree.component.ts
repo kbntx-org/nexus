@@ -32,7 +32,9 @@ import { FileTreeNodeComponent } from '../file-tree-node/file-tree-node.componen
     }
   `,
   template: `
-    <header class="flex shrink-0 items-center justify-between border-b border-border bg-muted/30 px-4 py-3">
+    <header
+      class="flex shrink-0 items-center justify-between border-b border-border bg-muted/30 px-4 py-3"
+    >
       <div class="flex items-center gap-2">
         <lucide-angular name="folder-git-2" class="h-5 w-5 text-muted-foreground"></lucide-angular>
         <span class="text-sm font-medium text-foreground">{{ service.repoName$ | async }}</span>
@@ -68,7 +70,9 @@ import { FileTreeNodeComponent } from '../file-tree-node/file-tree-node.componen
     <nav class="flex-1 overflow-auto p-2">
       @if (service.isLoading$ | async) {
         <div class="flex items-center justify-center py-8">
-          <div class="h-6 w-6 animate-spin rounded-full border-2 border-muted-foreground border-t-primary"></div>
+          <div
+            class="h-6 w-6 animate-spin rounded-full border-2 border-muted-foreground border-t-primary"
+          ></div>
         </div>
       } @else if ((service.filteredTree$ | async)?.children?.length) {
         @for (child of (service.filteredTree$ | async)!.children; track child.path) {
