@@ -54,9 +54,12 @@ export class FileTreeService {
 
   public areAllExpanded$ = combineLatest([this.filteredTree$, this.searchQuery$]).pipe(
     map(([tree, query]) => {
-      if (!tree) return false;
-      // When searching, consider all as expanded since filter forces expansion
-      if (query.trim()) return true;
+      if (!tree) {
+        return false;
+      }
+      if (query.trim()) {
+        return true;
+      }
       return this.areAllExpanded(tree);
     })
   );
