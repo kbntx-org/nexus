@@ -124,7 +124,7 @@ import { Project } from '../../services/projects.service';
         </div>
 
         <div
-          class="border-t border-border bg-muted/30 p-8 pt-6"
+          class="border-t border-border bg-muted/30 p-6"
           *ngIf="project.liveUrl || project.githubUrl || project.codeSourceUrl"
         >
           <div class="flex w-full flex-wrap gap-4">

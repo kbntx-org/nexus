@@ -61,7 +61,7 @@ body {
   color: hsl(var(--foreground));
   margin: 0;
   padding: 0;
-  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   font-family:
     'Roboto',
@@ -73,7 +73,6 @@ body {
     sans-serif;
 }
 
-// Ensure body is flex container
 body {
   display: flex;
   flex-direction: column;
@@ -85,4 +84,5 @@ app-root {
   flex-direction: column;
   flex: 1;
   min-height: 0;
+  overflow: hidden;
 }

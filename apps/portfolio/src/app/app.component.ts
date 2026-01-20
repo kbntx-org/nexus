@@ -10,10 +10,8 @@ import { NavigationComponent } from './shared/components/navigation/navigation.c
   selector: 'app-root',
   template: `
     <app-navigation></app-navigation>
-    <main #mainContent class="flex flex-1 flex-col overflow-y-auto pt-16 lg:pt-[70px]">
-      <div class="flex min-h-0 flex-1 flex-col">
-        <router-outlet></router-outlet>
-      </div>
+    <main #mainContent class="flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
+      <router-outlet></router-outlet>
     </main>
   `
 })
@@ -23,7 +21,6 @@ export class AppComponent implements OnDestroy, AfterViewInit {
   private router = inject(Router);
 
   public ngAfterViewInit(): void {
-    // Subscribe to route changes to reset scroll
     this.routerSubscription = this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => {

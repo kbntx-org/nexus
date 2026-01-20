@@ -81,11 +81,7 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
                             ></lucide-angular>
                           </button>
                         </div>
-                        <div
-                          class="overflow-hidden transition-all duration-300 ease-in-out"
-                          [class.max-h-0]="!isRoleExpanded(i, j)"
-                          [class.max-h-[1000px]]="isRoleExpanded(i, j)"
-                        >
+                        @if (isRoleExpanded(i, j)) {
                           <div class="space-y-6 pb-4">
                             <div>
                               <h4 class="mb-3 text-lg font-medium text-foreground">
@@ -124,18 +120,35 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
                               <h4 class="mb-3 text-lg font-medium text-foreground">
                                 Technologies Used
                               </h4>
-                              <div class="flex flex-wrap gap-2">
-                                @for (tech of role.technologies; track tech) {
+                              <div class="flex flex-wrap items-center gap-2">
+                                @for (
+                                  tech of isTechExpanded(i, j)
+                                    ? role.technologies
+                                    : role.technologies.slice(0, 6);
+                                  track tech
+                                ) {
                                   <span
                                     class="rounded-full bg-secondary px-3 py-1 text-sm font-medium text-secondary-foreground"
                                   >
                                     {{ tech }}
                                   </span>
                                 }
+                                @if (role.technologies.length > 6) {
+                                  <button
+                                    (click)="toggleTech(i, j)"
+                                    class="rounded-full border border-[#667eea] px-3 py-1 text-sm font-medium text-[#667eea] transition-colors hover:bg-[#667eea]/10"
+                                  >
+                                    {{
+                                      isTechExpanded(i, j)
+                                        ? 'Show less'
+                                        : '+' + (role.technologies.length - 6) + ' more'
+                                    }}
+                                  </button>
+                                }
                               </div>
                             </div>
                           </div>
-                        </div>
+                        }
                       </div>
                     }
                   </div>
@@ -151,20 +164,25 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
 export class ExperiencesComponent {
   public experiences: Experience[] = EXPERIENCES;
   public expandedRoles: Set<string> = new Set();
+  public expandedTech: Set<string> = new Set();
 
-  // Lucide icons
   public readonly ChevronDownIcon = ChevronDown;
 
-  public toggleRole(experienceIndex: number, roleIndex: number): void {
-    const key = `${experienceIndex}-${roleIndex}`;
-    if (this.expandedRoles.has(key)) {
-      this.expandedRoles.delete(key);
-    } else {
-      this.expandedRoles.add(key);
-    }
+  public toggleRole(i: number, j: number): void {
+    const key = `${i}-${j}`;
+    this.expandedRoles.has(key) ? this.expandedRoles.delete(key) : this.expandedRoles.add(key);
   }
 
-  public isRoleExpanded(experienceIndex: number, roleIndex: number): boolean {
-    return this.expandedRoles.has(`${experienceIndex}-${roleIndex}`);
+  public isRoleExpanded(i: number, j: number): boolean {
+    return this.expandedRoles.has(`${i}-${j}`);
+  }
+
+  public toggleTech(i: number, j: number): void {
+    const key = `${i}-${j}`;
+    this.expandedTech.has(key) ? this.expandedTech.delete(key) : this.expandedTech.add(key);
+  }
+
+  public isTechExpanded(i: number, j: number): boolean {
+    return this.expandedTech.has(`${i}-${j}`);
   }
 }
