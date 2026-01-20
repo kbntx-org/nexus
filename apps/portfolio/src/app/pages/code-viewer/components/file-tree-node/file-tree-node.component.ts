@@ -79,6 +79,7 @@ import { FileTreeService } from '../../services/file-tree.service';
           [class.font-medium]="node.type === 'directory'"
           [class.text-foreground]="node.type === 'directory'"
           [class.text-muted-foreground]="node.type === 'file' && (isSelected$ | async) === false"
+          [title]="node.name"
         >
           {{ node.name }}
         </span>

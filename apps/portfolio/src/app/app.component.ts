@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnDestroy, inject, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
@@ -10,20 +10,26 @@ import { NavigationComponent } from './shared/components/navigation/navigation.c
   selector: 'app-root',
   template: `
     <app-navigation></app-navigation>
-    <main class="pt-[70px] lg:pt-[70px]">
-      <router-outlet></router-outlet>
+    <main #mainContent class="flex flex-1 flex-col overflow-y-auto pt-16 lg:pt-[70px]">
+      <div class="flex min-h-0 flex-1 flex-col">
+        <router-outlet></router-outlet>
+      </div>
     </main>
   `
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent implements OnDestroy, AfterViewInit {
+  @ViewChild('mainContent') public mainContent!: ElementRef<HTMLElement>;
   private routerSubscription?: Subscription;
   private router = inject(Router);
 
-  public ngOnInit(): void {
+  public ngAfterViewInit(): void {
+    // Subscribe to route changes to reset scroll
     this.routerSubscription = this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => {
-        window.scrollTo(0, 0);
+        if (this.mainContent?.nativeElement) {
+          this.mainContent.nativeElement.scrollTo(0, 0);
+        }
       });
   }
 

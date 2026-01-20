@@ -52,7 +52,14 @@ export class FileTreeService {
     map(node => node?.content === '[Binary file - cannot display]')
   );
 
-  public areAllExpanded$ = this.tree$.pipe(map(tree => (tree ? this.areAllExpanded(tree) : false)));
+  public areAllExpanded$ = combineLatest([this.filteredTree$, this.searchQuery$]).pipe(
+    map(([tree, query]) => {
+      if (!tree) return false;
+      // When searching, consider all as expanded since filter forces expansion
+      if (query.trim()) return true;
+      return this.areAllExpanded(tree);
+    })
+  );
 
   public loadRepository(url: string, name: string): void {
     this.repoNameSubject.next(name);
@@ -112,7 +119,14 @@ export class FileTreeService {
       return;
     }
 
-    const allExpanded = this.areAllExpanded(tree);
+    const hasSearchQuery = this.searchQuerySubject.value.trim().length > 0;
+    const allExpanded = hasSearchQuery || this.areAllExpanded(tree);
+
+    // Clear search when collapsing (since search forces expansion)
+    if (allExpanded && hasSearchQuery) {
+      this.searchQuerySubject.next('');
+    }
+
     this.setExpandedRecursive(tree, !allExpanded);
     this.treeSubject.next(tree);
   }

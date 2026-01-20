@@ -61,7 +61,8 @@ body {
   color: hsl(var(--foreground));
   margin: 0;
   padding: 0;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   font-family:
     'Roboto',
     -apple-system,
@@ -70,4 +71,18 @@ body {
     'Helvetica Neue',
     Arial,
     sans-serif;
+}
+
+// Ensure body is flex container
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+// Ensure app-root is flex container
+app-root {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
