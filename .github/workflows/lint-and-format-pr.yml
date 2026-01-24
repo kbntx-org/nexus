@@ -14,12 +14,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Fetch base branch
         run: |
-          git fetch origin ${{ github.base_ref }}
+          git fetch origin ${{ github.base_ref }} --depth=1
         shell: bash
 
       - name: Install dependencies
@@ -28,10 +26,10 @@ jobs:
         shell: bash
 
       - name: Check formatting
-        run: npx nx format:check --base remotes/origin/${{ github.base_ref }}
+        run: pnpm nx format:check --base remotes/origin/${{ github.base_ref }}
         shell: bash
 
       - name: Lint
         run: |
-          pnpm run lint --base remotes/origin/${{ github.base_ref }}
+          pnpm nx affected:lint --parallel --base remotes/origin/${{ github.base_ref }}
         shell: bash
