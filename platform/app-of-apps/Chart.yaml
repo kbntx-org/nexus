@@ -3,5 +3,5 @@ name: app-of-apps
 version: 1.0.0
 dependencies:
   - name: argocd-apps
-    version: 2.0.2
+    version: 2.0.4
     repository: https://argoproj.github.io/argo-helm
