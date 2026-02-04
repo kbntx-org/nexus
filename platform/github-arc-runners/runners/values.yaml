@@ -4,7 +4,7 @@ gha-runner-scale-set:
     name: github-arc-runners-controller-gha-rs-controller
   githubConfigUrl: 'https://github.com/kbntx-org'
   githubConfigSecret: github-arc-runners-secret
-  maxRunners: 3
+  maxRunners: 4
   minRunners: 0
   runnerGroup: 'default'
   runnerScaleSetName: 'nexus-runners'
@@ -12,10 +12,10 @@ gha-runner-scale-set:
     type: 'kubernetes'
     kubernetesModeWorkVolumeClaim:
       accessModes: ['ReadWriteOnce']
-      storageClassName: hcloud-volumes
+      storageClassName: local-path
       resources:
         requests:
-          storage: 20Gi
+          storage: 10Gi
   listenerTemplate:
     spec:
       containers:

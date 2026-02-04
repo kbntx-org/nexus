@@ -13,7 +13,7 @@ module "nexus_cluster" {
   docker_hub_password     = var.docker_hub_password
 
   control_plane = {
-    server_type = "cpx31"
+    server_type = "cx33"
     location    = "fsn1"
     labels = {
       "node-type"   = "control-plane"
