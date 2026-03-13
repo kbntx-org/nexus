@@ -12,3 +12,8 @@ jobs:
     name: Lint & Format
     uses: ./.github/workflows/lint-and-format-pr.yml
     secrets: inherit
+
+  test:
+    name: Test
+    uses: ./.github/workflows/test-pr.yml
+    secrets: inherit

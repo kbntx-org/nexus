@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cloudflare-ingress-controller
+automountServiceAccountToken: true
+---
+# ClusterRole: read ingresses across all namespaces
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cloudflare-ingress-controller
+rules:
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["ingresses"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cloudflare-ingress-controller
+subjects:
+  - kind: ServiceAccount
+    name: cloudflare-ingress-controller
+    namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: ClusterRole
+  name: cloudflare-ingress-controller
+  apiGroup: rbac.authorization.k8s.io
+---
+# Role: manage leader election Lease in the controller's namespace
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cloudflare-ingress-controller-leader-election
+rules:
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["get", "create", "update", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cloudflare-ingress-controller-leader-election
+subjects:
+  - kind: ServiceAccount
+    name: cloudflare-ingress-controller
+    namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: Role
+  name: cloudflare-ingress-controller-leader-election
+  apiGroup: rbac.authorization.k8s.io
