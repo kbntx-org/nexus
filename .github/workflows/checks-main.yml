@@ -21,12 +21,12 @@ jobs:
 
   deploy-portfolio:
     name: Deploy Portfolio
-    needs: lint-and-format
+    needs: [lint-and-format, test]
     uses: ./.github/workflows/deploy-portfolio.yml
     secrets: inherit
 
   deploy-documentation:
     name: Deploy Documentation
-    needs: lint-and-format
+    needs: [lint-and-format, test]
     uses: ./.github/workflows/deploy-documentation.yml
     secrets: inherit
