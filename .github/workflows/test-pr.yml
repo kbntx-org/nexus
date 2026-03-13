@@ -1,0 +1,28 @@
+name: Test PR
+
+on:
+  workflow_call:
+
+jobs:
+  test:
+    name: Test
+    runs-on: nexus-runners
+    container:
+      image: kbntx/nexus-ci-toolkit:1.0
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch base branch
+        run: git fetch origin ${{ github.base_ref }} --depth=1
+        shell: bash
+
+      - name: Install dependencies
+        run: pnpm install
+        shell: bash
+
+      - name: Test affected
+        run: pnpm nx affected --target=test --parallel --base remotes/origin/${{ github.base_ref }}
+        shell: bash

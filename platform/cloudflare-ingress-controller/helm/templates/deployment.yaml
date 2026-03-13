@@ -17,9 +17,6 @@ spec:
         - name: controller
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          envFrom:
-            - secretRef:
-                name: cloudflare-ingress-controller-secret
           env:
             - name: TARGET_SERVICE_URL
               value: {{ .Values.targetServiceUrl | quote }}
@@ -35,3 +32,6 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+            {{- with .Values.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}

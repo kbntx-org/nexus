@@ -14,8 +14,30 @@ ingressClassName: ""
 # Reconciliation interval in milliseconds
 reconcileIntervalMs: 30000
 
-cloudflare:
-  apiToken: ""
-  accountId: ""
-  tunnelId: ""
-  zoneId: ""
+# Additional env vars injected into the controller container.
+# Use this to provide CF_API_TOKEN, CF_ACCOUNT_ID, CF_TUNNEL_ID, CF_ZONE_ID
+# from your own secret(s), using standard Kubernetes env syntax.
+#
+# Example:
+#   extraEnv:
+#     - name: CF_API_TOKEN
+#       valueFrom:
+#         secretKeyRef:
+#           name: my-cloudflare-secret
+#           key: apiToken
+#     - name: CF_ACCOUNT_ID
+#       valueFrom:
+#         secretKeyRef:
+#           name: my-cloudflare-secret
+#           key: accountId
+#     - name: CF_TUNNEL_ID
+#       valueFrom:
+#         secretKeyRef:
+#           name: my-cloudflare-secret
+#           key: tunnelId
+#     - name: CF_ZONE_ID
+#       valueFrom:
+#         secretKeyRef:
+#           name: my-cloudflare-secret
+#           key: zoneId
+extraEnv: []
