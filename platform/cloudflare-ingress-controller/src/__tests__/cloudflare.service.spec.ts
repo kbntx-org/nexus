@@ -1,10 +1,9 @@
-import { createCloudflareService } from '../cloudflare.service';
-import type { TunnelIngress } from '../cloudflare.service';
+import { createCloudflareService, type TunnelIngress } from '../cloudflare.service';
 
 const mockConfig = {
   apiToken: 'test-token',
   accountId: 'acc-123',
-  tunnelId: 'tun-456',
+  tunnelId: 'tun-456'
 };
 
 const baseUrl = `https://api.cloudflare.com/client/v4/accounts/${mockConfig.accountId}/cfd_tunnel/${mockConfig.tunnelId}/configurations`;
@@ -12,7 +11,7 @@ const baseUrl = `https://api.cloudflare.com/client/v4/accounts/${mockConfig.acco
 function mockFetch(response: unknown, ok = true) {
   global.fetch = jest.fn().mockResolvedValue({
     ok,
-    json: jest.fn().mockResolvedValue(response),
+    json: jest.fn().mockResolvedValue(response)
   });
 }
 
@@ -29,10 +28,10 @@ describe('createCloudflareService', () => {
             ingress: [
               { hostname: 'a.com', service: 'http://traefik:80' },
               { hostname: 'b.com', service: 'http://traefik:80' },
-              { service: 'http_status:404' },
-            ],
-          },
-        },
+              { service: 'http_status:404' }
+            ]
+          }
+        }
       });
 
       const service = createCloudflareService(mockConfig);
@@ -49,9 +48,9 @@ describe('createCloudflareService', () => {
         errors: [],
         result: {
           config: {
-            ingress: [{ service: 'http_status:404' }],
-          },
-        },
+            ingress: [{ service: 'http_status:404' }]
+          }
+        }
       });
 
       const service = createCloudflareService(mockConfig);
@@ -74,14 +73,14 @@ describe('createCloudflareService', () => {
       const service = createCloudflareService(mockConfig);
       const rules: TunnelIngress[] = [
         { hostname: 'a.com', service: 'http://traefik:80' },
-        { hostname: 'b.com', service: 'http://traefik:80' },
+        { hostname: 'b.com', service: 'http://traefik:80' }
       ];
 
       await service.putConfig(rules);
 
       expect(global.fetch).toHaveBeenCalledWith(
         baseUrl,
-        expect.objectContaining({ method: 'PUT' }),
+        expect.objectContaining({ method: 'PUT' })
       );
 
       const callArgs = (global.fetch as jest.Mock).mock.calls[0][1];

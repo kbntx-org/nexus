@@ -3,8 +3,8 @@ export default {
   preset: '../../jest.preset.js',
   testEnvironment: 'node',
   transform: {
-    '^.+\\.[tj]s$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }],
+    '^.+\\.[tj]s$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }]
   },
   moduleFileExtensions: ['ts', 'js'],
-  coverageDirectory: '../../coverage/platform/cloudflare-ingress-controller',
+  coverageDirectory: '../../coverage/platform/cloudflare-ingress-controller'
 };

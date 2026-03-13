@@ -1,10 +1,10 @@
-import type { K8sService } from './k8s.service';
 import type { CloudflareService, TunnelIngress } from './cloudflare.service';
+import type { K8sService } from './k8s.service';
 
 export async function reconcile(
   k8s: K8sService,
   cloudflare: CloudflareService,
-  targetServiceUrl: string,
+  targetServiceUrl: string
 ): Promise<void> {
   const ingresses = await k8s.list();
   const desired = new Set<string>();
@@ -15,22 +15,26 @@ export async function reconcile(
   }
 
   const current = await cloudflare.getConfig();
-  const currentHostnames = new Set(current.map((r) => r.hostname!));
+  const currentHostnames = new Set(current.map(r => r.hostname!));
 
-  const added = [...desired].filter((h) => !currentHostnames.has(h));
-  const removed = [...currentHostnames].filter((h) => !desired.has(h));
+  const added = [...desired].filter(h => !currentHostnames.has(h));
+  const removed = [...currentHostnames].filter(h => !desired.has(h));
 
   if (added.length === 0 && removed.length === 0) {
     console.log('[controller] tunnel config is up to date, nothing to do');
     return;
   }
 
-  if (added.length > 0) console.log('[controller] adding hostnames:', added);
-  if (removed.length > 0) console.log('[controller] removing hostnames:', removed);
+  if (added.length > 0) {
+    console.log('[controller] adding hostnames:', added);
+  }
+  if (removed.length > 0) {
+    console.log('[controller] removing hostnames:', removed);
+  }
 
-  const newRules: TunnelIngress[] = [...desired].map((hostname) => ({
+  const newRules: TunnelIngress[] = [...desired].map(hostname => ({
     hostname,
-    service: targetServiceUrl,
+    service: targetServiceUrl
   }));
 
   await cloudflare.putConfig(newRules);

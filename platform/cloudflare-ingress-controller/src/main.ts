@@ -1,7 +1,8 @@
 import * as k8s from '@kubernetes/client-node';
-import { createK8sService } from './k8s.service';
+
 import { createCloudflareService } from './cloudflare.service';
 import { reconcile } from './controller';
+import { createK8sService } from './k8s.service';
 
 function requireEnv(name: string): string {
   const val = process.env[name];
@@ -30,11 +31,11 @@ async function main() {
   const cfService = createCloudflareService({
     apiToken: cfApiToken,
     accountId: cfAccountId,
-    tunnelId: cfTunnelId,
+    tunnelId: cfTunnelId
   });
 
   console.log(
-    `[main] starting cloudflare-ingress-controller (class filter: ${ingressClassName ?? 'all'})`,
+    `[main] starting cloudflare-ingress-controller (class filter: ${ingressClassName ?? 'all'})`
   );
 
   const kc = new k8s.KubeConfig();
@@ -77,7 +78,7 @@ async function main() {
         'cloudflare-ingress-controller-leader',
         podNamespace,
         podName,
-        coordinationApi,
+        coordinationApi
       ),
       leaseDuration: 15,
       renewDeadline: 10,
@@ -88,9 +89,9 @@ async function main() {
         if (identity !== podName) {
           console.log(`[main] current leader: ${identity}`);
         }
-      },
+      }
     },
-    false,
+    false
   );
 
   leaderElector.run();

@@ -33,7 +33,7 @@ export function createCloudflareService(config: CloudflareConfig): CloudflareSer
   const baseUrl = `https://api.cloudflare.com/client/v4/accounts/${accountId}/cfd_tunnel/${tunnelId}/configurations`;
   const headers = {
     Authorization: `Bearer ${apiToken}`,
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json'
   };
 
   return {
@@ -44,24 +44,24 @@ export function createCloudflareService(config: CloudflareConfig): CloudflareSer
         throw new Error(`Cloudflare getConfig failed: ${JSON.stringify(body.errors)}`);
       }
       const ingress = body.result?.config?.ingress ?? [];
-      return ingress.filter((rule) => rule.hostname !== undefined);
+      return ingress.filter(rule => rule.hostname !== undefined);
     },
 
     async putConfig(rules: TunnelIngress[]): Promise<void> {
       const payload = {
         config: {
-          ingress: [...rules, CATCH_ALL],
-        },
+          ingress: [...rules, CATCH_ALL]
+        }
       };
       const res = await fetch(baseUrl, {
         method: 'PUT',
         headers,
-        body: JSON.stringify(payload),
+        body: JSON.stringify(payload)
       });
       const body = (await res.json()) as CfApiResponse<unknown>;
       if (!body.success) {
         throw new Error(`Cloudflare putConfig failed: ${JSON.stringify(body.errors)}`);
       }
-    },
+    }
   };
 }

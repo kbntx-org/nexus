@@ -2,7 +2,9 @@ import type { V1Ingress } from '@kubernetes/client-node';
 
 // Filter and extraction logic extracted for unit testing without K8s API calls
 function matchesClass(ingress: V1Ingress, className: string | undefined): boolean {
-  if (!className) return true;
+  if (!className) {
+    return true;
+  }
   const specClass = ingress.spec?.ingressClassName;
   const annotationClass = ingress.metadata?.annotations?.['kubernetes.io/ingress.class'];
   return specClass === className || annotationClass === className;
@@ -10,25 +12,25 @@ function matchesClass(ingress: V1Ingress, className: string | undefined): boolea
 
 function extractHostnames(ingress: V1Ingress): string[] {
   return (ingress.spec?.rules ?? [])
-    .map((r) => r.host)
+    .map(r => r.host)
     .filter((h): h is string => typeof h === 'string' && h.length > 0);
 }
 
 function makeIngress(
   host: string | undefined,
-  opts: { specClass?: string; annotationClass?: string } = {},
+  opts: { specClass?: string; annotationClass?: string } = {}
 ): V1Ingress {
   return {
     metadata: {
       name: 'test',
       annotations: opts.annotationClass
         ? { 'kubernetes.io/ingress.class': opts.annotationClass }
-        : undefined,
+        : undefined
     },
     spec: {
       ingressClassName: opts.specClass,
-      rules: host ? [{ host, http: { paths: [] } }] : [],
-    },
+      rules: host ? [{ host, http: { paths: [] } }] : []
+    }
   };
 }
 
@@ -37,9 +39,9 @@ describe('matchesClass', () => {
     const ingresses = [
       makeIngress('a.com', { specClass: 'traefik' }),
       makeIngress('b.com', { specClass: 'nginx' }),
-      makeIngress('c.com'),
+      makeIngress('c.com')
     ];
-    expect(ingresses.filter((i) => matchesClass(i, undefined))).toHaveLength(3);
+    expect(ingresses.filter(i => matchesClass(i, undefined))).toHaveLength(3);
   });
 
   it('filters by spec ingressClassName', () => {
@@ -67,9 +69,9 @@ describe('extractHostnames', () => {
       spec: {
         rules: [
           { host: 'a.com', http: { paths: [] } },
-          { host: 'b.com', http: { paths: [] } },
-        ],
-      },
+          { host: 'b.com', http: { paths: [] } }
+        ]
+      }
     };
     expect(extractHostnames(ingress)).toEqual(['a.com', 'b.com']);
   });
@@ -77,11 +79,8 @@ describe('extractHostnames', () => {
   it('ignores rules without a host', () => {
     const ingress: V1Ingress = {
       spec: {
-        rules: [
-          { http: { paths: [] } },
-          { host: 'a.com', http: { paths: [] } },
-        ],
-      },
+        rules: [{ http: { paths: [] } }, { host: 'a.com', http: { paths: [] } }]
+      }
     };
     expect(extractHostnames(ingress)).toEqual(['a.com']);
   });
@@ -94,8 +93,8 @@ describe('extractHostnames', () => {
   it('filters out empty string hosts', () => {
     const ingress: V1Ingress = {
       spec: {
-        rules: [{ host: '', http: { paths: [] } }],
-      },
+        rules: [{ host: '', http: { paths: [] } }]
+      }
     };
     expect(extractHostnames(ingress)).toEqual([]);
   });

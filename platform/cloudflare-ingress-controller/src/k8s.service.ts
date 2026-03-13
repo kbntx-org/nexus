@@ -8,7 +8,9 @@ export interface IngressInfo {
 }
 
 function matchesClass(ingress: k8s.V1Ingress, className: string | undefined): boolean {
-  if (!className) return true;
+  if (!className) {
+    return true;
+  }
   const specClass = ingress.spec?.ingressClassName;
   const annotationClass = ingress.metadata?.annotations?.['kubernetes.io/ingress.class'];
   return specClass === className || annotationClass === className;
@@ -16,14 +18,14 @@ function matchesClass(ingress: k8s.V1Ingress, className: string | undefined): bo
 
 function toIngressInfo(ingress: k8s.V1Ingress): IngressInfo {
   const hostnames = (ingress.spec?.rules ?? [])
-    .map((r) => r.host)
+    .map(r => r.host)
     .filter((h): h is string => typeof h === 'string' && h.length > 0);
 
   return {
     name: ingress.metadata?.name ?? '',
     namespace: ingress.metadata?.namespace ?? '',
     hostnames,
-    ingressClassName: ingress.spec?.ingressClassName,
+    ingressClassName: ingress.spec?.ingressClassName
   };
 }
 
@@ -42,9 +44,7 @@ export function createK8sService(className: string | undefined): K8sService {
   return {
     async list(): Promise<IngressInfo[]> {
       const res = await networkingApi.listIngressForAllNamespaces();
-      return res.items
-        .filter((ing) => matchesClass(ing, className))
-        .map(toIngressInfo);
+      return res.items.filter(ing => matchesClass(ing, className)).map(toIngressInfo);
     },
 
     watch(onEvent): () => void {
@@ -52,22 +52,30 @@ export function createK8sService(className: string | undefined): K8sService {
       let stopped = false;
 
       async function start() {
-        if (stopped) return;
+        if (stopped) {
+          return;
+        }
         try {
           req = await watch.watch(
             '/apis/networking.k8s.io/v1/ingresses',
             {},
             (type: string, obj: k8s.V1Ingress) => {
-              if (type !== 'ADDED' && type !== 'MODIFIED' && type !== 'DELETED') return;
-              if (!matchesClass(obj, className)) return;
+              if (type !== 'ADDED' && type !== 'MODIFIED' && type !== 'DELETED') {
+                return;
+              }
+              if (!matchesClass(obj, className)) {
+                return;
+              }
               onEvent(type as 'ADDED' | 'MODIFIED' | 'DELETED', toIngressInfo(obj));
             },
-            (err) => {
+            err => {
               if (!stopped) {
-                if (err) console.error('[k8s] watch error, restarting:', err.message);
+                if (err) {
+                  console.error('[k8s] watch error, restarting:', err.message);
+                }
                 setTimeout(start, 5000);
               }
-            },
+            }
           );
         } catch (err) {
           if (!stopped) {
@@ -83,6 +91,6 @@ export function createK8sService(className: string | undefined): K8sService {
         stopped = true;
         req?.abort();
       };
-    },
+    }
   };
 }

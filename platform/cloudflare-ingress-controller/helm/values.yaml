@@ -5,11 +5,11 @@ image:
 
 # URL of the backend service that ingress traffic is forwarded to
 # e.g. http://traefik.traefik.svc.cluster.local:80
-targetServiceUrl: ""
+targetServiceUrl: ''
 
 # Only process ingresses with this ingressClassName.
 # Leave empty to watch all ingresses regardless of class.
-ingressClassName: ""
+ingressClassName: ''
 
 # Reconciliation interval in milliseconds
 reconcileIntervalMs: 30000
