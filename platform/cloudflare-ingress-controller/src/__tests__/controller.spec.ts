@@ -22,9 +22,6 @@ function makeCf(existing: string[]): { service: CloudflareService; putConfig: je
   return { service, putConfig };
 }
 
-beforeEach(() => jest.spyOn(console, 'log').mockImplementation(() => {}));
-afterEach(() => jest.restoreAllMocks());
-
 describe('reconcile', () => {
   it('adds new hostnames', async () => {
     const k8s = makeK8s(['a.com', 'b.com']);
