@@ -57,15 +57,14 @@ const baseConfig: Config = {
   traefikService: 'http://traefik.traefik.svc.cluster.local:80',
   ingressClassName: null,
   namespace: null,
-  reconcileIntervalMs: 60000
+  reconcileIntervalMs: 60000,
+  podName: 'cf-ingress-controller-0',
+  leaderElectionNamespace: 'platform'
 };
 
 describe('IngressController.collectHostnames', () => {
   it('collects all hostnames when no ingressClassName is set', async () => {
-    const ingresses = [
-      makeIngress('portfolio.kbntx.com'),
-      makeIngress('blog.kbntx.com')
-    ];
+    const ingresses = [makeIngress('portfolio.kbntx.com'), makeIngress('blog.kbntx.com')];
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const controller = new IngressController(baseConfig, makeMockK8sApi(ingresses) as any, makeMockCfClient());
 

@@ -3,7 +3,7 @@ export default {
   displayName: 'cf-ingress-controller',
   preset: '../../jest.preset.js',
   testEnvironment: 'node',
-  coverageDirectory: '../../coverage/apps/cf-ingress-controller',
+  coverageDirectory: '../../coverage/platform/cf-ingress-controller',
   transform: {
     '^.+\\.[tj]s$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }]
   },

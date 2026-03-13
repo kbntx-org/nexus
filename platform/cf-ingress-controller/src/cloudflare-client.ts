@@ -1,5 +1,3 @@
-import * as https from 'https';
-
 import {
   CloudflareApiResponse,
   CloudflareTunnelConfig,
@@ -16,7 +14,7 @@ export class CloudflareClient {
     this.apiToken = apiToken;
     this.accountId = accountId;
     this.tunnelId = tunnelId;
-    this.baseUrl = 'api.cloudflare.com';
+    this.baseUrl = 'https://api.cloudflare.com';
   }
 
   public async getTunnelConfig(): Promise<CloudflareTunnelConfig> {
@@ -55,45 +53,28 @@ export class CloudflareClient {
     return [...managedEntries, ...unmanagedEntries, ...(hasCatchAll ? [] : [catchAll])];
   }
 
-  private request<T>(method: string, path: string, body?: unknown): Promise<CloudflareApiResponse<T>> {
-    return new Promise((resolve, reject) => {
-      const bodyStr = body ? JSON.stringify(body) : undefined;
-      const options: https.RequestOptions = {
-        hostname: this.baseUrl,
-        path,
-        method,
-        headers: {
-          Authorization: `Bearer ${this.apiToken}`,
-          'Content-Type': 'application/json',
-          ...(bodyStr ? { 'Content-Length': Buffer.byteLength(bodyStr) } : {})
-        }
-      };
-
-      const req = https.request(options, res => {
-        const chunks: Buffer[] = [];
-        res.on('data', (chunk: Buffer) => chunks.push(chunk));
-        res.on('end', () => {
-          const text = Buffer.concat(chunks).toString('utf-8');
-          let parsed: CloudflareApiResponse<T>;
-          try {
-            parsed = JSON.parse(text) as CloudflareApiResponse<T>;
-          } catch {
-            return reject(new Error(`Failed to parse Cloudflare API response: ${text}`));
-          }
-          if (!parsed.success) {
-            const errMsg = parsed.errors.map(e => `${e.code}: ${e.message}`).join(', ');
-            return reject(new Error(`Cloudflare API error: ${errMsg}`));
-          }
-          resolve(parsed);
-        });
-      });
-
-      req.on('error', reject);
-
-      if (bodyStr) {
-        req.write(bodyStr);
-      }
-      req.end();
+  private async request<T>(
+    method: string,
+    path: string,
+    body?: unknown
+  ): Promise<CloudflareApiResponse<T>> {
+    const url = `${this.baseUrl}${path}`;
+    const response = await fetch(url, {
+      method,
+      headers: {
+        Authorization: `Bearer ${this.apiToken}`,
+        'Content-Type': 'application/json'
+      },
+      ...(body !== undefined ? { body: JSON.stringify(body) } : {})
     });
+
+    const data = (await response.json()) as CloudflareApiResponse<T>;
+
+    if (!data.success) {
+      const errMsg = data.errors.map(e => `${e.code}: ${e.message}`).join(', ');
+      throw new Error(`Cloudflare API error: ${errMsg}`);
+    }
+
+    return data;
   }
 }

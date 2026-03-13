@@ -1,0 +1,4 @@
+apiVersion: v2
+name: cf-ingress-controller
+description: Kubernetes controller that syncs Cloudflare Tunnel ingress rules from cluster Ingress resources to route traffic through Traefik
+version: 1.0.0

@@ -37,9 +37,7 @@ describe('CloudflareClient.buildIngressRules', () => {
   });
 
   it('does not duplicate the catch-all rule when one already exists in existing ingress', () => {
-    const existing: CloudflareTunnelIngress[] = [
-      { service: 'http_status:404' }
-    ];
+    const existing: CloudflareTunnelIngress[] = [{ service: 'http_status:404' }];
 
     const result = client.buildIngressRules(
       ['portfolio.kbntx.com'],

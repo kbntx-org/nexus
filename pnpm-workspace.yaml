@@ -2,4 +2,4 @@ injectWorkspacePackages: true
 
 packages:
   - 'apps/portfolio'
-  - 'apps/cf-ingress-controller'
+  - 'platform/cf-ingress-controller'

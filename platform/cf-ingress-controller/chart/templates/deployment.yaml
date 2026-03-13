@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cf-ingress-controller
+  labels:
+    app: cf-ingress-controller
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: cf-ingress-controller
+  template:
+    metadata:
+      labels:
+        app: cf-ingress-controller
+    spec:
+      serviceAccountName: cf-ingress-controller
+      containers:
+        - name: cf-ingress-controller
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: LEADER_ELECTION_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: CF_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: cf-ingress-secret
+                  key: apiToken
+            - name: CF_ACCOUNT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: cf-ingress-secret
+                  key: accountId
+            - name: CF_TUNNEL_ID
+              valueFrom:
+                secretKeyRef:
+                  name: cf-ingress-secret
+                  key: tunnelId
+            - name: TRAEFIK_SERVICE
+              value: {{ .Values.traefikService | quote }}
+            {{- if .Values.ingressClassName }}
+            - name: INGRESS_CLASS_NAME
+              value: {{ .Values.ingressClassName | quote }}
+            {{- end }}
+            {{- if .Values.watchNamespace }}
+            - name: NAMESPACE
+              value: {{ .Values.watchNamespace | quote }}
+            {{- end }}
+            - name: RECONCILE_INTERVAL_MS
+              value: {{ .Values.reconcileIntervalMs | quote }}
+          resources:
+            {{- with .Values.resources.requests }}
+            requests:
+              cpu: {{ .cpu }}
+              memory: {{ .memory }}
+            {{- end }}
+            {{- with .Values.resources.limits }}
+            limits:
+              cpu: {{ .cpu }}
+              memory: {{ .memory }}
+            {{- end }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: cf-ingress-controller-pdb
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: cf-ingress-controller

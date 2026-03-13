@@ -1,0 +1,28 @@
+replicaCount: 2
+
+image:
+  repository: kbntx/cf-ingress-controller
+  tag: latest
+  pullPolicy: Always
+
+# Namespace the controller watches for Ingresses.
+# Leave empty to watch all namespaces (requires ClusterRole).
+watchNamespace: ""
+
+# Only process Ingresses with this ingressClassName.
+# Leave empty to process all Ingresses regardless of class.
+ingressClassName: ""
+
+# Cloudflare Tunnel target — the Traefik service inside the cluster.
+traefikService: "http://traefik.traefik.svc.cluster.local:80"
+
+# How often (ms) to reconcile the Cloudflare tunnel config.
+reconcileIntervalMs: 30000
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 128Mi

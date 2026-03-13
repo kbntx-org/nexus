@@ -7,3 +7,10 @@ export class KubeConfig {
 }
 
 export class NetworkingV1Api {}
+export class CoordinationV1Api {}
+
+export class V1MicroTime extends Date {
+  public toISOString(): string {
+    return super.toISOString();
+  }
+}

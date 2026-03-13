@@ -22,20 +22,16 @@ export class IngressController {
       this.k8sApi = kc.makeApiClient(k8s.NetworkingV1Api);
     }
 
-    this.cfClient = cfClient ?? new CloudflareClient(
-      config.cfApiToken,
-      config.cfAccountId,
-      config.cfTunnelId
-    );
+    this.cfClient =
+      cfClient ??
+      new CloudflareClient(config.cfApiToken, config.cfAccountId, config.cfTunnelId);
   }
 
   public async start(): Promise<void> {
     this.isRunning = true;
     console.log('Starting Cloudflare Ingress Controller');
     console.log(`Traefik service: ${this.config.traefikService}`);
-    console.log(
-      `Watching ingress class: ${this.config.ingressClassName ?? '(all classes)'}`
-    );
+    console.log(`Watching ingress class: ${this.config.ingressClassName ?? '(all classes)'}`);
     console.log(`Namespace: ${this.config.namespace ?? '(all namespaces)'}`);
 
     await this.reconcile();
@@ -92,11 +88,11 @@ export class IngressController {
     let ingressList: k8s.V1IngressList;
     try {
       if (this.config.namespace) {
-        const res = await this.k8sApi.listNamespacedIngress({ namespace: this.config.namespace });
-        ingressList = res;
+        ingressList = await this.k8sApi.listNamespacedIngress({
+          namespace: this.config.namespace
+        });
       } else {
-        const res = await this.k8sApi.listIngressForAllNamespaces();
-        ingressList = res;
+        ingressList = await this.k8sApi.listIngressForAllNamespaces();
       }
     } catch (err) {
       throw new Error(`Failed to list ingresses: ${String(err)}`);

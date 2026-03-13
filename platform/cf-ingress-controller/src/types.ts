@@ -6,6 +6,8 @@ export interface Config {
   ingressClassName: string | null;
   namespace: string | null;
   reconcileIntervalMs: number;
+  podName: string;
+  leaderElectionNamespace: string;
 }
 
 export interface CloudflareTunnelIngress {
