@@ -19,10 +19,10 @@ sync_docs() {
     rm -rf "$DOCS_DEST"/*
     mkdir -p "$DOCS_DEST"
 
-    # apps/documentation/docs → /docs (root)
-    if [[ -d "$WORKSPACE/apps/documentation/docs" ]]; then
-        echo "→ Copying apps/documentation/docs → $DOCS_DEST"
-        copy_directory "$WORKSPACE/apps/documentation/docs" "$DOCS_DEST"
+    # docs/src → /docs (root)
+    if [[ -d "$WORKSPACE/docs/src" ]]; then
+        echo "→ Copying docs/src → $DOCS_DEST"
+        copy_directory "$WORKSPACE/docs/src" "$DOCS_DEST"
     fi
 
     # All other docs folders → /docs/documentation/{path}
@@ -31,7 +31,7 @@ sync_docs() {
         | while read -r docs_path; do
             rel_path="${docs_path#$WORKSPACE/}"
 
-            if [[ "$rel_path" == "apps/documentation/docs" ]]; then
+            if [[ "$rel_path" == "docs" ]] || [[ "$rel_path" == "docs/src" ]]; then
                 continue
             fi
 
@@ -41,9 +41,9 @@ sync_docs() {
             copy_directory "$docs_path" "$dest_path"
         done
 
-    if [[ -f "$WORKSPACE/mkdocs.yml" ]]; then
-        echo "→ Copying mkdocs.yml → /mkdocs.yml"
-        cp "$WORKSPACE/mkdocs.yml" "/mkdocs.yml"
+    if [[ -f "$WORKSPACE/docs/mkdocs.yml" ]]; then
+        echo "→ Copying docs/mkdocs.yml → /mkdocs.yml"
+        cp "$WORKSPACE/docs/mkdocs.yml" "/mkdocs.yml"
     fi
 
     if [[ -f "$WORKSPACE/README.md" ]]; then
@@ -73,9 +73,7 @@ if [[ "${1:-}" == "serve" ]]; then
     while change=$(inotifywait -r -e modify,create,delete,move "$WORKSPACE" \
         --exclude "$IGNORED_PATHS" 2>&1); do
 
-        if echo "$change" | grep -qE "(docs|mkdocs\.yml|README\.md)" || \
-           (echo "$change" | grep -qE "apps/" && \
-            echo "$change" | grep -qiE "(move|delete|create)"); then
+        if echo "$change" | grep -qE "(docs|mkdocs\.yml|README\.md)"; then
             echo "→ Change detected: $change"
             echo "→ Resyncing…"
             sync_docs
