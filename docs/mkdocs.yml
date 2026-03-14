@@ -3,7 +3,7 @@ repo_name: kbntx-org/nexus
 repo_url: https://github.com/kbntx-org/nexus
 site_url: https://docs.kbntx.com
 
-docs_dir: /docs
+docs_dir: src
 
 # Extensions
 markdown_extensions: []
@@ -38,8 +38,8 @@ theme:
 
 plugins: []
 
-extra_css: [extra.css]
+extra_css: [assets/extra.css]
 
 watch:
-  - /docs
+  - src
   - mkdocs.yml

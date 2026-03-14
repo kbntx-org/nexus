@@ -1,0 +1,11 @@
+services:
+  docs:
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./mkdocs.yml:/workspace/mkdocs.yml:ro
+      - ./src:/workspace/src
+    command: mkdocs serve -f /workspace/mkdocs.yml -a 0.0.0.0:8000
