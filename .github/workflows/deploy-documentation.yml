@@ -26,8 +26,8 @@ jobs:
       - name: Build and push Docker image
         uses: ./.github/actions/buildkit-and-push
         with:
-          context: .
-          file: apps/documentation/Dockerfile
+          context: docs
+          file: docs/Dockerfile
           tag: kbntx/documentation:latest
 
       - name: Deploy

@@ -1,0 +1,76 @@
+site_name: Nexus documentation
+repo_name: kbntx-org/nexus
+repo_url: https://github.com/kbntx-org/nexus
+site_url: https://docs.kbntx.com
+
+docs_dir: src
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.superfences
+  - pymdownx.details
+
+theme:
+  name: material
+  logo: https://fsn1.your-objectstorage.com/nexus-public-statics/images/kt-logo.jpg
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - content.code.copy
+    - toc.follow
+
+  palette:
+    - media: '(prefers-color-scheme)'
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    - media: '(prefers-color-scheme: light)'
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: '(prefers-color-scheme: dark)'
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+
+plugins:
+  - search
+
+extra_javascript:
+  - https://unpkg.com/mermaid@10/dist/mermaid.min.js
+  - assets/mermaid-init.js
+
+extra_css:
+  - assets/extra.css
+
+nav:
+  - Home: index.md
+  - Onboarding:
+      - Overview: onboarding/index.md
+      - Local development: onboarding/local-development.md
+      - First week checklist: onboarding/first-week-checklist.md
+  - Platform:
+      - Overview: platform/index.md
+      - GitOps and delivery: platform/gitops-and-delivery.md
+      - Kubernetes and networking: platform/kubernetes-and-networking.md
+      - Observability and operations: platform/observability-and-operations.md
+  - Applications:
+      - Overview: applications/index.md
+      - Portfolio: applications/portfolio.md
+      - Homepage: applications/homepage.md
+      - Documentation site: applications/documentation-site.md
+  - Runbooks:
+      - Common tasks: runbooks/common-tasks.md
+  - Reference:
+      - Repository map: reference/repository-map.md
+
+watch:
+  - src
+  - mkdocs.yml

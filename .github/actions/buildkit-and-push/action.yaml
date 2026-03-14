@@ -16,11 +16,34 @@ runs:
     - name: Build with buildctl
       shell: bash
       run: |
-        DOCKERFILE_DIR=$(dirname "${{ inputs.file }}")
-        DOCKERFILE_NAME=$(basename "${{ inputs.file }}")
+        set -euo pipefail
+
+        CONTEXT="${{ inputs.context }}"
+        DOCKERFILE_INPUT="${{ inputs.file }}"
+
+        if [ ! -d "$CONTEXT" ]; then
+          echo "Error: build context '$CONTEXT' does not exist."
+          exit 1
+        fi
+
+        if [ -f "$DOCKERFILE_INPUT" ]; then
+          DOCKERFILE_PATH="$DOCKERFILE_INPUT"
+        elif [ -f "$CONTEXT/$DOCKERFILE_INPUT" ]; then
+          DOCKERFILE_PATH="$CONTEXT/$DOCKERFILE_INPUT"
+        else
+          echo "Error: Dockerfile '$DOCKERFILE_INPUT' not found."
+          echo "Checked:"
+          echo "  - $DOCKERFILE_INPUT"
+          echo "  - $CONTEXT/$DOCKERFILE_INPUT"
+          exit 1
+        fi
+
+        DOCKERFILE_DIR=$(dirname "$DOCKERFILE_PATH")
+        DOCKERFILE_NAME=$(basename "$DOCKERFILE_PATH")
+
         buildctl build \
           --frontend=dockerfile.v0 \
-          --local context="${{ inputs.context }}" \
+          --local context="$CONTEXT" \
           --local dockerfile="$DOCKERFILE_DIR" \
           --opt filename="$DOCKERFILE_NAME" \
           --output type=image,name="${{ inputs.tag }}",push=true
