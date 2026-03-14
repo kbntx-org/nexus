@@ -73,11 +73,11 @@ The deployment runs 2 replicas with a `PodDisruptionBudget` of `minAvailable: 1`
 
 ```markdown
 !!! tip "Pro tip"
-    Use this for helpful hints.
+Use this for helpful hints.
 
 !!! warning
-    Use this for important caveats.
+Use this for important caveats.
 
 !!! danger "Careful"
-    Use this for dangerous operations.
+Use this for dangerous operations.
 ```

@@ -22,7 +22,7 @@ No application ever talks to Vault directly. The External Secrets Operator is th
 
 ## Components
 
-| Component | Path | Role |
-|-----------|------|------|
-| [HashiCorp Vault](vault.md) | `platform/vault/` | Source of truth for all secrets |
-| [External Secrets Operator](external-secrets.md) | `platform/external-secrets/` | Syncs Vault secrets into K8s |
+| Component                                        | Path                         | Role                            |
+| ------------------------------------------------ | ---------------------------- | ------------------------------- |
+| [HashiCorp Vault](vault.md)                      | `platform/vault/`            | Source of truth for all secrets |
+| [External Secrets Operator](external-secrets.md) | `platform/external-secrets/` | Syncs Vault secrets into K8s    |

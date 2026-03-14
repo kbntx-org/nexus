@@ -34,13 +34,13 @@ graph TD
 
 ## Components
 
-| Component | Path | Technology |
-|-----------|------|-----------|
-| K3S Cluster | `platform/kubernetes/` | Terraform + k3s module |
-| Private Network | `platform/network/` | Terraform |
-| Bastion Host | `platform/bastion/` | Terraform + Docker Compose |
-| HashiCorp Vault | `platform/vault/` | Terraform + Docker Compose |
-| Reusable Modules | `platform/terraform-modules/` | Terraform modules |
+| Component        | Path                          | Technology                 |
+| ---------------- | ----------------------------- | -------------------------- |
+| K3S Cluster      | `platform/kubernetes/`        | Terraform + k3s module     |
+| Private Network  | `platform/network/`           | Terraform                  |
+| Bastion Host     | `platform/bastion/`           | Terraform + Docker Compose |
+| HashiCorp Vault  | `platform/vault/`             | Terraform + Docker Compose |
+| Reusable Modules | `platform/terraform-modules/` | Terraform modules          |
 
 ## Terraform modules
 
@@ -81,7 +81,7 @@ terraform init && terraform apply
 ```
 
 !!! warning "State management"
-    Terraform state is not stored in this repository. Ensure you configure a remote backend (e.g., Terraform Cloud, S3) before provisioning shared infrastructure.
+Terraform state is not stored in this repository. Ensure you configure a remote backend (e.g., Terraform Cloud, S3) before provisioning shared infrastructure.
 
 ## Cluster access
 
