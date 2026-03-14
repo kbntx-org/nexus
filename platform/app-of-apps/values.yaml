@@ -147,7 +147,7 @@ argocd-apps:
       project: default
       source:
         repoURL: https://github.com/kbntx-org/nexus.git
-        path: apps/documentation/helm
+        path: docs/helm
         targetRevision: main
       destination:
         server: https://kubernetes.default.svc

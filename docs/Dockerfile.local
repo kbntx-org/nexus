@@ -1,0 +1,7 @@
+FROM squidfunk/mkdocs-material:9.6.20
+
+RUN pip install mkdocs-awesome-nav mkdocs-glightbox
+
+WORKDIR /workspace
+
+CMD ["mkdocs", "serve", "-f", "/workspace/mkdocs.yml", "-a", "0.0.0.0:8000"]
