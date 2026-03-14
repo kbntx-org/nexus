@@ -104,7 +104,7 @@ export class SkillsComponent implements AfterViewInit, OnDestroy {
     const containerRect = container.getBoundingClientRect();
     const particleSize = window.innerWidth < 768 ? 40 : 48;
 
-    particleElements.forEach((element: HTMLElement, index: number) => {
+    particleElements.forEach((element: HTMLElement) => {
       const x = Math.random() * (containerRect.width - particleSize);
       const y = Math.random() * (containerRect.height - particleSize);
 

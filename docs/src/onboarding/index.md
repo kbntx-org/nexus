@@ -69,14 +69,14 @@ sequenceDiagram
 
 Before working with Nexus, you'll need:
 
-| Tool | Purpose | Version |
-|------|---------|---------|
-| `terraform` | Provision infrastructure | ≥ 1.0 |
-| `kubectl` | Interact with the cluster | ≥ 1.29 |
-| `helm` | Render / inspect Helm charts | ≥ 3.14 |
-| `argocd` | Interact with ArgoCD | ≥ 2.14 |
-| `node` + `pnpm` | Frontend development | Node 22, pnpm 10 |
-| `docker` | Build images locally | ≥ 25 |
+| Tool            | Purpose                      | Version          |
+| --------------- | ---------------------------- | ---------------- |
+| `terraform`     | Provision infrastructure     | ≥ 1.0            |
+| `kubectl`       | Interact with the cluster    | ≥ 1.29           |
+| `helm`          | Render / inspect Helm charts | ≥ 3.14           |
+| `argocd`        | Interact with ArgoCD         | ≥ 2.14           |
+| `node` + `pnpm` | Frontend development         | Node 22, pnpm 10 |
+| `docker`        | Build images locally         | ≥ 25             |
 
 You'll also need accounts / credentials for:
 

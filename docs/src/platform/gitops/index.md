@@ -96,4 +96,4 @@ All applications use **manual sync** by default — they are synced explicitly b
 The only exception is infrastructure components (ArgoCD, Traefik, monitoring, etc.) which auto-sync since their Helm chart values rarely change without intent.
 
 !!! tip "Pruning"
-    The `--prune` flag on `argocd app sync` removes Kubernetes resources that are no longer present in Git. Always use it in CI to keep the cluster clean.
+The `--prune` flag on `argocd app sync` removes Kubernetes resources that are no longer present in Git. Always use it in CI to keep the cluster clean.

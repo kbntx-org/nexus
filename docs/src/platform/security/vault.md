@@ -53,7 +53,7 @@ docker exec vault vault operator unseal <key-3>
 ```
 
 !!! danger "Unseal keys"
-    The unseal keys and root token are shown **only once**. Store them securely (e.g., in a password manager). Without them, you cannot access Vault after a restart.
+The unseal keys and root token are shown **only once**. Store them securely (e.g., in a password manager). Without them, you cannot access Vault after a restart.
 
 ## Secret paths
 

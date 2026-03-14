@@ -68,17 +68,17 @@ sequenceDiagram
 
 ## Configuration
 
-| Environment variable | Required | Description |
-|---------------------|----------|-------------|
-| `TARGET_SERVICE_URL` | Yes | URL that all tunnel ingress rules point to (Traefik's internal address) |
-| `CF_API_TOKEN` | Yes | Cloudflare API token with tunnel write access |
-| `CF_ACCOUNT_ID` | Yes | Cloudflare account ID |
-| `CF_TUNNEL_ID` | Yes | ID of the Cloudflare Tunnel to manage |
-| `CF_ZONE_ID` | Yes | Cloudflare zone ID (reserved for future DNS operations) |
-| `POD_NAME` | Yes | Injected via Downward API — used for leader election identity |
-| `POD_NAMESPACE` | Yes | Injected via Downward API — namespace for the Lease lock |
-| `INGRESS_CLASS_NAME` | No | Filter Ingress resources by class name (watches all if unset) |
-| `RECONCILE_INTERVAL_MS` | No | Reconciliation interval in ms (default: `30000`) |
+| Environment variable    | Required | Description                                                             |
+| ----------------------- | -------- | ----------------------------------------------------------------------- |
+| `TARGET_SERVICE_URL`    | Yes      | URL that all tunnel ingress rules point to (Traefik's internal address) |
+| `CF_API_TOKEN`          | Yes      | Cloudflare API token with tunnel write access                           |
+| `CF_ACCOUNT_ID`         | Yes      | Cloudflare account ID                                                   |
+| `CF_TUNNEL_ID`          | Yes      | ID of the Cloudflare Tunnel to manage                                   |
+| `CF_ZONE_ID`            | Yes      | Cloudflare zone ID (reserved for future DNS operations)                 |
+| `POD_NAME`              | Yes      | Injected via Downward API — used for leader election identity           |
+| `POD_NAMESPACE`         | Yes      | Injected via Downward API — namespace for the Lease lock                |
+| `INGRESS_CLASS_NAME`    | No       | Filter Ingress resources by class name (watches all if unset)           |
+| `RECONCILE_INTERVAL_MS` | No       | Reconciliation interval in ms (default: `30000`)                        |
 
 All sensitive values (`CF_API_TOKEN`, etc.) are injected via the External Secrets Operator.
 
