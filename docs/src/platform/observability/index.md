@@ -30,14 +30,14 @@ graph TB
 
 ## Components
 
-| Component | Version | Role |
-|-----------|---------|------|
-| **Grafana** | 10.5.8 | Dashboards and alerting UI |
-| **VictoriaMetrics** | 0.24.6 | Prometheus-compatible time-series database |
-| **Loki** | 6.40.0 | Log aggregation |
-| **Promtail** | 6.17.1 | Log shipping agent (runs as DaemonSet) |
-| **Kube State Metrics** | 6.4.2 | Exposes K8s object state as Prometheus metrics |
-| **Node Exporter** | 4.48.0 | Exposes host-level metrics (CPU, memory, disk, network) |
+| Component              | Version | Role                                                    |
+| ---------------------- | ------- | ------------------------------------------------------- |
+| **Grafana**            | 10.5.8  | Dashboards and alerting UI                              |
+| **VictoriaMetrics**    | 0.24.6  | Prometheus-compatible time-series database              |
+| **Loki**               | 6.40.0  | Log aggregation                                         |
+| **Promtail**           | 6.17.1  | Log shipping agent (runs as DaemonSet)                  |
+| **Kube State Metrics** | 6.4.2   | Exposes K8s object state as Prometheus metrics          |
+| **Node Exporter**      | 4.48.0  | Exposes host-level metrics (CPU, memory, disk, network) |
 
 All are deployed via their upstream Helm charts, composed in `platform/monitoring/Chart.yaml` as dependencies.
 

@@ -4,11 +4,11 @@ Nexus hosts several applications on the platform. Each application follows the s
 
 ## Applications
 
-| Application | URL | Stack | Path |
-|-------------|-----|-------|------|
-| [Portfolio](portfolio.md) | portfolio.kbntx.com | Angular 20 + Caddy | `apps/portfolio/` |
-| [Documentation](documentation.md) | docs.kbntx.com | MkDocs Material + Caddy | `docs/` |
-| Homepage | homepage.kbntx.com | — | `apps/homepage/` |
+| Application                       | URL                 | Stack                   | Path              |
+| --------------------------------- | ------------------- | ----------------------- | ----------------- |
+| [Portfolio](portfolio.md)         | portfolio.kbntx.com | Angular 20 + Caddy      | `apps/portfolio/` |
+| [Documentation](documentation.md) | docs.kbntx.com      | MkDocs Material + Caddy | `docs/`           |
+| Homepage                          | homepage.kbntx.com  | —                       | `apps/homepage/`  |
 
 ## Deployment pattern
 

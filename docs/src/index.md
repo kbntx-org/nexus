@@ -45,15 +45,15 @@ graph TB
 
 ## What's inside
 
-| Area | Components |
-|------|-----------|
-| **Infrastructure** | K3S on Hetzner Cloud, Terraform modules, VPC, Bastion |
-| **GitOps** | ArgoCD, App-of-Apps pattern |
-| **Networking** | Traefik, Cloudflared, custom Cloudflare Ingress Controller |
-| **Security** | HashiCorp Vault, External Secrets Operator |
-| **Observability** | Grafana, Loki, Promtail, VictoriaMetrics, Node Exporter |
-| **CI/CD** | GitHub Actions, self-hosted ARC runners, custom CI toolkit |
-| **Applications** | Portfolio (Angular), Documentation (MkDocs), Homepage |
+| Area               | Components                                                 |
+| ------------------ | ---------------------------------------------------------- |
+| **Infrastructure** | K3S on Hetzner Cloud, Terraform modules, VPC, Bastion      |
+| **GitOps**         | ArgoCD, App-of-Apps pattern                                |
+| **Networking**     | Traefik, Cloudflared, custom Cloudflare Ingress Controller |
+| **Security**       | HashiCorp Vault, External Secrets Operator                 |
+| **Observability**  | Grafana, Loki, Promtail, VictoriaMetrics, Node Exporter    |
+| **CI/CD**          | GitHub Actions, self-hosted ARC runners, custom CI toolkit |
+| **Applications**   | Portfolio (Angular), Documentation (MkDocs), Homepage      |
 
 ## Where to start
 

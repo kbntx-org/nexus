@@ -23,8 +23,8 @@ No inbound firewall ports need to be opened. The tunnel is fully outbound, which
 
 ## Components
 
-| Component | Path | Role |
-|-----------|------|------|
-| [Traefik](traefik.md) | `platform/traefik/` | In-cluster ingress controller |
-| [cloudflared](cloudflared.md) | `platform/cloudflared/` | Cloudflare Tunnel daemon |
+| Component                                                         | Path                                      | Role                                         |
+| ----------------------------------------------------------------- | ----------------------------------------- | -------------------------------------------- |
+| [Traefik](traefik.md)                                             | `platform/traefik/`                       | In-cluster ingress controller                |
+| [cloudflared](cloudflared.md)                                     | `platform/cloudflared/`                   | Cloudflare Tunnel daemon                     |
 | [Cloudflare Ingress Controller](cloudflare-ingress-controller.md) | `platform/cloudflare-ingress-controller/` | Syncs K8s Ingress → Cloudflare tunnel config |

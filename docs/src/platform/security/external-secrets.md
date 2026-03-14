@@ -44,7 +44,7 @@ spec:
     name: vault-backend
     kind: ClusterSecretStore
   target:
-    name: cloudflare-credentials   # name of the K8s Secret to create
+    name: cloudflare-credentials # name of the K8s Secret to create
   data:
     - secretKey: CF_API_TOKEN
       remoteRef:
@@ -63,4 +63,4 @@ The resulting `cloudflare-credentials` Secret can then be referenced in a `Deplo
 ESO periodically re-fetches from Vault and updates the Kubernetes Secret. Applications that mount secrets as environment variables need a pod restart to pick up rotated values. Secrets mounted as volumes are updated in place.
 
 !!! tip "Force refresh"
-    Annotate the `ExternalSecret` with `force-sync: <timestamp>` to trigger an immediate refresh outside the normal schedule.
+Annotate the `ExternalSecret` with `force-sync: <timestamp>` to trigger an immediate refresh outside the normal schedule.

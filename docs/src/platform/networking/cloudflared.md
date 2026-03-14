@@ -4,12 +4,12 @@
 
 ## Why a tunnel?
 
-| Traditional ingress | Cloudflare Tunnel |
-|---------------------|------------------|
-| Public IP + firewall rules required | No public IP needed |
-| DDoS mitigation at perimeter | DDoS protection built in via Cloudflare |
-| TLS certs managed in cluster | TLS terminated at Cloudflare edge |
-| Open inbound ports | No inbound ports — fully outbound |
+| Traditional ingress                 | Cloudflare Tunnel                       |
+| ----------------------------------- | --------------------------------------- |
+| Public IP + firewall rules required | No public IP needed                     |
+| DDoS mitigation at perimeter        | DDoS protection built in via Cloudflare |
+| TLS certs managed in cluster        | TLS terminated at Cloudflare edge       |
+| Open inbound ports                  | No inbound ports — fully outbound       |
 
 ## How it works
 
