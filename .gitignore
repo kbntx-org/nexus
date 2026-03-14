@@ -5,6 +5,9 @@ dist
 tmp
 /out-tsc
 
+# MkDocs generated site
+docs/site/
+
 # dependencies
 node_modules
 
