@@ -6,7 +6,7 @@ RUN pip install mkdocs-awesome-nav mkdocs-glightbox
 FROM builder AS docs
 
 COPY mkdocs.yml /mkdocs.yml
-COPY ./src /docs
+COPY ./src /src
 
 WORKDIR /
 
