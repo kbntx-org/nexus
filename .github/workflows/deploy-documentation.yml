@@ -27,7 +27,7 @@ jobs:
         uses: ./.github/actions/buildkit-and-push
         with:
           context: docs
-          file: Dockerfile
+          file: docs/Dockerfile
           tag: kbntx/documentation:latest
 
       - name: Deploy
