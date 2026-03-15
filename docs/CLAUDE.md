@@ -36,6 +36,16 @@ Use diagrams when a flow is hard to follow as prose.
 Keep them small and readable — max ~6-8 nodes, avoid wide layouts.
 A diagram with too many elements is harder to read than no diagram at all.
 
+### Avoid Over-Specific Details
+
+Do not hard-code specifics that can be found in the repository itself:
+
+- **No version numbers** — exact versions live in `Chart.yaml`, `values.yaml`, `package.json`, etc.
+- **No counts** — number of replicas, nodes, or workers changes; the code is the source of truth
+- **No exact CIDRs or IPs** — infrastructure details belong in Terraform configs, not docs
+
+These details age badly and create maintenance burden. Link to the relevant file instead.
+
 ### Code References
 
 Prefer linking to actual files over copy-pasting content:

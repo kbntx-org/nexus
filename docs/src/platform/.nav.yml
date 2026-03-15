@@ -1,0 +1,11 @@
+title: Platform
+
+nav:
+  - ci-cd
+  - networking
+  - argocd
+  - kubernetes
+  - traefik
+  - observability
+  - secrets
+  - appsmith
