@@ -14,8 +14,9 @@ kind: Ingress
 metadata:
   name: traefik-dashboard-ingress
 spec:
+  ingressClassName: traefik
   rules:
-    - host: traefik.kbntx.com
+    - host: {{ .Values.dashboardHost }}
       http:
         paths:
           - path: /

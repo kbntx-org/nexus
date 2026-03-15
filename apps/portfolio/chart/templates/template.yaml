@@ -5,7 +5,11 @@ metadata:
   labels:
     app: portfolio
 spec:
-  replicas: 2
+  replicas: {{ .Values.replicas | default 2 }}
+  {{- with .Values.deploymentStrategy }}
+  strategy:
+    type: {{ . }}
+  {{- end }}
   selector:
     matchLabels:
       app: portfolio
@@ -16,14 +20,15 @@ spec:
     spec:
       containers:
         - name: portfolio
-          image: kbntx/portfolio:latest
+          image: {{ .Values.image }}
           imagePullPolicy: Always
           ports:
-            - containerPort: 80
+            - containerPort: {{ .Values.containerPort | default 80 }}
+          {{- if .Values.healthProbes }}
           livenessProbe:
             httpGet:
               path: /healthz
-              port: 80
+              port: {{ .Values.containerPort | default 80 }}
             initialDelaySeconds: 10
             periodSeconds: 10
             timeoutSeconds: 5
@@ -31,11 +36,12 @@ spec:
           readinessProbe:
             httpGet:
               path: /healthz
-              port: 80
+              port: {{ .Values.containerPort | default 80 }}
             initialDelaySeconds: 10
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 5
+          {{- end }}
           {{- with .Values.resources }}
           {{- if or .requests .limits }}
           resources:
@@ -80,16 +86,17 @@ spec:
   selector:
     app: portfolio
   ports:
-    - port: 80
-      targetPort: 80
+    - port: {{ .Values.containerPort | default 80 }}
+      targetPort: {{ .Values.containerPort | default 80 }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: portfolio-ingress
 spec:
+  ingressClassName: traefik
   rules:
-    - host: portfolio.kbntx.com
+    - host: {{ .Values.ingressHost }}
       http:
         paths:
           - path: /
@@ -98,4 +105,4 @@ spec:
               service:
                 name: portfolio-service
                 port:
-                  number: 80
+                  number: {{ .Values.containerPort | default 80 }}

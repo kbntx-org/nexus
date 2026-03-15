@@ -1,0 +1,6 @@
+image: kbntx/portfolio:latest
+containerPort: 4200
+replicas: 2
+healthProbes: true
+ingressHost: portfolio.kbntx.com
+deploymentStrategy: RollingUpdate

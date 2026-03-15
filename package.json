@@ -3,6 +3,13 @@
   "version": "0.0.0",
   "license": "MIT",
   "private": true,
+  "scripts": {
+    "cluster:create": "bash scripts/cluster.sh create",
+    "cluster:delete": "bash scripts/cluster.sh delete",
+    "dev:docs": "tilt up -- --profile=docs",
+    "dev:portfolio": "tilt up -- --profile=portfolio",
+    "dev:reset": "tilt down"
+  },
   "dependencies": {
     "@angular/animations": "20.3.16",
     "@kubernetes/client-node": "^1.0.0",

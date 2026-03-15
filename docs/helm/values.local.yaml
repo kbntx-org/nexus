@@ -1,0 +1,3 @@
+containerPort: 8000
+replicas: 1
+ingressHost: docs.localhost

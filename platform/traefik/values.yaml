@@ -1,3 +1,5 @@
+dashboardHost: traefik.kbntx.com
+
 traefik:
   ingressClass:
     isDefaultClass: true

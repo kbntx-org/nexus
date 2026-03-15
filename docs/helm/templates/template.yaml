@@ -5,7 +5,7 @@ metadata:
   labels:
     app: documentation
 spec:
-  replicas: 2
+  replicas: {{ .Values.replicas | default 2 }}
   selector:
     matchLabels:
       app: documentation
@@ -16,10 +16,10 @@ spec:
     spec:
       containers:
         - name: documentation
-          image: kbntx/documentation:latest
+          image: {{ .Values.image }}
           imagePullPolicy: Always
           ports:
-            - containerPort: 80
+            - containerPort: {{ .Values.containerPort | default 80 }}
           {{- with .Values.resources }}
           {{- if or .requests .limits }}
           resources:
@@ -64,16 +64,17 @@ spec:
   selector:
     app: documentation
   ports:
-    - port: 80
-      targetPort: 80
+    - port: {{ .Values.containerPort | default 80 }}
+      targetPort: {{ .Values.containerPort | default 80 }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: documentation-ingress
 spec:
+  ingressClassName: traefik
   rules:
-    - host: docs.kbntx.com
+    - host: {{ .Values.ingressHost }}
       http:
         paths:
           - path: /
@@ -82,4 +83,4 @@ spec:
               service:
                 name: documentation-service
                 port:
-                  number: 80
+                  number: {{ .Values.containerPort | default 80 }}

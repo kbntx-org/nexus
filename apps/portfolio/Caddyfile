@@ -3,7 +3,7 @@
     auto_https off
 }
 
-:80 {
+:4200 {
     root * /srv/app
     file_server
 

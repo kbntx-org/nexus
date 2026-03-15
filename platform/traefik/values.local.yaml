@@ -1,0 +1,9 @@
+dashboardHost: traefik.localhost
+
+traefik:
+  service:
+    type: NodePort
+
+  ports:
+    web:
+      nodePort: 30080

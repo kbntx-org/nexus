@@ -1,8 +1,8 @@
 # Cloudflare Ingress Controller
 
-The Cloudflare Ingress Controller is a **custom Kubernetes controller** written in TypeScript. It bridges the gap between Kubernetes `Ingress` resources and the Cloudflare Tunnel configuration — so you don't have to manually add hostnames to Cloudflare whenever you deploy a new service.
+The Cloudflare Ingress Controller is a **custom Kubernetes controller written in Go**. It bridges the gap between Kubernetes `Ingress` resources and the Cloudflare Tunnel configuration — so you don't have to manually add hostnames to Cloudflare whenever you deploy a new service.
 
-**Source:** `platform/cloudflare-ingress-controller/src/`
+**Source:** `platform/cloudflare-ingress-controller/`
 
 ## Problem it solves
 
@@ -66,6 +66,24 @@ sequenceDiagram
     Note over Pod2: takes over reconciliation
 ```
 
+## Package structure
+
+```
+platform/cloudflare-ingress-controller/
+├── cmd/
+│   └── main.go               # Entry point: env validation, leader election, reconciliation loop
+├── internal/
+│   ├── cloudflare/
+│   │   └── cloudflare.go     # Cloudflare API client (GetConfig / PutConfig)
+│   ├── controller/
+│   │   └── controller.go     # Reconcile(): diffs desired vs current, calls PutConfig
+│   └── k8s/
+│       └── k8s.go            # Kubernetes client: List() and Watch() for Ingress resources
+├── helm/                     # Kubernetes deployment (Deployment, RBAC, values)
+├── go.mod
+└── Dockerfile
+```
+
 ## Configuration
 
 | Environment variable    | Required | Description                                                             |
@@ -87,14 +105,14 @@ All sensitive values (`CF_API_TOKEN`, etc.) are injected via the External Secret
 ```bash
 cd platform/cloudflare-ingress-controller
 
-# Install dependencies
-pnpm install
+# Download dependencies
+go mod download
 
 # Run tests
-pnpm test
+go test ./...
 
-# Build
-pnpm build
+# Build binary
+go build -o cloudflare-ingress-controller ./cmd/
 ```
 
 The Docker image is built by the `build-docker-images` workflow and pushed to Docker Hub.

@@ -1,0 +1,4 @@
+replicas: 1
+healthProbes: false
+ingressHost: portfolio.localhost
+deploymentStrategy: Recreate

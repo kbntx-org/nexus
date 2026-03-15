@@ -1,17 +1,12 @@
-FROM node:22-alpine AS builder
+FROM golang:1.26-alpine AS builder
 WORKDIR /app
 
-RUN npm install -g pnpm
+COPY go.mod go.sum ./
+RUN go mod download
 
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -o cloudflare-ingress-controller ./cmd/
 
-COPY nx.json tsconfig.base.json ./
-COPY platform/cloudflare-ingress-controller platform/cloudflare-ingress-controller
-
-RUN pnpm exec nx build cloudflare-ingress-controller --configuration=production
-
-FROM node:22-alpine
-WORKDIR /app
-COPY --from=builder /app/dist/platform/cloudflare-ingress-controller/main.js ./main.js
-CMD ["node", "main.js"]
+FROM golang:1.26-alpine
+COPY --from=builder /app/cloudflare-ingress-controller /cloudflare-ingress-controller
+ENTRYPOINT ["/cloudflare-ingress-controller"]

@@ -2,26 +2,36 @@
   "name": "cloudflare-ingress-controller",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
-  "sourceRoot": "platform/cloudflare-ingress-controller/src",
+  "sourceRoot": "platform/cloudflare-ingress-controller",
+  "tags": ["lang:go", "platform"],
   "targets": {
     "build": {
-      "executor": "@nx/esbuild:esbuild",
-      "outputs": ["{options.outputPath}"],
+      "executor": "nx:run-commands",
       "options": {
-        "platform": "node",
-        "outputPath": "dist/platform/cloudflare-ingress-controller",
-        "main": "platform/cloudflare-ingress-controller/src/main.ts",
-        "tsConfig": "platform/cloudflare-ingress-controller/tsconfig.app.json",
-        "bundle": true,
-        "format": ["cjs"],
-        "thirdParty": true
-      }
+        "command": "go build -o dist/cloudflare-ingress-controller ./cmd/",
+        "cwd": "platform/cloudflare-ingress-controller"
+      },
+      "outputs": ["{workspaceRoot}/platform/cloudflare-ingress-controller/dist"]
     },
     "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "executor": "nx:run-commands",
       "options": {
-        "jestConfig": "platform/cloudflare-ingress-controller/jest.config.ts"
+        "command": "go test ./...",
+        "cwd": "platform/cloudflare-ingress-controller"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "go vet ./...",
+        "cwd": "platform/cloudflare-ingress-controller"
+      }
+    },
+    "docker-build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker build -t cloudflare-ingress-controller:latest .",
+        "cwd": "platform/cloudflare-ingress-controller"
       }
     }
   }
