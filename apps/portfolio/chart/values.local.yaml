@@ -1,4 +1,6 @@
 replicas: 1
 healthProbes: false
-ingressHost: portfolio.localhost
+ingressHosts:
+  - portfolio.localhost
+  - portfolio-local.kbntx.com
 deploymentStrategy: Recreate

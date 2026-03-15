@@ -1,145 +1,183 @@
 package cloudflare
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
-	"io"
-	"net/http"
+
+	cloudflareSDK "github.com/cloudflare/cloudflare-go/v6"
+	"github.com/cloudflare/cloudflare-go/v6/option"
+	"github.com/cloudflare/cloudflare-go/v6/zero_trust"
+	"github.com/cloudflare/cloudflare-go/v6/zones"
 )
 
-// IngressRule represents a single tunnel ingress routing rule.
+// IngressRule represents a single tunnel routing rule.
 type IngressRule struct {
-	Hostname string `json:"hostname,omitempty"`
-	Service  string `json:"service"`
+	Hostname string
+	Service  string
+}
+
+// TunnelSummary carries identifying information about an existing Cloudflare Tunnel.
+type TunnelSummary struct {
+	ID   string
+	Name string
+}
+
+// TunnelInfo carries the details returned when a new tunnel is created.
+type TunnelInfo struct {
+	ID    string
+	Token string // value for the TUNNEL_TOKEN environment variable
 }
 
 const catchAllRule = "http_status:404"
 
-type cloudflareError struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-}
+const tunnelSecretByteLength = 32
 
-type getConfigResponse struct {
-	Success bool               `json:"success"`
-	Errors  []cloudflareError  `json:"errors"`
-	Result  struct {
-		Config struct {
-			Ingress []IngressRule `json:"ingress"`
-		} `json:"config"`
-	} `json:"result"`
-}
-
-type putConfigRequest struct {
-	Config struct {
-		Ingress []IngressRule `json:"ingress"`
-	} `json:"config"`
-}
-
-type putConfigResponse struct {
-	Success bool              `json:"success"`
-	Errors  []cloudflareError `json:"errors"`
-}
-
-// Service manages Cloudflare Tunnel ingress configuration.
+// Service manages Cloudflare Tunnel lifecycle and ingress configuration.
 type Service interface {
-	GetConfig(ctx context.Context) ([]IngressRule, error)
-	PutConfig(ctx context.Context, rules []IngressRule) error
+	LookupZoneName(ctx context.Context, zoneID string) (string, error)
+	ListTunnels(ctx context.Context) ([]TunnelSummary, error)
+	CreateTunnel(ctx context.Context, name string) (TunnelInfo, error)
+	DeleteTunnel(ctx context.Context, tunnelID string) error
+	GetConfig(ctx context.Context, tunnelID string) ([]IngressRule, error)
+	PutConfig(ctx context.Context, tunnelID string, rules []IngressRule) error
 }
 
 type service struct {
-	accountID  string
-	tunnelID   string
-	apiToken   string
-	httpClient *http.Client
-	baseURL    string
+	accountID string
+	client    *cloudflareSDK.Client
 }
 
 // NewService constructs a Service backed by the Cloudflare API.
-func NewService(accountID, tunnelID, apiToken string) Service {
-	return NewServiceWithBaseURL(accountID, tunnelID, apiToken,
-		fmt.Sprintf("https://api.cloudflare.com/client/v4/accounts/%s/cfd_tunnel/%s/configurations", accountID, tunnelID),
-	)
+func NewService(accountID, apiToken string) Service {
+	return newService(accountID, apiToken)
 }
 
 // NewServiceWithBaseURL constructs a Service with a custom base URL. Intended for testing.
-func NewServiceWithBaseURL(accountID, tunnelID, apiToken, baseURL string) Service {
+// Retries are disabled so test servers don't receive unexpected retry requests.
+func NewServiceWithBaseURL(accountID, apiToken, baseURL string) Service {
+	return newService(accountID, apiToken, option.WithBaseURL(baseURL), option.WithMaxRetries(0))
+}
+
+func newService(accountID, apiToken string, extraOpts ...option.RequestOption) *service {
+	opts := append([]option.RequestOption{option.WithAPIToken(apiToken)}, extraOpts...)
 	return &service{
-		accountID:  accountID,
-		tunnelID:   tunnelID,
-		apiToken:   apiToken,
-		httpClient: &http.Client{},
-		baseURL:    baseURL,
+		accountID: accountID,
+		client:    cloudflareSDK.NewClient(opts...),
 	}
 }
 
-// GetConfig returns the current tunnel ingress rules, excluding the catch-all.
-func (s *service) GetConfig(ctx context.Context) ([]IngressRule, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.baseURL, nil)
+// LookupZoneName returns the domain name for the given Cloudflare Zone ID.
+func (s *service) LookupZoneName(ctx context.Context, zoneID string) (string, error) {
+	zone, err := s.client.Zones.Get(ctx, zones.ZoneGetParams{
+		ZoneID: cloudflareSDK.F(zoneID),
+	})
 	if err != nil {
-		return nil, err
+		return "", fmt.Errorf("lookup zone %q: %w", zoneID, err)
 	}
-	s.setHeaders(req)
+	return zone.Name, nil
+}
 
-	resp, err := s.httpClient.Do(req)
+// ListTunnels returns all non-deleted tunnels in the account.
+func (s *service) ListTunnels(ctx context.Context) ([]TunnelSummary, error) {
+	pager := s.client.ZeroTrust.Tunnels.Cloudflared.ListAutoPaging(ctx, zero_trust.TunnelCloudflaredListParams{
+		AccountID: cloudflareSDK.F(s.accountID),
+		IsDeleted: cloudflareSDK.F(false),
+	})
+
+	var summaries []TunnelSummary
+	for pager.Next() {
+		tunnel := pager.Current()
+		summaries = append(summaries, TunnelSummary{
+			ID:   tunnel.ID,
+			Name: tunnel.Name,
+		})
+	}
+	if err := pager.Err(); err != nil {
+		return nil, fmt.Errorf("list tunnels: %w", err)
+	}
+	return summaries, nil
+}
+
+// CreateTunnel creates a remotely-managed Cloudflare Tunnel and returns its ID and token.
+func (s *service) CreateTunnel(ctx context.Context, name string) (TunnelInfo, error) {
+	secretBytes := make([]byte, tunnelSecretByteLength)
+	if _, err := rand.Read(secretBytes); err != nil {
+		return TunnelInfo{}, fmt.Errorf("generate tunnel secret: %w", err)
+	}
+
+	tunnel, err := s.client.ZeroTrust.Tunnels.Cloudflared.New(ctx, zero_trust.TunnelCloudflaredNewParams{
+		AccountID:    cloudflareSDK.F(s.accountID),
+		Name:         cloudflareSDK.F(name),
+		ConfigSrc:    cloudflareSDK.F(zero_trust.TunnelCloudflaredNewParamsConfigSrcCloudflare),
+		TunnelSecret: cloudflareSDK.F(base64.StdEncoding.EncodeToString(secretBytes)),
+	})
 	if err != nil {
-		return nil, err
+		return TunnelInfo{}, fmt.Errorf("create tunnel %q: %w", name, err)
 	}
-	defer resp.Body.Close()
 
-	var result getConfigResponse
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, fmt.Errorf("decode response: %w", err)
+	token, err := s.client.ZeroTrust.Tunnels.Cloudflared.Token.Get(ctx, tunnel.ID, zero_trust.TunnelCloudflaredTokenGetParams{
+		AccountID: cloudflareSDK.F(s.accountID),
+	})
+	if err != nil {
+		return TunnelInfo{}, fmt.Errorf("get token for tunnel %q: %w", name, err)
 	}
-	if !result.Success {
-		return nil, fmt.Errorf("cloudflare getConfig failed: %v", result.Errors)
+
+	return TunnelInfo{ID: tunnel.ID, Token: *token}, nil
+}
+
+// DeleteTunnel deletes the Cloudflare Tunnel with the given ID.
+func (s *service) DeleteTunnel(ctx context.Context, tunnelID string) error {
+	if _, err := s.client.ZeroTrust.Tunnels.Cloudflared.Delete(ctx, tunnelID, zero_trust.TunnelCloudflaredDeleteParams{
+		AccountID: cloudflareSDK.F(s.accountID),
+	}); err != nil {
+		return fmt.Errorf("delete tunnel %q: %w", tunnelID, err)
+	}
+	return nil
+}
+
+// GetConfig returns the current ingress rules for the given tunnel, excluding the catch-all.
+func (s *service) GetConfig(ctx context.Context, tunnelID string) ([]IngressRule, error) {
+	response, err := s.client.ZeroTrust.Tunnels.Cloudflared.Configurations.Get(ctx, tunnelID, zero_trust.TunnelCloudflaredConfigurationGetParams{
+		AccountID: cloudflareSDK.F(s.accountID),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("get tunnel config %q: %w", tunnelID, err)
 	}
 
 	var rules []IngressRule
-	for _, rule := range result.Result.Config.Ingress {
-		if rule.Hostname != "" {
-			rules = append(rules, rule)
+	for _, ingressRule := range response.Config.Ingress {
+		if ingressRule.Hostname != "" {
+			rules = append(rules, IngressRule{
+				Hostname: ingressRule.Hostname,
+				Service:  ingressRule.Service,
+			})
 		}
 	}
 	return rules, nil
 }
 
-// PutConfig replaces the tunnel ingress rules. A catch-all 404 rule is always appended.
-func (s *service) PutConfig(ctx context.Context, rules []IngressRule) error {
-	var payload putConfigRequest
-	payload.Config.Ingress = append(rules, IngressRule{Service: catchAllRule})
-
-	body, err := json.Marshal(payload)
-	if err != nil {
-		return err
+// PutConfig replaces the ingress rules for the given tunnel. A catch-all 404 rule is always appended.
+func (s *service) PutConfig(ctx context.Context, tunnelID string, rules []IngressRule) error {
+	ingressParams := make([]zero_trust.TunnelCloudflaredConfigurationUpdateParamsConfigIngress, 0, len(rules)+1)
+	for _, rule := range rules {
+		ingressParams = append(ingressParams, zero_trust.TunnelCloudflaredConfigurationUpdateParamsConfigIngress{
+			Hostname: cloudflareSDK.F(rule.Hostname),
+			Service:  cloudflareSDK.F(rule.Service),
+		})
 	}
+	ingressParams = append(ingressParams, zero_trust.TunnelCloudflaredConfigurationUpdateParamsConfigIngress{
+		Service: cloudflareSDK.F(catchAllRule),
+	})
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPut, s.baseURL, bytes.NewReader(body))
-	if err != nil {
-		return err
-	}
-	s.setHeaders(req)
-
-	resp, err := s.httpClient.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	respBody, _ := io.ReadAll(resp.Body)
-	var result putConfigResponse
-	if err := json.Unmarshal(respBody, &result); err != nil {
-		return fmt.Errorf("decode response: %w", err)
-	}
-	if !result.Success {
-		return fmt.Errorf("cloudflare putConfig failed: %v", result.Errors)
+	if _, err := s.client.ZeroTrust.Tunnels.Cloudflared.Configurations.Update(ctx, tunnelID, zero_trust.TunnelCloudflaredConfigurationUpdateParams{
+		AccountID: cloudflareSDK.F(s.accountID),
+		Config: cloudflareSDK.F(zero_trust.TunnelCloudflaredConfigurationUpdateParamsConfig{
+			Ingress: cloudflareSDK.F(ingressParams),
+		}),
+	}); err != nil {
+		return fmt.Errorf("put tunnel config %q: %w", tunnelID, err)
 	}
 	return nil
-}
-
-func (s *service) setHeaders(req *http.Request) {
-	req.Header.Set("Authorization", "Bearer "+s.apiToken)
-	req.Header.Set("Content-Type", "application/json")
 }

@@ -24,7 +24,7 @@ graph LR
 3. When a request arrives at the Cloudflare edge, it is forwarded down that tunnel to `cloudflared`
 4. `cloudflared` forwards it to **Traefik**, the in-cluster ingress controller, which routes to the correct pod by hostname
 
-The [`cloudflare-ingress-controller`](https://github.com/kbntx-org/nexus/tree/main/platform/cloudflare-ingress-controller) (a custom Go controller) keeps the tunnel routing config in sync with Kubernetes `Ingress` resources automatically — no manual Cloudflare dashboard updates needed when deploying a new service.
+The [`cloudflare-ingress-controller`](https://github.com/kbntx-org/nexus/tree/main/platform/cloudflare-ingress-controller) (a custom Go controller) owns the full tunnel lifecycle: it reads `cloudflare.io/tunnel` annotations on `Ingress` resources and automatically creates the Cloudflare Tunnel, DNS records, and the `cloudflared` Deployment — no manual dashboard changes needed.
 
 ### Tools with Direct Tunnels
 
@@ -54,8 +54,7 @@ The result: my devices can talk directly to any IP on the Hetzner private networ
 
 ## References
 
-- [`platform/cloudflared/`](https://github.com/kbntx-org/nexus/tree/main/platform/cloudflared) — cluster tunnel deployment
-- [`platform/cloudflare-ingress-controller/`](https://github.com/kbntx-org/nexus/tree/main/platform/cloudflare-ingress-controller) — custom controller syncing Ingress to Cloudflare
+- [`platform/cloudflare-ingress-controller/`](https://github.com/kbntx-org/nexus/tree/main/platform/cloudflare-ingress-controller) — custom controller managing tunnel lifecycle and syncing Ingress to Cloudflare
 - [`platform/bastion/`](https://github.com/kbntx-org/nexus/tree/main/platform/bastion) — bastion host provisioning and tunnel
 - [`platform/traefik/`](https://github.com/kbntx-org/nexus/tree/main/platform/traefik) — in-cluster ingress controller
 - [Cloudflare Tunnel documentation](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/)

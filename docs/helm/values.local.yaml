@@ -1,3 +1,5 @@
 containerPort: 8000
 replicas: 1
-ingressHost: docs.localhost
+ingressHosts:
+  - docs.localhost
+  - docs-local.kbntx.com

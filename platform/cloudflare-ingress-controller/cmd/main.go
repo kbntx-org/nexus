@@ -19,17 +19,41 @@ import (
 	k8ssvc "github.com/kbntx-org/nexus/platform/cloudflare-ingress-controller/internal/k8s"
 )
 
+const defaultReconcileInterval = 30 * time.Second
+const defaultTunnelNamePrefix = "k8s"
+const defaultCloudflaredImage = "cloudflare/cloudflared:latest"
+const defaultCloudflaredReplicas = int32(2)
+
 func main() {
+	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
+
 	targetServiceURL := mustGetenv("TARGET_SERVICE_URL")
 	cloudflareAPIToken := mustGetenv("CF_API_TOKEN")
 	cloudflareAccountID := mustGetenv("CF_ACCOUNT_ID")
-	cloudflareTunnelID := mustGetenv("CF_TUNNEL_ID")
-	_ = mustGetenv("CF_ZONE_ID") // reserved for future DNS operations
+	cloudflareZoneID := mustGetenv("CF_ZONE_ID")
 	podName := mustGetenv("POD_NAME")
 	podNamespace := mustGetenv("POD_NAMESPACE")
 
 	ingressClassName := os.Getenv("INGRESS_CLASS_NAME")
-	reconcileInterval := 30 * time.Second
+
+	tunnelNamePrefix := os.Getenv("CF_TUNNEL_NAME_PREFIX")
+	if tunnelNamePrefix == "" {
+		tunnelNamePrefix = defaultTunnelNamePrefix
+	}
+
+	cloudflaredImage := os.Getenv("CLOUDFLARED_IMAGE")
+	if cloudflaredImage == "" {
+		cloudflaredImage = defaultCloudflaredImage
+	}
+
+	cloudflaredReplicas := defaultCloudflaredReplicas
+	if replicasStr := os.Getenv("CLOUDFLARED_REPLICAS"); replicasStr != "" {
+		if parsed, err := strconv.Atoi(replicasStr); err == nil {
+			cloudflaredReplicas = int32(parsed)
+		}
+	}
+
+	reconcileInterval := defaultReconcileInterval
 	if intervalStr := os.Getenv("RECONCILE_INTERVAL_MS"); intervalStr != "" {
 		if milliseconds, err := strconv.Atoi(intervalStr); err == nil {
 			reconcileInterval = time.Duration(milliseconds) * time.Millisecond
@@ -39,6 +63,7 @@ func main() {
 	slog.Info("starting cloudflare-ingress-controller",
 		"pod", podName,
 		"ingressClassName", ingressClassName,
+		"tunnelNamePrefix", tunnelNamePrefix,
 		"reconcileInterval", reconcileInterval,
 	)
 
@@ -53,11 +78,28 @@ func main() {
 		os.Exit(1)
 	}
 
-	cloudflareService := cloudflare.NewService(cloudflareAccountID, cloudflareTunnelID, cloudflareAPIToken)
+	cloudflareService := cloudflare.NewService(cloudflareAccountID, cloudflareAPIToken)
 	kubernetesService := k8ssvc.NewService(kubeClient, ingressClassName)
 
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
 	defer cancel()
+
+	zoneName, err := cloudflareService.LookupZoneName(ctx, cloudflareZoneID)
+	if err != nil {
+		slog.Error("failed to look up zone name", "zoneID", cloudflareZoneID, "error", err)
+		os.Exit(1)
+	}
+
+	slog.Info("zone resolved", "zone", zoneName)
+
+	reconcileConfig := controller.ReconcileConfig{
+		TargetServiceURL:    targetServiceURL,
+		TunnelNamePrefix:    tunnelNamePrefix,
+		ControllerNamespace: podNamespace,
+		CloudflaredImage:    cloudflaredImage,
+		CloudflaredReplicas: cloudflaredReplicas,
+		ZoneDomain:          zoneName,
+	}
 
 	resourceLock, err := resourcelock.New(
 		resourcelock.LeasesResourceLock,
@@ -81,7 +123,7 @@ func main() {
 		ReleaseOnCancel: true,
 		Callbacks: leaderelection.LeaderCallbacks{
 			OnStartedLeading: func(ctx context.Context) {
-				runLeader(ctx, kubernetesService, cloudflareService, targetServiceURL, reconcileInterval, podName)
+				runLeader(ctx, kubernetesService, cloudflareService, reconcileConfig, reconcileInterval, podName)
 			},
 			OnStoppedLeading: func() {
 				slog.Info("lost leadership, shutting down", "pod", podName)
@@ -95,7 +137,7 @@ func main() {
 	})
 }
 
-func runLeader(ctx context.Context, kubernetesService k8ssvc.Service, cloudflareService cloudflare.Service, targetServiceURL string, reconcileInterval time.Duration, podName string) {
+func runLeader(ctx context.Context, kubernetesService k8ssvc.Service, cloudflareService cloudflare.Service, reconcileConfig controller.ReconcileConfig, reconcileInterval time.Duration, podName string) {
 	slog.Info("became leader, starting reconciliation loop", "pod", podName)
 
 	trigger := make(chan struct{}, 1)
@@ -125,7 +167,7 @@ func runLeader(ctx context.Context, kubernetesService k8ssvc.Service, cloudflare
 		case <-ticker.C:
 			enqueue()
 		case <-trigger:
-			if err := controller.Reconcile(ctx, kubernetesService, cloudflareService, targetServiceURL); err != nil {
+			if err := controller.Reconcile(ctx, kubernetesService, cloudflareService, reconcileConfig); err != nil {
 				slog.Error("reconciliation failed", "error", err)
 			}
 		}
@@ -133,10 +175,10 @@ func runLeader(ctx context.Context, kubernetesService k8ssvc.Service, cloudflare
 }
 
 func mustGetenv(key string) string {
-	v := os.Getenv(key)
-	if v == "" {
+	value := os.Getenv(key)
+	if value == "" {
 		slog.Error("required environment variable not set", "key", key)
 		os.Exit(1)
 	}
-	return v
+	return value
 }

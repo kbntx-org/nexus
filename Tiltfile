@@ -7,6 +7,28 @@ default_registry(
 
 load('ext://helm_resource', 'helm_resource', 'helm_repo')
 
+def dotenv_helm_flags(path):
+  content = str(read_file(path, default=''))
+  flags = []
+  index = 0
+  for line in content.splitlines():
+    line = line.strip()
+    if not line or line.startswith('#'):
+      continue
+    separator = line.index('=')
+    key   = line[:separator]
+    value = line[separator + 1:]
+    if len(value) >= 2 and value[0] == '"' and value[-1] == '"':
+      value = value[1:-1]
+    if len(value) >= 2 and value[0] == "'" and value[-1] == "'":
+      value = value[1:-1]
+    flags += [
+      '--set', 'extraEnv[%d].name=%s'  % (index, key),
+      '--set', 'extraEnv[%d].value=%s' % (index, value),
+    ]
+    index += 1
+  return flags
+
 def bootstrap_kubernetes(kubernetesContext):
   availableContexts = [
     contextName
@@ -34,12 +56,13 @@ config.define_string_list("profile", args=False, usage="Dev profiles: docs | por
 parsedConfig = config.parse()
 selectedProfiles = parsedConfig.get("profile", [])
 
-CORE_RESOURCES = ['traefik']
+CORE_RESOURCES = ['traefik', 'metrics-server-repo', 'metrics-server']
 
 SERVICES = {
-  'docs':      ['docs'],
-  'portfolio': ['portfolio'],
-  'all':       ['docs', 'portfolio'],
+  'docs':                        ['docs'],
+  'portfolio':                   ['portfolio'],
+  'cloudflare-ingress-controller': ['cloudflare-ingress-controller'],
+  'all':                         ['docs', 'portfolio'],
 }
 
 if selectedProfiles:
@@ -59,6 +82,24 @@ print("🚀 Profiles: %s — enabling: %s" % (selectedProfiles or ['all'], ', '.
 
 bootstrap_kubernetes(DOCKER_CONTEXT)
 
+helm_repo(
+  'metrics-server-repo',
+  'https://kubernetes-sigs.github.io/metrics-server/',
+  labels=['infra'],
+)
+
+helm_resource(
+  'metrics-server',
+  'metrics-server-repo/metrics-server',
+  namespace='kube-system',
+  flags=[
+    '--version=3.13.0',
+    '--set-json=args=["--kubelet-insecure-tls", "--kubelet-preferred-address-types=InternalIP"]',
+  ],
+  resource_deps=['metrics-server-repo'],
+  labels=['infra'],
+)
+
 # ── Traefik (auto-started as a dependency of all product services) ─────────────
 helm_resource(
   'traefik',
@@ -69,6 +110,27 @@ helm_resource(
     '--create-namespace',
     '--values', 'platform/traefik/values.local.yaml',
   ],
+  labels=['infra'],
+)
+
+# ── Cloudflare Ingress Controller ─────────────────────────────────────────────
+docker_build(
+  'cloudflare-ingress-controller',
+  'platform/cloudflare-ingress-controller',
+  dockerfile='platform/cloudflare-ingress-controller/Dockerfile',
+)
+
+helm_resource(
+  'cloudflare-ingress-controller',
+  'platform/cloudflare-ingress-controller/helm',
+  deps=['platform/cloudflare-ingress-controller/helm'],
+  image_deps=['cloudflare-ingress-controller'],
+  image_keys=[('image.repository', 'image.tag')],
+  namespace='default',
+  flags=[
+    '--values', 'platform/cloudflare-ingress-controller/helm/values.local.yaml',
+    '--create-namespace',
+  ] + dotenv_helm_flags('platform/cloudflare-ingress-controller/.env'),
   labels=['infra'],
 )
 

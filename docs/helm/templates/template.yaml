@@ -74,7 +74,10 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-    - host: {{ .Values.ingressHost }}
+    {{- $ingressHosts := .Values.ingressHosts }}
+    {{- range $host := $ingressHosts }}
+    {{- if $host }}
+    - host: {{ $host }}
       http:
         paths:
           - path: /
@@ -83,4 +86,6 @@ spec:
               service:
                 name: documentation-service
                 port:
-                  number: {{ .Values.containerPort | default 80 }}
+                  number: {{ $.Values.containerPort | default 80 }}
+    {{- end }}
+    {{- end }}

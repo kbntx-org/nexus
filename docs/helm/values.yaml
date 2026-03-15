@@ -1,4 +1,5 @@
 image: kbntx/documentation:latest
 containerPort: 80
 replicas: 2
-ingressHost: docs.kbntx.com
+ingressHosts:
+  - docs.kbntx.com

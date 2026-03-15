@@ -24,6 +24,12 @@ spec:
               value: {{ .Values.ingressClassName | quote }}
             - name: RECONCILE_INTERVAL_MS
               value: {{ .Values.reconcileIntervalMs | quote }}
+            - name: CF_TUNNEL_NAME_PREFIX
+              value: {{ .Values.tunnelNamePrefix | quote }}
+            - name: CLOUDFLARED_IMAGE
+              value: {{ .Values.cloudflared.image | quote }}
+            - name: CLOUDFLARED_REPLICAS
+              value: {{ .Values.cloudflared.replicas | quote }}
             - name: POD_NAME
               valueFrom:
                 fieldRef:

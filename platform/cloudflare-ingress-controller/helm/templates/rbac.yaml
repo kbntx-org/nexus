@@ -49,3 +49,32 @@ roleRef:
   kind: Role
   name: cloudflare-ingress-controller-leader-election
   apiGroup: rbac.authorization.k8s.io
+---
+# Role: manage cloudflared Secrets, Deployments, and PodDisruptionBudgets
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cloudflare-ingress-controller-resources
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "create", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "create", "delete"]
+  - apiGroups: ["policy"]
+    resources: ["poddisruptionbudgets"]
+    verbs: ["get", "create", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cloudflare-ingress-controller-resources
+subjects:
+  - kind: ServiceAccount
+    name: cloudflare-ingress-controller
+    namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: Role
+  name: cloudflare-ingress-controller-resources
+  apiGroup: rbac.authorization.k8s.io
