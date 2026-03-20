@@ -4,8 +4,8 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "cluster:create": "bash scripts/cluster.sh create",
-    "cluster:delete": "bash scripts/cluster.sh delete",
+    "cluster:create": "bash tools/bash/cluster.sh create",
+    "cluster:delete": "bash tools/bash/cluster.sh delete",
     "dev:docs": "tilt up -- --profile=docs",
     "dev:portfolio": "tilt up -- --profile=portfolio",
     "dev:reset": "tilt down"
