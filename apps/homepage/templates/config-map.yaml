@@ -31,12 +31,6 @@ data:
         - Hetzner:
             icon: hetzner-h.svg
             href: https://console.hetzner.com
-        - Appsmith:
-            icon: https://nexus-public-statics.fsn1.your-objectstorage.com/images/appsmith-logo.png
-            href: https://appsmith.kbntx.com
-        - S3 Client:
-            icon: https://nexus-public-statics.fsn1.your-objectstorage.com/images/s3-logo.svg
-            href: https://appsmith.kbntx.com/app/s3-statics-client/page1-691860ad613acd5b6ba7e634
     - Calendar:
         - Calendar:
             widget:

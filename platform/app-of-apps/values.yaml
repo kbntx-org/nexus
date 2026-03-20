@@ -78,19 +78,6 @@ argocd-apps:
         syncOptions:
           - CreateNamespace=true
 
-    appsmith:
-      project: default
-      source:
-        repoURL: https://github.com/kbntx-org/nexus.git
-        path: platform/appsmith
-        targetRevision: main
-      destination:
-        server: https://kubernetes.default.svc
-        namespace: appsmith
-      syncPolicy:
-        syncOptions:
-          - CreateNamespace=true
-
     github-arc-runners-controller:
       project: default
       source:

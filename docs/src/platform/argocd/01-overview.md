@@ -20,17 +20,16 @@ graph TD
     Root --> external-secrets
     Root --> runners[github-arc-runners]
     Root --> apps[portfolio · docs · homepage]
-    Root --> appsmith
 ```
 
 The root application is deployed at [`platform/app-of-apps/`](https://github.com/kbntx-org/nexus/tree/main/platform/app-of-apps).
 
 ## Sync Strategies
 
-| Type | Strategy | Why |
-|---|---|---|
-| Infrastructure components (Traefik, ESO, monitoring…) | **Auto-sync** | Changes are always intentional; let ArgoCD converge immediately |
-| Applications (portfolio, docs…) | **Manual sync, triggered by CI** | The image must be pushed and the manifest updated before ArgoCD syncs |
+| Type                                                  | Strategy                         | Why                                                                   |
+| ----------------------------------------------------- | -------------------------------- | --------------------------------------------------------------------- |
+| Infrastructure components (Traefik, ESO, monitoring…) | **Auto-sync**                    | Changes are always intentional; let ArgoCD converge immediately       |
+| Applications (portfolio, docs…)                       | **Manual sync, triggered by CI** | The image must be pushed and the manifest updated before ArgoCD syncs |
 
 For applications, the CI pipeline calls `argocd app sync` after a successful build. This ensures the new image exists before the rollout starts.
 
@@ -73,7 +72,7 @@ argocd app actions run portfolio restart \
 ```
 
 !!! tip "Always use --prune"
-    The `--prune` flag on sync removes Kubernetes resources that no longer exist in Git. Without it, deleted resources linger in the cluster.
+The `--prune` flag on sync removes Kubernetes resources that no longer exist in Git. Without it, deleted resources linger in the cluster.
 
 ## References
 
