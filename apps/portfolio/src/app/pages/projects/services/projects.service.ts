@@ -7,7 +7,6 @@ import { BehaviorSubject, from, mergeMap, toArray } from 'rxjs';
 const PROJECT_FILES = [
   'assets/content/projects/nexus-observability.md',
   'assets/content/projects/nexus-kubernetes.md',
-  'assets/content/projects/nexus-internal-tooling.md',
   'assets/content/projects/portfolio.md'
 ];
 
