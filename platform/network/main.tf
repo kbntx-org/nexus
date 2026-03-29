@@ -3,11 +3,11 @@ resource "hcloud_network" "main_vpc" {
   ip_range          = "10.0.0.0/16"
   delete_protection = true
 }
-resource "hcloud_network" "secondary_vpc" {
-  name              = "secondary-vpc"
-  ip_range          = "10.1.0.0/16"
-  delete_protection = false
-}
+# resource "hcloud_network" "secondary_vpc" {
+#   name              = "secondary-vpc"
+#   ip_range          = "10.1.0.0/16"
+#   delete_protection = false
+# }
 
 resource "hcloud_network_subnet" "main_subnet" {
   network_id   = hcloud_network.main_vpc.id
