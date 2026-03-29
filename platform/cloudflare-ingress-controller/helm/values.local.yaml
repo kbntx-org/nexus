@@ -1,7 +1,0 @@
-targetServiceUrl: 'http://traefik.traefik.svc.cluster.local:80'
-
-ingressClassName: 'traefik'
-
-# Faster reconciliation in local dev
-reconcileIntervalMs: 5000
-tunnelNamePrefix: 'local'
