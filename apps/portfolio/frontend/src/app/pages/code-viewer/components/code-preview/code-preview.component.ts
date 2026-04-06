@@ -1,9 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, FileCode } from 'lucide-angular';
-import { Subject, takeUntil } from 'rxjs';
 
-import { ThemeService } from '../../../../shared/services/theme.service';
 import { FileTreeService } from '../../services/file-tree.service';
 import { TabBarComponent } from '../tab-bar/tab-bar.component';
 
@@ -22,7 +20,7 @@ import { TabBarComponent } from '../tab-bar/tab-bar.component';
     :host {
       display: flex;
       flex-direction: column;
-      background: hsl(var(--card));
+      background: var(--card);
     }
   `,
   template: `
@@ -66,19 +64,6 @@ import { TabBarComponent } from '../tab-bar/tab-bar.component';
     }
   `
 })
-export class CodePreviewComponent implements OnInit, OnDestroy {
+export class CodePreviewComponent {
   public readonly service = inject(FileTreeService);
-  private readonly themeService = inject(ThemeService);
-  private readonly destroy$ = new Subject<void>();
-
-  public ngOnInit(): void {
-    this.themeService.theme$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => this.service.reloadCodeHighlighting());
-  }
-
-  public ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
 }

@@ -5,7 +5,6 @@ import { unzipSync } from 'fflate';
 import { BehaviorSubject, combineLatest, map } from 'rxjs';
 import { codeToHtml } from 'shiki';
 
-import { ThemeService } from '../../../shared/services/theme.service';
 import { CodeViewerTab } from '../models/code-viewer-tab.model';
 import { getLanguage, isImageFile } from '../models/file-mappings.model';
 import { FileTreeNode } from '../models/file-tree.model';
@@ -16,7 +15,6 @@ import { FileTreeNode } from '../models/file-tree.model';
 export class FileTreeService {
   private readonly http = inject(HttpClient);
   private readonly sanitizer = inject(DomSanitizer);
-  private readonly themeService = inject(ThemeService);
 
   private treeSubject = new BehaviorSubject<FileTreeNode | null>(null);
   private selectedNodeSubject = new BehaviorSubject<FileTreeNode | null>(null);
@@ -242,8 +240,7 @@ export class FileTreeService {
     this.isCodeLoadingSubject.next(true);
     try {
       const language = getLanguage(path);
-      const theme = this.themeService.theme() === 'dark' ? 'github-dark' : 'github-light';
-      const result = await codeToHtml(content, { lang: language, theme });
+      const result = await codeToHtml(content, { lang: language, theme: 'github-dark' });
       const safeHtml = this.sanitizer.bypassSecurityTrustHtml(result);
 
       const currentTabs = this.openTabsSubject.value;

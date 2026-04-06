@@ -7,7 +7,6 @@ module.exports = {
     join(__dirname, 'src/**/!(*.stories|*.spec).{ts,html}'),
     ...createGlobPatternsForDependencies(__dirname)
   ],
-  darkMode: 'class',
   theme: {
     extend: {
       screens: {
@@ -17,36 +16,35 @@ module.exports = {
         wide: '1280px'
       },
       colors: {
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
+        background: 'hsl(230 65% 7%)',
+        foreground: 'hsl(225 20% 92%)',
         primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))'
+          DEFAULT: 'hsl(38 86% 56%)',
+          foreground: 'hsl(230 65% 7%)'
         },
         secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
-          foreground: 'hsl(var(--secondary-foreground))'
+          DEFAULT: 'hsl(225 55% 16%)',
+          foreground: 'hsl(225 20% 92%)'
         },
         muted: {
-          DEFAULT: 'hsl(var(--muted))',
-          foreground: 'hsl(var(--muted-foreground))'
+          DEFAULT: 'hsl(225 40% 14%)',
+          foreground: 'hsl(225 30% 65%)'
         },
         accent: {
-          DEFAULT: 'hsl(var(--accent))',
-          foreground: 'hsl(var(--accent-foreground))'
+          DEFAULT: 'hsl(225 55% 16%)',
+          foreground: 'hsl(225 20% 92%)'
         },
-        border: 'hsl(var(--border))',
+        border: 'hsl(225 30% 20%)',
         card: {
-          DEFAULT: 'hsl(var(--card))',
-          foreground: 'hsl(var(--card-foreground))'
+          DEFAULT: 'hsl(225 55% 12%)',
+          foreground: 'hsl(225 20% 92%)'
         },
         destructive: {
-          DEFAULT: 'hsl(var(--destructive))',
-          foreground: 'hsl(var(--destructive-foreground))'
+          DEFAULT: 'hsl(0 62.8% 30.6%)',
+          foreground: 'hsl(225 20% 92%)'
         },
-        ring: 'hsl(var(--ring))',
-        input: 'hsl(var(--input))',
-        radius: 'var(--radius)',
+        ring: 'hsl(225 30% 65%)',
+        input: 'hsl(225 30% 20%)',
         night: {
           sky: '#0a0e27',
           card: '#0f1b3d',
@@ -60,9 +58,9 @@ module.exports = {
         }
       },
       borderRadius: {
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)'
+        lg: '0.5rem',
+        md: 'calc(0.5rem - 2px)',
+        sm: 'calc(0.5rem - 4px)'
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))'

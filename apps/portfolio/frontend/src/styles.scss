@@ -4,6 +4,11 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap');
 
+:root {
+  --card: hsl(225 55% 12%);
+  --muted-foreground: 225 30% 65%;
+}
+
 @layer components {
   .glass-card {
     @apply rounded-xl border border-white/10 bg-night-card/40 shadow-xl backdrop-blur-xl;
@@ -19,33 +24,10 @@
   }
 }
 
-:root {
-  --background: 230 65% 7%;
-  --foreground: 225 20% 92%;
-  --card: 225 55% 12%;
-  --card-foreground: 225 20% 92%;
-  --popover: 225 55% 12%;
-  --popover-foreground: 225 20% 92%;
-  --primary: 38 86% 56%;
-  --primary-foreground: 230 65% 7%;
-  --secondary: 225 55% 16%;
-  --secondary-foreground: 225 20% 92%;
-  --muted: 225 40% 14%;
-  --muted-foreground: 225 30% 65%;
-  --accent: 225 55% 16%;
-  --accent-foreground: 225 20% 92%;
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 225 20% 92%;
-  --border: 225 30% 20%;
-  --input: 225 30% 20%;
-  --ring: 225 30% 65%;
-  --radius: 0.5rem;
-}
-
 html,
 body {
-  background-color: hsl(var(--background));
-  color: hsl(var(--foreground));
+  background-color: hsl(230 65% 7%);
+  color: hsl(225 20% 92%);
   margin: 0;
   padding: 0;
   height: 100dvh;
