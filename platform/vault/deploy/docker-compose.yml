@@ -18,7 +18,7 @@ services:
       context: .
       dockerfile: Dockerfile.postgresql
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
     environment:
       POSTGRES_DB: ${VAULT_POSTGRES_DB}
       POSTGRES_USER: ${VAULT_POSTGRES_USER}
