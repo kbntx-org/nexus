@@ -38,6 +38,15 @@ jobs:
             echo "base=${{ github.event.before }}" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Resolve build sha
+        id: build_sha
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "sha=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Compute affected projects
         id: affected
         run: |
@@ -48,23 +57,39 @@ jobs:
       - name: Compute deploy targets
         id: deploy_targets
         run: |
-          changedFiles=$(git diff --name-only "${{ steps.base.outputs.base }}" HEAD)
+          changedFiles=$(git diff --name-only "${{ steps.base.outputs.base }}" "${{ github.sha }}")
           echo "Changed files:"
           echo "$changedFiles"
 
           deployTargets='${{ steps.affected.outputs.affected }}'
           allProjects=$(pnpm -s nx show projects --json)
 
-          for project in $(echo "$allProjects" | jq -r '.[]'); do
-            deployPaths=$(pnpm -s nx show project "$project" --json | jq -r '.metadata.deployPaths // [] | .[]')
-            [ -z "$deployPaths" ] && continue
-            while IFS= read -r pattern; do
-              regex=$(echo "$pattern" | sed -e 's|/\*\*|/.*|g' -e 's|\.|\\.|g')
-              if echo "$changedFiles" | grep -qE "^${regex}$"; then
-                deployTargets=$(echo "$deployTargets" | jq --arg p "$project" '. + [$p] | unique')
-                break
+          if echo "$changedFiles" | grep -qx '\.github/workflows/compute-affected\.yml'; then
+            echo "compute-affected.yml changed — marking all applications as deploy targets"
+            allApplications='[]'
+            for project in $(echo "$allProjects" | jq -r '.[]'); do
+              projectType=$(pnpm -s nx show project "$project" --json | jq -r '.projectType // ""')
+              if [ "$projectType" = "application" ]; then
+                allApplications=$(echo "$allApplications" | jq --arg p "$project" '. + [$p]')
               fi
-            done <<< "$deployPaths"
+            done
+            deployTargets=$(echo "$deployTargets $allApplications" | jq -s 'add | unique')
+          fi
+
+          for project in $(echo "$allProjects" | jq -r '.[]'); do
+            matched=$(pnpm -s nx show project "$project" --json \
+              | jq -r '.metadata.deployPaths // [] | .[]' \
+              | while read -r pattern; do
+                  [ -z "$pattern" ] && continue
+                  regex=$(echo "$pattern" | sed -e 's|/\*\*|/.*|g' -e 's|\.|\\.|g')
+                  if echo "$changedFiles" | grep -qE "^${regex}$"; then
+                    echo yes
+                    break
+                  fi
+                done)
+            if [ "$matched" = "yes" ]; then
+              deployTargets=$(echo "$deployTargets" | jq --arg p "$project" '. + [$p] | unique')
+            fi
           done
 
           echo "Deploy targets: $deployTargets"
@@ -73,16 +98,17 @@ jobs:
       - name: Build manifest
         run: |
           jq -n \
-            --arg sha "${{ github.sha }}" \
+            --arg sha "${{ steps.build_sha.outputs.sha }}" \
+            --arg mergeSha "${{ github.sha }}" \
             --arg ref "${{ github.ref }}" \
             --argjson affected '${{ steps.affected.outputs.affected }}' \
             --argjson deployTargets '${{ steps.deploy_targets.outputs.deploy_targets }}' \
-            '{sha: $sha, ref: $ref, affected: $affected, deploy_targets: $deployTargets}' \
-            > affected-${{ github.sha }}.json
-          cat affected-${{ github.sha }}.json
+            '{sha: $sha, merge_sha: $mergeSha, ref: $ref, affected: $affected, deploy_targets: $deployTargets}' \
+            > affected-${{ steps.build_sha.outputs.sha }}.json
+          cat affected-${{ steps.build_sha.outputs.sha }}.json
 
       - name: Upload manifest
         uses: actions/upload-artifact@v4
         with:
-          name: affected-${{ github.sha }}
-          path: affected-${{ github.sha }}.json
+          name: affected-${{ steps.build_sha.outputs.sha }}
+          path: affected-${{ steps.build_sha.outputs.sha }}.json
