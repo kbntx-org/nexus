@@ -22,7 +22,7 @@ import { NavigationComponent } from './shared/components/navigation/navigation.c
       z-index: 0;
       background-image: url('/assets/images/lofi-kenny.webp');
       background-size: cover;
-      background-position: center;
+      background-position: bottom;
       pointer-events: none;
 
       &::after {
