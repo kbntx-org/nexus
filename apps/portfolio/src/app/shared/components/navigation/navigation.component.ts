@@ -1,6 +1,14 @@
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { LucideAngularModule, Home, Briefcase, Rocket, Laptop, Github, Linkedin } from 'lucide-angular';
+import {
+  LucideAngularModule,
+  Home,
+  Briefcase,
+  Rocket,
+  Laptop,
+  Github,
+  Linkedin
+} from 'lucide-angular';
 
 @Component({
   selector: 'app-navigation',

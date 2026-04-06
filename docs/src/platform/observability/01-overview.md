@@ -6,13 +6,13 @@ title: Overview
 
 The monitoring stack provides metrics, logs, and dashboards for the cluster and all workloads. Every component is deployed as part of a single Helm chart at [`platform/monitoring/`](https://github.com/kbntx-org/nexus/tree/main/platform/monitoring).
 
-| Component | Role |
-|---|---|
-| **VictoriaMetrics** | Prometheus-compatible time-series database — stores all metrics |
-| **Grafana** | Dashboards and the primary observability UI |
-| **Loki** | Log aggregation backend |
-| **Promtail** | Log shipper — runs as a DaemonSet, collects all pod logs |
-| **Node Exporter** | Host-level metrics (CPU, memory, disk, network) |
+| Component              | Role                                                             |
+| ---------------------- | ---------------------------------------------------------------- |
+| **VictoriaMetrics**    | Prometheus-compatible time-series database — stores all metrics  |
+| **Grafana**            | Dashboards and the primary observability UI                      |
+| **Loki**               | Log aggregation backend                                          |
+| **Promtail**           | Log shipper — runs as a DaemonSet, collects all pod logs         |
+| **Node Exporter**      | Host-level metrics (CPU, memory, disk, network)                  |
 | **Kube State Metrics** | Kubernetes object state as metrics (pod status, replica counts…) |
 
 ## How It Fits Together

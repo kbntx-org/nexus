@@ -44,19 +44,19 @@ All tunnels managed by this controller are prefixed with a configurable string (
 ```yaml
 metadata:
   annotations:
-    cloudflare.io/tunnel: kenny   # → creates/manages CF tunnel "k8s-kenny"
+    cloudflare.io/tunnel: kenny # → creates/manages CF tunnel "k8s-kenny"
 ```
 
 Multiple Ingresses can share the same annotation value and will be merged into a single tunnel and `cloudflared` Deployment.
 
 ## Package layout
 
-| Path | Responsibility |
-|------|----------------|
-| [`cmd/main.go`](https://github.com/kbntx-org/nexus/tree/main/platform/cloudflare-ingress-controller/cmd/main.go) | Entry point — wiring, leader election, reconciliation loop |
-| [`internal/k8s/k8s.go`](https://github.com/kbntx-org/nexus/tree/main/platform/cloudflare-ingress-controller/internal/k8s/k8s.go) | Kubernetes lister/watcher + Secret/Deployment/PDB management |
-| [`internal/cloudflare/cloudflare.go`](https://github.com/kbntx-org/nexus/tree/main/platform/cloudflare-ingress-controller/internal/cloudflare/cloudflare.go) | Cloudflare SDK client (tunnel lifecycle + ingress config) |
-| [`internal/controller/controller.go`](https://github.com/kbntx-org/nexus/tree/main/platform/cloudflare-ingress-controller/internal/controller/controller.go) | Pure reconciliation logic — no I/O, fully unit-tested |
+| Path                                                                                                                                                         | Responsibility                                               |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------ |
+| [`cmd/main.go`](https://github.com/kbntx-org/nexus/tree/main/platform/cloudflare-ingress-controller/cmd/main.go)                                             | Entry point — wiring, leader election, reconciliation loop   |
+| [`internal/k8s/k8s.go`](https://github.com/kbntx-org/nexus/tree/main/platform/cloudflare-ingress-controller/internal/k8s/k8s.go)                             | Kubernetes lister/watcher + Secret/Deployment/PDB management |
+| [`internal/cloudflare/cloudflare.go`](https://github.com/kbntx-org/nexus/tree/main/platform/cloudflare-ingress-controller/internal/cloudflare/cloudflare.go) | Cloudflare SDK client (tunnel lifecycle + ingress config)    |
+| [`internal/controller/controller.go`](https://github.com/kbntx-org/nexus/tree/main/platform/cloudflare-ingress-controller/internal/controller/controller.go) | Pure reconciliation logic — no I/O, fully unit-tested        |
 
 The reconciliation logic is intentionally pure (no I/O) so it can be tested without a real cluster or Cloudflare account. All side effects are injected through the `k8s.Service` and `cloudflare.Service` interfaces.
 
@@ -64,17 +64,17 @@ The reconciliation logic is intentionally pure (no I/O) so it can be tested with
 
 The controller is configured entirely via environment variables, injected by the Helm chart:
 
-| Variable | Source | Purpose |
-|----------|--------|---------|
-| `TARGET_SERVICE_URL` | `values.yaml` | Backend URL all hostnames forward to (Traefik's cluster-internal address) |
-| `INGRESS_CLASS_NAME` | `values.yaml` | Only process `Ingress` objects with this class; empty = watch all |
-| `RECONCILE_INTERVAL_MS` | `values.yaml` | How often to force a full reconcile, in addition to watch events |
-| `CF_TUNNEL_NAME_PREFIX` | `values.yaml` | Prefix for all managed tunnel names (default: `k8s`) |
-| `CLOUDFLARED_IMAGE` | `values.yaml` | Image used for cloudflared Deployments |
-| `CLOUDFLARED_REPLICAS` | `values.yaml` | Replica count per cloudflared Deployment |
-| `CF_API_TOKEN` | secret via `extraEnv` | Cloudflare API token with tunnel write access |
-| `CF_ACCOUNT_ID` | secret via `extraEnv` | Cloudflare account ID |
-| `CF_ZONE_ID` | secret via `extraEnv` | Reserved for future DNS operations |
+| Variable                | Source                | Purpose                                                                   |
+| ----------------------- | --------------------- | ------------------------------------------------------------------------- |
+| `TARGET_SERVICE_URL`    | `values.yaml`         | Backend URL all hostnames forward to (Traefik's cluster-internal address) |
+| `INGRESS_CLASS_NAME`    | `values.yaml`         | Only process `Ingress` objects with this class; empty = watch all         |
+| `RECONCILE_INTERVAL_MS` | `values.yaml`         | How often to force a full reconcile, in addition to watch events          |
+| `CF_TUNNEL_NAME_PREFIX` | `values.yaml`         | Prefix for all managed tunnel names (default: `k8s`)                      |
+| `CLOUDFLARED_IMAGE`     | `values.yaml`         | Image used for cloudflared Deployments                                    |
+| `CLOUDFLARED_REPLICAS`  | `values.yaml`         | Replica count per cloudflared Deployment                                  |
+| `CF_API_TOKEN`          | secret via `extraEnv` | Cloudflare API token with tunnel write access                             |
+| `CF_ACCOUNT_ID`         | secret via `extraEnv` | Cloudflare account ID                                                     |
+| `CF_ZONE_ID`            | secret via `extraEnv` | Reserved for future DNS operations                                        |
 
 Cloudflare credentials are never baked into `values.yaml`; they are injected using the `extraEnv` list with `secretKeyRef` entries. See [`helm/values.yaml`](https://github.com/kbntx-org/nexus/tree/main/platform/cloudflare-ingress-controller/helm/values.yaml) for the full example.
 

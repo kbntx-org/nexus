@@ -54,7 +54,10 @@ import { Project } from '../../services/projects.service';
         </div>
 
         <div class="custom-scrollbar overflow-y-auto px-8 pb-8">
-          <div class="mb-8 overflow-hidden rounded-xl border border-white/5" *ngIf="project.images && project.images.length > 0">
+          <div
+            class="mb-8 overflow-hidden rounded-xl border border-white/5"
+            *ngIf="project.images && project.images.length > 0"
+          >
             <div class="relative h-80 w-full overflow-hidden bg-night-sky/30">
               <div
                 class="flex h-full w-full transition-transform duration-500 ease-out"
@@ -94,7 +97,9 @@ import { Project } from '../../services/projects.service';
               >
                 <button
                   class="h-1.5 w-1.5 rounded-full transition-all duration-200"
-                  [class]="i === currentImageIndex ? 'w-4 bg-night-gold' : 'bg-white/30 hover:bg-white/50'"
+                  [class]="
+                    i === currentImageIndex ? 'w-4 bg-night-gold' : 'bg-white/30 hover:bg-white/50'
+                  "
                   *ngFor="let image of project.images; let i = index"
                   (click)="goToImage(i)"
                 ></button>
@@ -108,12 +113,11 @@ import { Project } from '../../services/projects.service';
             </div>
 
             <div *ngIf="project.features && project.features.length > 0">
-              <h3 class="mb-3 text-sm font-semibold uppercase tracking-wider text-night-text-muted">Features</h3>
+              <h3 class="mb-3 text-sm font-semibold uppercase tracking-wider text-night-text-muted">
+                Features
+              </h3>
               <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                <div
-                  class="flex items-start gap-2.5"
-                  *ngFor="let feature of project.features"
-                >
+                <div class="flex items-start gap-2.5" *ngFor="let feature of project.features">
                   <span class="mt-0.5 text-night-gold">✓</span>
                   <span class="text-sm text-night-text-soft">{{ feature }}</span>
                 </div>
@@ -121,20 +125,22 @@ import { Project } from '../../services/projects.service';
             </div>
 
             <div>
-              <h3 class="mb-3 text-sm font-semibold uppercase tracking-wider text-night-text-muted">Stack</h3>
+              <h3 class="mb-3 text-sm font-semibold uppercase tracking-wider text-night-text-muted">
+                Stack
+              </h3>
               <div class="flex flex-wrap gap-1.5">
                 <span
                   class="rounded-full bg-white/5 px-3 py-1 text-xs font-medium text-night-text-muted"
                   *ngFor="let tech of project.tech"
-                >{{ tech }}</span>
+                  >{{ tech }}</span
+                >
               </div>
             </div>
           </div>
-
         </div>
 
         <div
-          class="z-20 flex flex-shrink-0 flex-wrap gap-3 border-t border-white/10 bg-white/5 backdrop-blur-sm px-8 py-5"
+          class="z-20 flex flex-shrink-0 flex-wrap gap-3 border-t border-white/10 bg-white/5 px-8 py-5 backdrop-blur-sm"
           *ngIf="project.liveUrl"
         >
           <a
@@ -182,7 +188,10 @@ import { Project } from '../../services/projects.service';
         </div>
 
         <div class="overflow-y-auto px-5 pb-5">
-          <div class="mb-5 overflow-hidden rounded-xl border border-white/5" *ngIf="project.images && project.images.length > 0">
+          <div
+            class="mb-5 overflow-hidden rounded-xl border border-white/5"
+            *ngIf="project.images && project.images.length > 0"
+          >
             <div class="relative h-52 w-full overflow-hidden bg-night-sky/30">
               <div
                 class="flex h-full w-full transition-transform duration-500 ease-out"
@@ -222,7 +231,11 @@ import { Project } from '../../services/projects.service';
               >
                 <button
                   class="h-1.5 w-1.5 rounded-full transition-all duration-200"
-                  [class]="i === currentImageIndex ? 'w-3.5 bg-night-gold' : 'bg-white/30 hover:bg-white/50'"
+                  [class]="
+                    i === currentImageIndex
+                      ? 'w-3.5 bg-night-gold'
+                      : 'bg-white/30 hover:bg-white/50'
+                  "
                   *ngFor="let image of project.images; let i = index"
                   (click)="goToImage(i)"
                 ></button>
@@ -239,12 +252,13 @@ import { Project } from '../../services/projects.service';
             </div>
 
             <div *ngIf="project.features && project.features.length > 0">
-              <h3 class="mb-2.5 text-xs font-semibold uppercase tracking-wider text-night-text-muted">Features</h3>
+              <h3
+                class="mb-2.5 text-xs font-semibold uppercase tracking-wider text-night-text-muted"
+              >
+                Features
+              </h3>
               <div class="space-y-1.5">
-                <div
-                  class="flex items-start gap-2.5"
-                  *ngFor="let feature of project.features"
-                >
+                <div class="flex items-start gap-2.5" *ngFor="let feature of project.features">
                   <span class="mt-0.5 text-night-gold">✓</span>
                   <span class="text-sm text-night-text-soft">{{ feature }}</span>
                 </div>
@@ -252,19 +266,24 @@ import { Project } from '../../services/projects.service';
             </div>
 
             <div>
-              <h3 class="mb-2.5 text-xs font-semibold uppercase tracking-wider text-night-text-muted">Stack</h3>
+              <h3
+                class="mb-2.5 text-xs font-semibold uppercase tracking-wider text-night-text-muted"
+              >
+                Stack
+              </h3>
               <div class="flex flex-wrap gap-1.5">
                 <span
                   class="rounded-full bg-white/5 px-2.5 py-1 text-xs font-medium text-night-text-muted"
                   *ngFor="let tech of project.tech"
-                >{{ tech }}</span>
+                  >{{ tech }}</span
+                >
               </div>
             </div>
           </div>
         </div>
 
         <div
-          class="flex-shrink-0 border-t border-white/10 bg-white/5 backdrop-blur-sm px-5 py-4"
+          class="flex-shrink-0 border-t border-white/10 bg-white/5 px-5 py-4 backdrop-blur-sm"
           *ngIf="project.liveUrl"
         >
           <div class="flex flex-wrap gap-2.5">

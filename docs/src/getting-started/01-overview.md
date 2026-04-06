@@ -43,12 +43,12 @@ graph TD
 
 **Key components:**
 
-| Area | What |
-|---|---|
-| Infrastructure | K3S on Hetzner Cloud, provisioned with Terraform |
-| GitOps | ArgoCD — the cluster always converges to what's in Git |
-| Networking | Cloudflare Tunnel + Traefik — no public load balancer |
-| Secrets | HashiCorp Vault + External Secrets Operator — no secrets in Git |
-| Observability | Grafana, Loki, VictoriaMetrics |
-| CI/CD | GitHub Actions with self-hosted runners inside the cluster |
-| Applications | Portfolio, Documentation, Homepage |
+| Area           | What                                                            |
+| -------------- | --------------------------------------------------------------- |
+| Infrastructure | K3S on Hetzner Cloud, provisioned with Terraform                |
+| GitOps         | ArgoCD — the cluster always converges to what's in Git          |
+| Networking     | Cloudflare Tunnel + Traefik — no public load balancer           |
+| Secrets        | HashiCorp Vault + External Secrets Operator — no secrets in Git |
+| Observability  | Grafana, Loki, VictoriaMetrics                                  |
+| CI/CD          | GitHub Actions with self-hosted runners inside the cluster      |
+| Applications   | Portfolio, Documentation, Homepage                              |

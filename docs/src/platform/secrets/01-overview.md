@@ -18,7 +18,7 @@ flowchart LR
     KSec -->|env or volume| App[Application Pod]
 ```
 
-The `ExternalSecret` CRD lives in Git (it only describes *which* secret to fetch, not the value itself), while Vault holds the actual credentials.
+The `ExternalSecret` CRD lives in Git (it only describes _which_ secret to fetch, not the value itself), while Vault holds the actual credentials.
 
 ## HashiCorp Vault
 
@@ -41,7 +41,7 @@ docker exec vault vault operator unseal
 ```
 
 !!! danger "Unseal keys"
-    The unseal keys and root token are shown **only once**. Store them in a password manager immediately. Without them you cannot access Vault after a restart.
+The unseal keys and root token are shown **only once**. Store them in a password manager immediately. Without them you cannot access Vault after a restart.
 
 ### Secret Organisation
 
@@ -62,11 +62,13 @@ ESO watches `ExternalSecret` resources and creates Kubernetes `Secret` objects f
 ### Adding a Secret
 
 1. **Add the value to Vault:**
+
    ```bash
    vault kv put secret/my-app api_key=<value>
    ```
 
 2. **Create an `ExternalSecret` in your namespace:**
+
    ```yaml
    apiVersion: external-secrets.io/v1beta1
    kind: ExternalSecret
@@ -94,7 +96,7 @@ ESO watches `ExternalSecret` resources and creates Kubernetes `Secret` objects f
 ESO re-fetches from Vault on the `refreshInterval` (default: 1h) and updates the Kubernetes Secret automatically. Pods that consume secrets as environment variables need a restart to pick up the new value; secrets mounted as volumes are updated in place.
 
 !!! tip "Force an immediate refresh"
-    Add the annotation `force-sync: <any-value>` to an `ExternalSecret` to trigger a refresh outside the normal schedule.
+Add the annotation `force-sync: <any-value>` to an `ExternalSecret` to trigger a refresh outside the normal schedule.
 
 ## References
 

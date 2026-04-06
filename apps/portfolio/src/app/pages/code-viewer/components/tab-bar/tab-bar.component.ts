@@ -56,9 +56,7 @@ import { FileTreeService } from '../../services/file-tree.service';
   `,
   template: `
     @if ((service.openTabs$ | async)?.length) {
-      <div
-        class="tab-container flex overflow-x-auto border-b border-border bg-muted/30"
-      >
+      <div class="tab-container flex overflow-x-auto border-b border-border bg-muted/30">
         @for (tab of service.openTabs$ | async; track tab.node.path; let index = $index) {
           <button
             class="group flex shrink-0 items-center gap-1.5 border-r border-border px-3 py-2 text-sm transition-colors"

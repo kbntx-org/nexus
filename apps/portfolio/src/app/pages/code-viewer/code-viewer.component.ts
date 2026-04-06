@@ -69,7 +69,7 @@ import { FileTreeService } from './services/file-tree.service';
   template: `
     <div class="h-full w-full p-4">
       <div
-        class="flex h-full w-full overflow-hidden rounded-xl border border-white/10 bg-night-card/40 backdrop-blur-sm shadow-lg"
+        class="flex h-full w-full overflow-hidden rounded-xl border border-white/10 bg-night-card/40 shadow-lg backdrop-blur-sm"
       >
         <!-- Mobile view -->
         <div class="flex h-full w-full flex-col lg:hidden">

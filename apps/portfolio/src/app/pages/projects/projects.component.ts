@@ -38,5 +38,4 @@ export class ProjectsComponent {
     ];
     return gradients[index % gradients.length];
   }
-
 }

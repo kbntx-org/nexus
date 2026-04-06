@@ -31,12 +31,12 @@ graph TD
     CP --- CI
 ```
 
-| Component | Path | Technology |
-|---|---|---|
-| K3S Cluster | `platform/kubernetes/` | Terraform + k3s module |
-| Private Network | `platform/network/` | Terraform |
-| Bastion Host | `platform/bastion/` | Terraform + Docker Compose |
-| Vault Host | `platform/vault/` | Terraform + Docker Compose |
+| Component        | Path                          | Technology                                   |
+| ---------------- | ----------------------------- | -------------------------------------------- |
+| K3S Cluster      | `platform/kubernetes/`        | Terraform + k3s module                       |
+| Private Network  | `platform/network/`           | Terraform                                    |
+| Bastion Host     | `platform/bastion/`           | Terraform + Docker Compose                   |
+| Vault Host       | `platform/vault/`             | Terraform + Docker Compose                   |
 | Reusable Modules | `platform/terraform-modules/` | Terraform modules (`k3s`, `firewall`, `vps`) |
 
 The **CI worker** is a dedicated node with a taint that only ARC runner pods tolerate. This keeps CI workloads physically separated from production workloads.
@@ -66,7 +66,7 @@ cd platform/vault/provision && terraform apply
 ```
 
 !!! warning "Terraform state"
-    State is not stored in this repository. Configure a remote backend before provisioning shared infrastructure.
+State is not stored in this repository. Configure a remote backend before provisioning shared infrastructure.
 
 ## Cluster Access
 
