@@ -69,24 +69,24 @@ import { FileTreeService } from './services/file-tree.service';
   template: `
     <div class="h-full w-full p-4">
       <div
-        class="flex h-full w-full overflow-hidden rounded-xl border border-border bg-card shadow-lg"
+        class="flex h-full w-full overflow-hidden rounded-xl border border-white/10 bg-night-card/40 backdrop-blur-sm shadow-lg"
       >
         <!-- Mobile view -->
         <div class="flex h-full w-full flex-col lg:hidden">
           @if ((service.selectedNode$ | async) === null) {
             <div class="flex flex-1 flex-col items-center justify-center gap-6 p-8">
-              <div class="flex h-24 w-24 items-center justify-center rounded-full bg-muted">
+              <div class="flex h-24 w-24 items-center justify-center rounded-full bg-white/5">
                 <lucide-angular
                   name="folder-open"
-                  class="h-12 w-12 text-muted-foreground"
+                  class="h-12 w-12 text-night-text-muted"
                 ></lucide-angular>
               </div>
-              <h3 class="text-xl font-medium text-foreground">Browse Source Code</h3>
-              <p class="text-sm text-muted-foreground">
+              <h3 class="text-xl font-medium text-night-text">Browse Source Code</h3>
+              <p class="text-sm text-night-text-muted">
                 Select a file from the repository to view its contents
               </p>
               <button
-                class="inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                class="inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-night-gold to-night-gold-deep px-6 py-3 text-sm font-medium text-night-sky transition-colors hover:brightness-110"
                 (click)="openFileTreeModal()"
               >
                 <lucide-angular name="folder-open" class="h-4 w-4"></lucide-angular>
@@ -95,9 +95,9 @@ import { FileTreeService } from './services/file-tree.service';
             </div>
           } @else {
             <app-code-preview class="flex-1 overflow-hidden"></app-code-preview>
-            <div class="border-t border-border p-3">
+            <div class="border-t border-white/10 p-3">
               <button
-                class="inline-flex w-full items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                class="inline-flex w-full items-center justify-center gap-2 rounded-md border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-night-text transition-colors hover:bg-white/10 hover:text-night-text"
                 (click)="openFileTreeModal()"
               >
                 <lucide-angular name="folder-open" class="h-4 w-4"></lucide-angular>
@@ -110,13 +110,13 @@ import { FileTreeService } from './services/file-tree.service';
         <!-- Desktop view -->
         <div class="hidden h-full w-full lg:flex">
           <app-file-tree
-            class="h-full overflow-hidden border-r border-border transition-all duration-300"
+            class="h-full overflow-hidden border-r border-white/10 transition-all duration-300"
             [class.w-72]="isSidebarOpen$ | async"
             [class.w-0]="(isSidebarOpen$ | async) === false"
           ></app-file-tree>
 
           <button
-            class="flex h-full w-6 shrink-0 items-center justify-center border-r border-border bg-muted/30 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            class="flex h-full w-6 shrink-0 items-center justify-center border-r border-white/10 bg-white/5 text-night-text-muted transition-colors hover:bg-white/5 hover:text-night-text"
             (click)="toggleSidebar()"
             [title]="(isSidebarOpen$ | async) ? 'Hide sidebar' : 'Show sidebar'"
           >

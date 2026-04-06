@@ -40,7 +40,18 @@ module.exports = {
         },
         ring: 'hsl(var(--ring))',
         input: 'hsl(var(--input))',
-        radius: 'var(--radius)'
+        radius: 'var(--radius)',
+        night: {
+          sky: '#0a0e27',
+          card: '#0f1b3d',
+          text: '#e8eaf0',
+          'text-soft': '#c0c8e0',
+          'text-muted': '#8a9cc5',
+          gold: '#f0a830',
+          'gold-deep': '#e8963a',
+          purple: '#667eea',
+          'purple-deep': '#764ba2'
+        }
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -55,7 +66,8 @@ module.exports = {
         'pulse-slow': 'pulse 2s infinite',
         'fade-in': 'fadeIn 0.6s ease-out',
         float: 'float 30s ease-in-out infinite',
-        'expand-width': 'expandWidth 1s ease-out 0.5s forwards'
+        'expand-width': 'expandWidth 1s ease-out 0.5s forwards',
+        twinkle: 'twinkle 4s ease-in-out infinite'
       },
       keyframes: {
         slideInUp: {
@@ -74,6 +86,10 @@ module.exports = {
         expandWidth: {
           '0%': { transform: 'scaleX(0)' },
           '100%': { transform: 'scaleX(1)' }
+        },
+        twinkle: {
+          '0%, 100%': { opacity: '0.4' },
+          '50%': { opacity: '1' }
         }
       }
     }

@@ -18,187 +18,62 @@ import { Project } from '../../services/projects.service';
   imports: [CommonModule, RouterModule, LucideAngularModule],
   template: `
     <div
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md"
       (click)="closeModal()"
     >
       <div
-        class="custom-scrollbar relative mx-4 box-border hidden max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-lg border border-border bg-card shadow-2xl lg:block"
+        class="relative mx-4 box-border hidden max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-white/15 bg-night-card/50 shadow-2xl shadow-black/40 backdrop-blur-xl lg:flex"
         (click)="$event.stopPropagation()"
       >
-        <div class="border-b border-border p-4">
-          <div class="flex items-center justify-between">
-            <h2 class="text-2xl font-bold text-foreground">{{ project.title }}</h2>
-            <button
-              class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-border bg-background text-foreground transition-all duration-200 hover:scale-110 hover:bg-accent"
-              (click)="closeModal()"
-            >
-              <lucide-angular [img]="XIcon" class="h-6 w-6"></lucide-angular>
-            </button>
-          </div>
-        </div>
-
-        <div class="p-8 pt-6">
-          <div class="mb-8" *ngIf="project.images && project.images.length > 0">
-            <div class="relative overflow-hidden rounded-lg">
-              <div class="h-80 w-full overflow-hidden">
-                <div
-                  class="flex h-full w-full transition-transform duration-300 ease-in-out"
-                  [style.transform]="'translateX(-' + currentImageIndex * 100 + '%)'"
-                >
-                  <div
-                    class="h-full w-full flex-shrink-0"
-                    *ngFor="let image of project.images; let i = index"
-                  >
-                    <img
-                      [src]="image"
-                      [alt]="project.title + ' image ' + (i + 1)"
-                      class="h-full w-full object-contain p-2"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <button
-                class="absolute left-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-border bg-background/90 text-foreground transition-all duration-200 hover:scale-110 hover:bg-accent"
-                (click)="previousImage()"
-                *ngIf="project.images.length > 1"
-              >
-                <lucide-angular [img]="ChevronLeftIcon" class="h-5 w-5"></lucide-angular>
-              </button>
-
-              <button
-                class="absolute right-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-border bg-background/90 text-foreground transition-all duration-200 hover:scale-110 hover:bg-accent"
-                (click)="nextImage()"
-                *ngIf="project.images.length > 1"
-              >
-                <lucide-angular [img]="ChevronRightIcon" class="h-5 w-5"></lucide-angular>
-              </button>
-
-              <div
-                class="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-2"
-                *ngIf="project.images.length > 1"
-              >
-                <button
-                  class="h-2 w-2 rounded-full transition-all duration-200"
-                  [class]="
-                    i === currentImageIndex
-                      ? 'scale-125 bg-primary'
-                      : 'bg-muted-foreground/50 hover:bg-muted-foreground/80'
-                  "
-                  *ngFor="let image of project.images; let i = index"
-                  (click)="goToImage(i)"
-                ></button>
-              </div>
-            </div>
-          </div>
-
-          <div class="space-y-8">
-            <div>
-              <h3 class="mb-4 text-xl font-semibold text-foreground">About this project</h3>
-              <p [innerHTML]="project.content" class="leading-relaxed text-muted-foreground"></p>
-            </div>
-            <div *ngIf="project.features && project.features.length > 0">
-              <h3 class="mb-4 text-xl font-semibold text-foreground">Key Features</h3>
-              <ul class="space-y-2">
-                <li
-                  class="flex items-start gap-3 text-muted-foreground"
-                  *ngFor="let feature of project.features"
-                >
-                  <span class="mt-0.5 font-bold text-primary">✓</span>
-                  <span>{{ feature }}</span>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 class="mb-4 text-xl font-semibold text-foreground">Technologies Used</h3>
-              <div class="flex flex-wrap gap-2">
-                <span
-                  class="rounded-full bg-secondary px-3 py-1 text-sm font-medium text-secondary-foreground"
-                  *ngFor="let tech of project.tech"
-                  >{{ tech }}</span
-                >
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div
-          class="border-t border-border bg-muted/30 p-6"
-          *ngIf="project.liveUrl || project.githubUrl || project.codeSourceUrl"
-        >
-          <div class="flex w-full flex-wrap gap-4">
-            <a
-              *ngIf="project.liveUrl"
-              [href]="project.liveUrl"
-              target="_blank"
-              class="inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 font-medium text-primary-foreground transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary/90"
-            >
-              <lucide-angular [img]="ExternalLinkIcon" class="h-4 w-4"></lucide-angular>
-              Live Demo
-            </a>
+        <div class="z-20 flex flex-shrink-0 items-center justify-between px-8 py-5">
+          <h2 class="text-2xl font-bold text-night-text">{{ project.title }}</h2>
+          <div class="flex items-center gap-1">
             <a
               *ngIf="project.githubUrl"
               [href]="project.githubUrl"
               target="_blank"
-              class="inline-flex items-center gap-2 rounded-md border border-border bg-transparent px-6 py-3 font-medium text-foreground transition-all duration-200 hover:-translate-y-0.5 hover:bg-accent hover:text-accent-foreground"
+              class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-night-text-muted transition-all duration-200 hover:bg-white/10 hover:text-night-text"
             >
               <lucide-angular [img]="GithubIcon" class="h-4 w-4"></lucide-angular>
-              View Code
             </a>
             <a
               *ngIf="project.codeSourceUrl"
               [routerLink]="project.codeSourceUrl"
               (click)="closeModal()"
-              class="inline-flex items-center gap-2 rounded-md border border-border bg-transparent px-6 py-3 font-medium text-foreground transition-all duration-200 hover:-translate-y-0.5 hover:bg-accent hover:text-accent-foreground"
+              class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-night-text-muted transition-all duration-200 hover:bg-white/10 hover:text-night-text"
             >
               <lucide-angular [img]="Code2Icon" class="h-4 w-4"></lucide-angular>
-              Browse Source
             </a>
-          </div>
-        </div>
-      </div>
-
-      <div
-        class="fixed bottom-0 left-0 right-0 max-h-[90svh] transform overflow-y-auto rounded-t-2xl border-t border-border bg-card shadow-2xl transition-transform duration-300 ease-out lg:hidden"
-        [class]="isOpening ? 'translate-y-0' : 'translate-y-full'"
-        (click)="$event.stopPropagation()"
-      >
-        <div class="border-b border-border p-4">
-          <div class="flex items-center justify-between">
-            <h2 class="text-xl font-bold text-foreground">{{ project.title }}</h2>
             <button
-              class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-border bg-background text-foreground transition-all duration-200 hover:scale-110 hover:bg-accent"
+              class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-night-text-muted transition-all duration-200 hover:bg-white/10 hover:text-night-text"
               (click)="closeModal()"
             >
-              <lucide-angular [img]="XIcon" class="h-6 w-6"></lucide-angular>
+              <lucide-angular [img]="XIcon" class="h-5 w-5"></lucide-angular>
             </button>
           </div>
         </div>
 
-        <div class="p-6 pt-4">
-          <div class="mb-6" *ngIf="project.images && project.images.length > 0">
-            <div class="relative overflow-hidden rounded-lg">
-              <div class="h-56 w-full overflow-hidden">
+        <div class="custom-scrollbar overflow-y-auto px-8 pb-8">
+          <div class="mb-8 overflow-hidden rounded-xl border border-white/5" *ngIf="project.images && project.images.length > 0">
+            <div class="relative h-80 w-full overflow-hidden bg-night-sky/30">
+              <div
+                class="flex h-full w-full transition-transform duration-500 ease-out"
+                [style.transform]="'translateX(-' + currentImageIndex * 100 + '%)'"
+              >
                 <div
-                  class="flex h-full w-full transition-transform duration-300 ease-in-out"
-                  [style.transform]="'translateX(-' + currentImageIndex * 100 + '%)'"
+                  class="h-full w-full flex-shrink-0"
+                  *ngFor="let image of project.images; let i = index"
                 >
-                  <div
-                    class="h-full w-full flex-shrink-0"
-                    *ngFor="let image of project.images; let i = index"
-                  >
-                    <img
-                      [src]="image"
-                      [alt]="project.title + ' image ' + (i + 1)"
-                      class="h-full w-full object-contain p-2"
-                    />
-                  </div>
+                  <img
+                    [src]="image"
+                    [alt]="project.title + ' image ' + (i + 1)"
+                    class="h-full w-full object-contain p-4"
+                  />
                 </div>
               </div>
 
               <button
-                class="absolute left-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-border bg-background/90 text-foreground transition-all duration-200 hover:scale-110 hover:bg-accent"
+                class="absolute left-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-night-sky/60 text-white/80 backdrop-blur-sm transition-all duration-200 hover:bg-night-sky/80 hover:text-white"
                 (click)="previousImage()"
                 *ngIf="project.images.length > 1"
               >
@@ -206,7 +81,7 @@ import { Project } from '../../services/projects.service';
               </button>
 
               <button
-                class="absolute right-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-border bg-background/90 text-foreground transition-all duration-200 hover:scale-110 hover:bg-accent"
+                class="absolute right-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-night-sky/60 text-white/80 backdrop-blur-sm transition-all duration-200 hover:bg-night-sky/80 hover:text-white"
                 (click)="nextImage()"
                 *ngIf="project.images.length > 1"
               >
@@ -214,16 +89,12 @@ import { Project } from '../../services/projects.service';
               </button>
 
               <div
-                class="absolute bottom-2 left-1/2 z-10 flex -translate-x-1/2 gap-1.5"
+                class="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-1.5 rounded-full bg-night-sky/50 px-2.5 py-1.5 backdrop-blur-sm"
                 *ngIf="project.images.length > 1"
               >
                 <button
                   class="h-1.5 w-1.5 rounded-full transition-all duration-200"
-                  [class]="
-                    i === currentImageIndex
-                      ? 'scale-125 bg-primary'
-                      : 'bg-muted-foreground/50 hover:bg-muted-foreground/80'
-                  "
+                  [class]="i === currentImageIndex ? 'w-4 bg-night-gold' : 'bg-white/30 hover:bg-white/50'"
                   *ngFor="let image of project.images; let i = index"
                   (click)="goToImage(i)"
                 ></button>
@@ -233,70 +104,177 @@ import { Project } from '../../services/projects.service';
 
           <div class="space-y-6">
             <div>
-              <h3 class="mb-3 text-lg font-semibold text-foreground">About this project</h3>
+              <p [innerHTML]="project.content" class="leading-relaxed text-night-text-soft"></p>
+            </div>
+
+            <div *ngIf="project.features && project.features.length > 0">
+              <h3 class="mb-3 text-sm font-semibold uppercase tracking-wider text-night-text-muted">Features</h3>
+              <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <div
+                  class="flex items-start gap-2.5"
+                  *ngFor="let feature of project.features"
+                >
+                  <span class="mt-0.5 text-night-gold">✓</span>
+                  <span class="text-sm text-night-text-soft">{{ feature }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="mb-3 text-sm font-semibold uppercase tracking-wider text-night-text-muted">Stack</h3>
+              <div class="flex flex-wrap gap-1.5">
+                <span
+                  class="rounded-full bg-white/5 px-3 py-1 text-xs font-medium text-night-text-muted"
+                  *ngFor="let tech of project.tech"
+                >{{ tech }}</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div
+          class="z-20 flex flex-shrink-0 flex-wrap gap-3 border-t border-white/10 bg-white/5 backdrop-blur-sm px-8 py-5"
+          *ngIf="project.liveUrl"
+        >
+          <a
+            [href]="project.liveUrl"
+            target="_blank"
+            class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-night-gold to-night-gold-deep px-5 py-2.5 text-sm font-medium text-night-sky transition-all duration-200 hover:brightness-110"
+          >
+            <lucide-angular [img]="ExternalLinkIcon" class="h-4 w-4"></lucide-angular>
+            Live Demo
+          </a>
+        </div>
+      </div>
+
+      <div
+        class="fixed bottom-0 left-0 right-0 flex max-h-[90svh] transform flex-col overflow-hidden rounded-t-2xl border-t border-white/15 bg-night-card/50 shadow-2xl shadow-black/40 backdrop-blur-xl transition-transform duration-300 ease-out lg:hidden"
+        [class]="isOpening ? 'translate-y-0' : 'translate-y-full'"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="flex flex-shrink-0 items-center justify-between px-5 py-4">
+          <h2 class="text-xl font-bold text-night-text">{{ project.title }}</h2>
+          <div class="flex items-center gap-1">
+            <a
+              *ngIf="project.githubUrl"
+              [href]="project.githubUrl"
+              target="_blank"
+              class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-night-text-muted transition-all duration-200 hover:bg-white/10 hover:text-night-text"
+            >
+              <lucide-angular [img]="GithubIcon" class="h-4 w-4"></lucide-angular>
+            </a>
+            <a
+              *ngIf="project.codeSourceUrl"
+              [routerLink]="project.codeSourceUrl"
+              (click)="closeModal()"
+              class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-night-text-muted transition-all duration-200 hover:bg-white/10 hover:text-night-text"
+            >
+              <lucide-angular [img]="Code2Icon" class="h-4 w-4"></lucide-angular>
+            </a>
+            <button
+              class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-night-text-muted transition-all duration-200 hover:bg-white/10 hover:text-night-text"
+              (click)="closeModal()"
+            >
+              <lucide-angular [img]="XIcon" class="h-5 w-5"></lucide-angular>
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-y-auto px-5 pb-5">
+          <div class="mb-5 overflow-hidden rounded-xl border border-white/5" *ngIf="project.images && project.images.length > 0">
+            <div class="relative h-52 w-full overflow-hidden bg-night-sky/30">
+              <div
+                class="flex h-full w-full transition-transform duration-500 ease-out"
+                [style.transform]="'translateX(-' + currentImageIndex * 100 + '%)'"
+              >
+                <div
+                  class="h-full w-full flex-shrink-0"
+                  *ngFor="let image of project.images; let i = index"
+                >
+                  <img
+                    [src]="image"
+                    [alt]="project.title + ' image ' + (i + 1)"
+                    class="h-full w-full object-contain p-3"
+                  />
+                </div>
+              </div>
+
+              <button
+                class="absolute left-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-night-sky/60 text-white/80 backdrop-blur-sm transition-all duration-200 hover:bg-night-sky/80"
+                (click)="previousImage()"
+                *ngIf="project.images.length > 1"
+              >
+                <lucide-angular [img]="ChevronLeftIcon" class="h-4 w-4"></lucide-angular>
+              </button>
+
+              <button
+                class="absolute right-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-night-sky/60 text-white/80 backdrop-blur-sm transition-all duration-200 hover:bg-night-sky/80"
+                (click)="nextImage()"
+                *ngIf="project.images.length > 1"
+              >
+                <lucide-angular [img]="ChevronRightIcon" class="h-4 w-4"></lucide-angular>
+              </button>
+
+              <div
+                class="absolute bottom-2 left-1/2 z-10 flex -translate-x-1/2 gap-1.5 rounded-full bg-night-sky/50 px-2 py-1 backdrop-blur-sm"
+                *ngIf="project.images.length > 1"
+              >
+                <button
+                  class="h-1.5 w-1.5 rounded-full transition-all duration-200"
+                  [class]="i === currentImageIndex ? 'w-3.5 bg-night-gold' : 'bg-white/30 hover:bg-white/50'"
+                  *ngFor="let image of project.images; let i = index"
+                  (click)="goToImage(i)"
+                ></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-5">
+            <div>
               <p
                 [innerHTML]="project.content"
-                class="text-sm leading-relaxed text-muted-foreground"
+                class="text-sm leading-relaxed text-night-text-soft"
               ></p>
             </div>
 
             <div *ngIf="project.features && project.features.length > 0">
-              <h3 class="mb-3 text-lg font-semibold text-foreground">Key Features</h3>
-              <ul class="space-y-2">
-                <li
-                  class="flex items-start gap-3 text-sm text-muted-foreground"
+              <h3 class="mb-2.5 text-xs font-semibold uppercase tracking-wider text-night-text-muted">Features</h3>
+              <div class="space-y-1.5">
+                <div
+                  class="flex items-start gap-2.5"
                   *ngFor="let feature of project.features"
                 >
-                  <span class="mt-0.5 font-bold text-primary">✓</span>
-                  <span>{{ feature }}</span>
-                </li>
-              </ul>
+                  <span class="mt-0.5 text-night-gold">✓</span>
+                  <span class="text-sm text-night-text-soft">{{ feature }}</span>
+                </div>
+              </div>
             </div>
 
             <div>
-              <h3 class="mb-3 text-lg font-semibold text-foreground">Technologies Used</h3>
-              <div class="flex flex-wrap gap-2">
+              <h3 class="mb-2.5 text-xs font-semibold uppercase tracking-wider text-night-text-muted">Stack</h3>
+              <div class="flex flex-wrap gap-1.5">
                 <span
-                  class="rounded-full bg-secondary px-2 py-1 text-xs font-medium text-secondary-foreground"
+                  class="rounded-full bg-white/5 px-2.5 py-1 text-xs font-medium text-night-text-muted"
                   *ngFor="let tech of project.tech"
-                  >{{ tech }}</span
-                >
+                >{{ tech }}</span>
               </div>
             </div>
           </div>
         </div>
 
         <div
-          class="sticky bottom-0 border-t border-border bg-card p-6 pt-4"
-          *ngIf="project.liveUrl || project.githubUrl || project.codeSourceUrl"
+          class="flex-shrink-0 border-t border-white/10 bg-white/5 backdrop-blur-sm px-5 py-4"
+          *ngIf="project.liveUrl"
         >
-          <div class="flex flex-wrap gap-3">
+          <div class="flex flex-wrap gap-2.5">
             <a
-              *ngIf="project.liveUrl"
               [href]="project.liveUrl"
               target="_blank"
-              class="inline-flex flex-1 items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-medium text-primary-foreground transition-all duration-200 hover:bg-primary/90 active:scale-95"
+              class="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-night-gold to-night-gold-deep px-4 py-2.5 text-sm font-medium text-night-sky transition-all duration-200 hover:brightness-110 active:scale-95"
             >
               <lucide-angular [img]="ExternalLinkIcon" class="h-4 w-4"></lucide-angular>
               Live Demo
-            </a>
-            <a
-              *ngIf="project.githubUrl"
-              [href]="project.githubUrl"
-              target="_blank"
-              class="inline-flex flex-1 items-center justify-center gap-2 rounded-md border border-border bg-transparent px-4 py-3 font-medium text-foreground transition-all duration-200 hover:bg-accent hover:text-accent-foreground active:scale-95"
-            >
-              <lucide-angular [img]="GithubIcon" class="h-4 w-4"></lucide-angular>
-              View Code
-            </a>
-            <a
-              *ngIf="project.codeSourceUrl"
-              [routerLink]="project.codeSourceUrl"
-              (click)="closeModal()"
-              class="inline-flex flex-1 items-center justify-center gap-2 rounded-md border border-border bg-transparent px-4 py-3 font-medium text-foreground transition-all duration-200 hover:bg-accent hover:text-accent-foreground active:scale-95"
-            >
-              <lucide-angular [img]="Code2Icon" class="h-4 w-4"></lucide-angular>
-              Browse Source
             </a>
           </div>
         </div>

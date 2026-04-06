@@ -7,23 +7,23 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
   selector: 'app-experiences',
   imports: [LucideAngularModule],
   template: `
-    <div class="bg-background py-8 text-foreground md:py-12">
+    <div class="relative z-10 py-8 text-night-text md:py-12">
       <div class="mx-auto max-w-6xl px-4">
         <div
           class="animate-slide-in-up opacity-0 will-change-transform"
           style="animation-delay: 0.1s; animation-fill-mode: forwards;"
         >
-          <h1 class="mb-4 text-center text-4xl font-bold text-foreground sm:text-5xl lg:text-6xl">
+          <h1 class="mb-4 text-center text-4xl font-bold text-night-text sm:text-5xl lg:text-6xl">
             My Experiences
           </h1>
-          <p class="mb-12 text-center text-lg text-muted-foreground sm:text-xl">
+          <p class="mb-12 text-center text-lg text-night-text-muted sm:text-xl">
             My professional journey and career progression
           </p>
         </div>
 
         <div class="relative">
           <div
-            class="absolute bottom-0 left-4 top-8 w-0.5 -translate-x-1/2 transform animate-fade-in bg-gradient-to-b from-[#667eea] to-[#764ba2] opacity-0 md:left-1/2"
+            class="absolute bottom-0 left-4 top-8 w-0.5 -translate-x-1/2 transform animate-fade-in bg-gradient-to-b from-night-purple to-night-purple-deep opacity-0 md:left-1/2"
             style="animation-delay: 1.2s; animation-fill-mode: forwards;"
           ></div>
 
@@ -31,45 +31,45 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
             @for (experience of experiences; track experience; let i = $index) {
               <div class="relative">
                 <div
-                  class="relative z-10 mb-8 animate-slide-in-up rounded-lg border border-border bg-card p-6 opacity-0 shadow-lg md:p-8"
+                  class="relative z-10 mb-8 animate-slide-in-up rounded-xl border border-white/10 bg-night-card/40 p-6 opacity-0 shadow-lg backdrop-blur-sm md:p-8"
                   [style.animation-delay]="0.5 + i * 0.1 + 's'"
                   style="animation-fill-mode: forwards;"
                 >
                   <div class="mb-4 flex flex-col md:flex-row md:items-center md:justify-between">
                     <div>
-                      <h2 class="mb-2 text-2xl font-bold text-foreground md:text-3xl">
+                      <h2 class="mb-2 text-2xl font-bold text-night-text md:text-3xl">
                         {{ experience.company }}
                       </h2>
-                      <p class="text-muted-foreground">{{ experience.location }}</p>
+                      <p class="text-night-text-muted">{{ experience.location }}</p>
                     </div>
                     <div class="mt-4 md:mt-0">
                       <span
-                        class="rounded-full bg-gradient-to-r from-[#667eea] to-[#764ba2] px-4 py-2 text-sm font-medium text-white"
+                        class="rounded-full bg-gradient-to-r from-night-purple to-night-purple-deep px-4 py-2 text-sm font-medium text-white"
                       >
                         {{ experience.duration }}
                       </span>
                     </div>
                   </div>
                   <div class="mb-6">
-                    <p class="leading-relaxed text-muted-foreground">
+                    <p class="leading-relaxed text-night-text-soft">
                       {{ experience.description }}
                     </p>
                   </div>
                   <div class="space-y-4">
                     @for (role of experience.roles; track role; let j = $index) {
-                      <div class="border-l-4 border-[#667eea] pl-6">
+                      <div class="border-l-4 border-night-purple pl-6">
                         <div
                           class="mb-4 flex flex-col md:flex-row md:items-center md:justify-between"
                         >
                           <div class="flex-1">
-                            <h3 class="text-xl font-semibold text-foreground">{{ role.title }}</h3>
-                            <span class="mt-1 block text-sm text-muted-foreground">{{
+                            <h3 class="text-xl font-semibold text-night-text">{{ role.title }}</h3>
+                            <span class="mt-1 block text-sm text-night-text-muted">{{
                               role.duration
                             }}</span>
                           </div>
                           <button
                             (click)="toggleRole(i, j)"
-                            class="mt-2 flex items-center gap-2 text-[#667eea] transition-colors duration-200 md:mt-0"
+                            class="mt-2 flex items-center gap-2 text-night-purple transition-colors duration-200 md:mt-0"
                           >
                             <span class="text-sm font-medium">
                               {{ isRoleExpanded(i, j) ? 'Show Less' : 'Show Details' }}
@@ -84,7 +84,7 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
                         @if (isRoleExpanded(i, j)) {
                           <div class="space-y-6 pb-4">
                             <div>
-                              <h4 class="mb-3 text-lg font-medium text-foreground">
+                              <h4 class="mb-3 text-lg font-medium text-night-text">
                                 Key Responsibilities
                               </h4>
                               <ul class="space-y-2">
@@ -92,9 +92,9 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
                                   responsibility of role.responsibilities;
                                   track responsibility
                                 ) {
-                                  <li class="flex items-start gap-3 text-muted-foreground">
+                                  <li class="flex items-start gap-3 text-night-text-muted">
                                     <span
-                                      class="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-[#667eea]"
+                                      class="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-night-purple"
                                     ></span>
                                     <span>{{ responsibility }}</span>
                                   </li>
@@ -102,14 +102,14 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
                               </ul>
                             </div>
                             <div>
-                              <h4 class="mb-3 text-lg font-medium text-foreground">
+                              <h4 class="mb-3 text-lg font-medium text-night-text">
                                 Major Achievements
                               </h4>
                               <ul class="space-y-2">
                                 @for (achievement of role.achievements; track achievement) {
-                                  <li class="flex items-start gap-3 text-muted-foreground">
+                                  <li class="flex items-start gap-3 text-night-text-muted">
                                     <span
-                                      class="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-[#764ba2]"
+                                      class="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-night-purple-deep"
                                     ></span>
                                     <span>{{ achievement }}</span>
                                   </li>
@@ -117,7 +117,7 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
                               </ul>
                             </div>
                             <div>
-                              <h4 class="mb-3 text-lg font-medium text-foreground">
+                              <h4 class="mb-3 text-lg font-medium text-night-text">
                                 Technologies Used
                               </h4>
                               <div class="flex flex-wrap items-center gap-2">
@@ -128,7 +128,7 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
                                   track tech
                                 ) {
                                   <span
-                                    class="rounded-full bg-secondary px-3 py-1 text-sm font-medium text-secondary-foreground"
+                                    class="rounded-full bg-white/10 px-3 py-1 text-sm font-medium text-night-text-soft"
                                   >
                                     {{ tech }}
                                   </span>
@@ -136,7 +136,7 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
                                 @if (role.technologies.length > 6) {
                                   <button
                                     (click)="toggleTech(i, j)"
-                                    class="rounded-full border border-[#667eea] px-3 py-1 text-sm font-medium text-[#667eea] transition-colors hover:bg-[#667eea]/10"
+                                    class="rounded-full border border-night-purple px-3 py-1 text-sm font-medium text-night-purple transition-colors hover:bg-night-purple/10"
                                   >
                                     {{
                                       isTechExpanded(i, j)

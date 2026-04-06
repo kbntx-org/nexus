@@ -1,12 +1,10 @@
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { LucideAngularModule, Home, Briefcase, Rocket, Laptop, X, Menu } from 'lucide-angular';
-
-import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
+import { LucideAngularModule, Home, Briefcase, Rocket, Laptop, Github, Linkedin } from 'lucide-angular';
 
 @Component({
   selector: 'app-navigation',
-  imports: [RouterModule, ThemeToggleComponent, LucideAngularModule],
+  imports: [RouterModule, LucideAngularModule],
   templateUrl: './navigation.component.html'
 })
 export class NavigationComponent {
@@ -16,21 +14,11 @@ export class NavigationComponent {
     { path: '/projects', label: 'Projects', icon: 'RocketIcon' }
   ];
 
-  public isMenuOpen = false;
-
   // Lucide icons
   public readonly HomeIcon = Home;
   public readonly BriefcaseIcon = Briefcase;
   public readonly RocketIcon = Rocket;
   public readonly LaptopIcon = Laptop;
-  public readonly XIcon = X;
-  public readonly MenuIcon = Menu;
-
-  public toggleMenu(): void {
-    this.isMenuOpen = !this.isMenuOpen;
-  }
-
-  public closeMenu(): void {
-    this.isMenuOpen = false;
-  }
+  public readonly GithubIcon = Github;
+  public readonly LinkedinIcon = Linkedin;
 }

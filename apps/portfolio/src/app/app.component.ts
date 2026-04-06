@@ -9,10 +9,38 @@ import { NavigationComponent } from './shared/components/navigation/navigation.c
   imports: [RouterModule, NavigationComponent],
   selector: 'app-root',
   template: `
+    <div class="night-background"></div>
     <app-navigation></app-navigation>
     <main #mainContent class="flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
       <router-outlet></router-outlet>
     </main>
+  `,
+  styles: `
+    .night-background {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background-image: url('/assets/images/lofi-kenny.webp');
+      background-size: cover;
+      background-position: center;
+      pointer-events: none;
+
+      &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          180deg,
+          rgba(10, 14, 39, 0.45) 0%,
+          rgba(10, 14, 39, 0.3) 40%,
+          rgba(10, 14, 39, 0.5) 100%
+        );
+      }
+
+      @media (max-width: 768px) {
+        background-image: url('/assets/images/lofi-kenny-vertical.webp');
+      }
+    }
   `
 })
 export class AppComponent implements OnDestroy, AfterViewInit {

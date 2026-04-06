@@ -21,7 +21,7 @@ interface Particle {
         >
           Skills & Technologies
           <div
-            class="absolute -bottom-3 left-1/2 h-1 w-16 -translate-x-1/2 transform rounded-full bg-gradient-to-r from-[#667eea] to-[#764ba2]"
+            class="absolute -bottom-3 left-1/2 h-1 w-16 -translate-x-1/2 transform rounded-full bg-gradient-to-r from-night-purple to-night-purple-deep"
           ></div>
         </h2>
 

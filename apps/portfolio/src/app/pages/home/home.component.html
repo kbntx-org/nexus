@@ -1,112 +1,86 @@
-<div class="font-roboto bg-background text-foreground">
-  <section
-    class="relative overflow-hidden bg-gradient-to-br from-background via-muted/20 to-background py-10 md:py-8"
-  >
-    <div
-      class="from-primary/8 via-primary/3 absolute inset-0 animate-pulse-slow bg-gradient-radial to-transparent opacity-50"
-      style="
-        background: radial-gradient(
-          ellipse at center,
-          hsl(var(--primary) / 0.08) 0%,
-          hsl(var(--primary) / 0.03) 40%,
-          transparent 70%
-        );
-      "
-    ></div>
-
-    <div class="relative z-10 mx-auto max-w-6xl px-4">
-      <div class="grid items-center gap-8 lg:grid-cols-2 lg:gap-16">
-        <div class="animate-slide-in-up">
-          <h1 class="mb-6 text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">
+<div class="font-roboto">
+  <section class="relative z-10 min-h-dvh sm:min-h-[calc(100dvh-4rem)] overflow-hidden">
+    <div class="relative mx-auto flex min-h-dvh sm:min-h-[calc(100dvh-4rem)] max-w-6xl items-center px-4 py-16">
+      <div class="animate-slide-in-up max-w-2xl">
+        <div class="mb-6 flex items-center gap-4">
+          <div
+            class="h-16 w-16 shrink-0 overflow-hidden rounded-full border-4 border-transparent bg-gradient-to-br from-night-purple to-night-purple-deep bg-clip-border shadow-lg shadow-purple-500/20"
+          >
+            <img src="assets/images/kenny.png" alt="Kenny" class="h-full w-full object-cover" />
+          </div>
+          <h1 class="text-4xl font-bold leading-tight text-night-text sm:text-5xl lg:text-6xl">
             Hi, I'm
             <span
-              class="relative bg-gradient-to-r from-[#667eea] to-[#764ba2] bg-clip-text text-transparent"
+              class="relative bg-gradient-to-r from-night-purple to-night-purple-deep bg-clip-text text-transparent"
             >
               {{ heroData.name }}
               <div
-                class="absolute -bottom-2 left-0 h-1 w-full scale-x-0 transform animate-expand-width bg-gradient-to-r from-[#667eea] to-[#764ba2]"
+                class="absolute -bottom-2 left-0 h-1 w-full scale-x-0 transform animate-expand-width bg-gradient-to-r from-night-purple to-night-purple-deep"
               ></div>
             </span>
           </h1>
-          <p
-            class="mb-8 text-lg leading-relaxed text-muted-foreground sm:text-xl"
-            style="animation-delay: 0.2s"
-          >
-            {{ heroData.subtitle }}
-          </p>
-          <div class="flex flex-wrap gap-4" style="animation-delay: 0.4s">
-            <button
-              class="group relative inline-flex items-center gap-2 overflow-hidden rounded-lg bg-gradient-to-r from-primary to-primary/80 px-6 py-3 font-medium text-primary-foreground shadow-lg transition-all duration-300 hover:shadow-xl"
-              (click)="navigateToExperiences()"
-            >
-              <span class="relative z-10">View Experiences</span>
-              <div
-                class="absolute inset-0 -translate-x-full transform bg-gradient-to-r from-primary/80 to-primary transition-transform duration-500 group-hover:translate-x-0"
-              ></div>
-            </button>
-            <a
-              href="assets/pdfs/cv-kenny-talbi.pdf"
-              download="cv-kenny-talbi.pdf"
-              class="group relative inline-flex items-center gap-2 overflow-hidden rounded-lg bg-gradient-to-r from-secondary to-secondary/80 px-6 py-3 font-medium text-secondary-foreground shadow-lg transition-all duration-300 hover:shadow-xl"
-            >
-              <span class="relative z-10">Download CV</span>
-              <div
-                class="absolute inset-0 -translate-x-full transform bg-gradient-to-r from-secondary/80 to-secondary transition-transform duration-500 group-hover:translate-x-0"
-              ></div>
-            </a>
-          </div>
         </div>
-
-        <div
-          class="animate-slide-in-up"
-          style="animation-delay: 0.3s; opacity: 0; animation-fill-mode: forwards"
-        >
-          <div class="rounded-xl border border-border bg-card p-8 text-center shadow-2xl">
-            <div class="mb-6">
-              <div
-                class="mx-auto mb-4 h-32 w-32 overflow-hidden rounded-full border-4 border-transparent bg-gradient-to-br from-[#667eea] to-[#764ba2] bg-clip-border shadow-lg"
-              >
-                <img src="assets/images/kenny.png" alt="Kenny" class="h-full w-full object-cover" />
-              </div>
-              <h3 class="mb-2 text-2xl font-semibold text-foreground">{{ heroData.name }}</h3>
-              <p class="text-muted-foreground">{{ heroData.title }}</p>
-            </div>
-
-            <div class="flex justify-center gap-4">
-              <a
-                href="https://www.linkedin.com/in/kennytalbi"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="flex h-12 w-12 items-center justify-center rounded-full bg-[#0077b5] text-white shadow-lg"
-              >
-                <lucide-angular [img]="LinkedinIcon" class="h-5 w-5"></lucide-angular>
-              </a>
-              <a
-                href="https://github.com/kbntx"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="flex h-12 w-12 items-center justify-center rounded-full bg-[#333] text-white shadow-lg"
-              >
-                <lucide-angular [img]="GithubIcon" class="h-5 w-5"></lucide-angular>
-              </a>
-            </div>
-          </div>
+        <p class="mb-4 text-sm text-night-text-muted">{{ heroData.title }}</p>
+        <p class="mb-8 text-lg leading-relaxed text-night-text-soft sm:text-xl">
+          {{ heroData.subtitle }}
+        </p>
+        <div class="flex flex-wrap items-center gap-4">
+          <button
+            class="group relative inline-flex items-center gap-2 overflow-hidden rounded-lg bg-gradient-to-r from-night-gold to-night-gold-deep px-6 py-3 font-medium text-night-sky shadow-lg shadow-amber-500/20 transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/30"
+            (click)="navigateToExperiences()"
+          >
+            <span class="relative z-10">View Experiences</span>
+            <div
+              class="absolute inset-0 -translate-x-full transform bg-gradient-to-r from-night-gold-deep to-night-gold transition-transform duration-500 group-hover:translate-x-0"
+            ></div>
+          </button>
+          <a
+            href="assets/pdfs/cv-kenny-talbi.pdf"
+            download="cv-kenny-talbi.pdf"
+            class="group relative inline-flex items-center gap-2 overflow-hidden rounded-lg border border-white/15 bg-white/5 px-6 py-3 font-medium text-night-text shadow-lg backdrop-blur-sm transition-all duration-300 hover:bg-white/10 hover:shadow-xl"
+          >
+            <span class="relative z-10">Download CV</span>
+            <div
+              class="absolute inset-0 -translate-x-full transform bg-white/5 transition-transform duration-500 group-hover:translate-x-0"
+            ></div>
+          </a>
+          <a
+            href="https://www.linkedin.com/in/kennytalbi"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-[#0077b5]/80 text-white shadow-lg backdrop-blur-sm transition-all duration-300 hover:bg-[#0077b5] hover:shadow-xl sm:flex"
+          >
+            <lucide-angular [img]="LinkedinIcon" [size]="16"></lucide-angular>
+          </a>
+          <a
+            href="https://github.com/kbntx"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white shadow-lg backdrop-blur-sm transition-all duration-300 hover:bg-white/20 hover:shadow-xl sm:flex"
+          >
+            <lucide-angular [img]="GithubIcon" [size]="16"></lucide-angular>
+          </a>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="bg-muted/20 py-12 md:py-8">
+  <section class="relative z-10 py-12 md:py-8">
+    <div
+      class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-night-purple/30 to-transparent"
+    ></div>
     <div class="mx-auto max-w-6xl px-4">
       <div class="animate-slide-in-up">
-        <h2 class="relative mb-12 text-center text-3xl font-bold text-foreground sm:text-4xl">
+        <h2 class="relative mb-12 text-center text-3xl font-bold text-night-text sm:text-4xl">
           About Me
           <div
-            class="absolute -bottom-3 left-1/2 h-1 w-16 -translate-x-1/2 transform rounded-full bg-gradient-to-r from-[#667eea] to-[#764ba2]"
+            class="absolute -bottom-3 left-1/2 h-1 w-16 -translate-x-1/2 transform rounded-full bg-gradient-to-r from-night-purple to-night-purple-deep"
           ></div>
         </h2>
         <div class="mx-auto max-w-4xl">
-          <div class="space-y-6 text-lg leading-relaxed text-muted-foreground">
+          <div
+            class="rounded-xl border border-white/10 bg-night-card/40 p-8 text-lg leading-relaxed text-night-text-soft shadow-xl backdrop-blur-sm"
+          >
             <div [innerHTML]="heroData.description"></div>
           </div>
         </div>
@@ -114,5 +88,7 @@
     </div>
   </section>
 
-  <app-skills></app-skills>
+  <div class="relative z-10">
+    <app-skills></app-skills>
+  </div>
 </div>
