@@ -53,6 +53,7 @@ jobs:
           changedFiles=$(git diff --name-only "${{ steps.refs.outputs.base }}" "${{ github.sha }}")
           echo "Changed files:"
           echo "$changedFiles"
+          echo "hello world"
 
           deployTargets='${{ steps.affected.outputs.affected }}'
           allProjects=$(pnpm -s nx show projects --json)

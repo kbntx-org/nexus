@@ -3,14 +3,14 @@
   (click)="closeModal()"
 >
   <section
-    class="glass-card relative box-border flex max-h-[90svh] w-full flex-col overflow-hidden ring-1 ring-white/5 transition-transform duration-300 ease-out
-           mobile:rounded-b-none
-           desktop:mx-4 desktop:max-h-[85vh] desktop:max-w-3xl"
+    class="glass-card relative box-border flex max-h-[90svh] w-full flex-col overflow-hidden ring-1 ring-white/5 transition-transform duration-300 ease-out mobile:rounded-b-none desktop:mx-4 desktop:max-h-[85vh] desktop:max-w-3xl"
     [class.translate-y-0]="isOpening"
     [class.translate-y-full]="!isOpening && isMobileViewport"
     (click)="$event.stopPropagation()"
   >
-    <header class="flex flex-shrink-0 items-center justify-between px-5 py-4 desktop:px-8 desktop:py-5">
+    <header
+      class="flex flex-shrink-0 items-center justify-between px-5 py-4 desktop:px-8 desktop:py-5"
+    >
       <h2 class="text-xl font-bold text-night-text desktop:text-2xl">{{ project.title }}</h2>
       <div class="flex items-center gap-1">
         @if (project.githubUrl) {
@@ -101,7 +101,9 @@
 
         @if (project.features && project.features.length > 0) {
           <div>
-            <h3 class="mb-2.5 text-xs font-semibold uppercase tracking-wider text-night-text-muted desktop:mb-3 desktop:text-sm">
+            <h3
+              class="mb-2.5 text-xs font-semibold uppercase tracking-wider text-night-text-muted desktop:mb-3 desktop:text-sm"
+            >
               Features
             </h3>
             <div class="grid grid-cols-1 gap-2 desktop:grid-cols-2">
@@ -116,12 +118,16 @@
         }
 
         <div>
-          <h3 class="mb-2.5 text-xs font-semibold uppercase tracking-wider text-night-text-muted desktop:mb-3 desktop:text-sm">
+          <h3
+            class="mb-2.5 text-xs font-semibold uppercase tracking-wider text-night-text-muted desktop:mb-3 desktop:text-sm"
+          >
             Stack
           </h3>
           <div class="flex flex-wrap gap-1.5">
             @for (tech of project.tech; track tech) {
-              <span class="rounded-full bg-white/5 px-3 py-1 text-xs font-medium text-night-text-muted">
+              <span
+                class="rounded-full bg-white/5 px-3 py-1 text-xs font-medium text-night-text-muted"
+              >
                 {{ tech }}
               </span>
             }

@@ -38,9 +38,7 @@ export class ProjectsService {
 
   private async loadProjectFiles(): Promise<void> {
     const rawFiles = await Promise.all(
-      PROJECT_FILES.map(file =>
-        firstValueFrom(this.httpClient.get(file, { responseType: 'text' }))
-      )
+      PROJECT_FILES.map(file => firstValueFrom(this.httpClient.get(file, { responseType: 'text' })))
     );
 
     const projects = rawFiles

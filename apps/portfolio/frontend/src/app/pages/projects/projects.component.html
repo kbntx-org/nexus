@@ -44,7 +44,9 @@
 
             <div class="mb-6 flex flex-wrap gap-2">
               @for (tech of project.tech.slice(0, 6); track tech) {
-                <span class="rounded-full bg-white/10 px-3 py-1 text-sm font-medium text-night-text-soft">
+                <span
+                  class="rounded-full bg-white/10 px-3 py-1 text-sm font-medium text-night-text-soft"
+                >
                   {{ tech }}
                 </span>
               }
@@ -74,5 +76,8 @@
 </div>
 
 @if (selectedProject) {
-  <app-project-modal [project]="selectedProject" (modalClose)="closeProjectModal()"></app-project-modal>
+  <app-project-modal
+    [project]="selectedProject"
+    (modalClose)="closeProjectModal()"
+  ></app-project-modal>
 }

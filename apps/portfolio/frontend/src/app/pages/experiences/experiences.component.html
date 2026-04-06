@@ -37,14 +37,18 @@
                 <div class="mb-4 flex flex-col md:flex-row md:items-center md:justify-between">
                   <div class="flex-1">
                     <h3 class="text-xl font-semibold">{{ role.title }}</h3>
-                    <span class="mt-1 block text-sm text-night-text-muted">{{ role.duration }}</span>
+                    <span class="mt-1 block text-sm text-night-text-muted">{{
+                      role.duration
+                    }}</span>
                   </div>
                   <button
                     (click)="toggleRole(experienceIndex, roleIndex)"
                     class="mt-2 flex items-center gap-2 text-night-purple transition-colors duration-200 md:mt-0"
                   >
                     <span class="text-sm font-medium">
-                      {{ isRoleExpanded(experienceIndex, roleIndex) ? 'Show Less' : 'Show Details' }}
+                      {{
+                        isRoleExpanded(experienceIndex, roleIndex) ? 'Show Less' : 'Show Details'
+                      }}
                     </span>
                     <lucide-angular
                       [img]="ChevronDownIcon"
@@ -61,7 +65,9 @@
                       <ul class="space-y-2">
                         @for (responsibility of role.responsibilities; track responsibility) {
                           <li class="flex items-start gap-3 text-night-text-muted">
-                            <span class="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-night-purple"></span>
+                            <span
+                              class="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-night-purple"
+                            ></span>
                             <span>{{ responsibility }}</span>
                           </li>
                         }
@@ -73,7 +79,9 @@
                       <ul class="space-y-2">
                         @for (achievement of role.achievements; track achievement) {
                           <li class="flex items-start gap-3 text-night-text-muted">
-                            <span class="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-night-purple-deep"></span>
+                            <span
+                              class="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-night-purple-deep"
+                            ></span>
                             <span>{{ achievement }}</span>
                           </li>
                         }
@@ -89,7 +97,9 @@
                             : role.technologies.slice(0, visibleTechCount);
                           track tech
                         ) {
-                          <span class="rounded-full bg-white/10 px-3 py-1 text-sm font-medium text-night-text-soft">
+                          <span
+                            class="rounded-full bg-white/10 px-3 py-1 text-sm font-medium text-night-text-soft"
+                          >
                             {{ tech }}
                           </span>
                         }
