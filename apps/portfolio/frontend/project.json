@@ -5,6 +5,12 @@
   "prefix": "app",
   "sourceRoot": "apps/portfolio/frontend/src",
   "tags": [],
+  "metadata": {
+    "deployPaths": [
+      "apps/portfolio/chart/**",
+      ".github/workflows/deploy-portfolio.yml"
+    ]
+  },
   "targets": {
     "build": {
       "executor": "@nx/angular:application",

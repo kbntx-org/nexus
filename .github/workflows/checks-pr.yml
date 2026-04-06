@@ -8,6 +8,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  affected:
+    name: Affected
+    uses: ./.github/workflows/compute-affected.yml
+    secrets: inherit
+
   lint-and-format:
     name: Lint & Format
     uses: ./.github/workflows/lint-and-format-pr.yml

@@ -129,7 +129,7 @@ helm_resource(
   'docs/helm',
   deps=['docs/helm'],
   image_deps=['documentation'],
-  image_keys=['image'],
+  image_keys=[('image.repository', 'image.tag')],
   namespace='default',
   flags=[
     '--values', 'docs/helm/values.local.yaml',
@@ -166,7 +166,7 @@ helm_resource(
   'apps/portfolio/chart',
   deps=['apps/portfolio/chart'],
   image_deps=['portfolio'],
-  image_keys=['image'],
+  image_keys=[('image.repository', 'image.tag')],
   namespace='default',
   flags=[
     '--values', 'apps/portfolio/chart/values.local.yaml',

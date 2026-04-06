@@ -1,0 +1,88 @@
+name: Compute affected
+
+on:
+  workflow_call:
+    outputs:
+      affected:
+        description: 'JSON array of nx-affected project names (drives test/lint gating)'
+        value: ${{ jobs.compute.outputs.affected }}
+      deploy_targets:
+        description: 'JSON array of projects whose code OR deployPaths changed (drives deploy gating)'
+        value: ${{ jobs.compute.outputs.deploy_targets }}
+
+jobs:
+  compute:
+    runs-on: nexus-runners
+    container:
+      image: kbntx/nexus-ci-toolkit:1.0
+    timeout-minutes: 5
+    outputs:
+      affected: ${{ steps.affected.outputs.affected }}
+      deploy_targets: ${{ steps.deploy_targets.outputs.deploy_targets }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Resolve base ref
+        id: base
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git fetch origin "${{ github.base_ref }}" --depth=1
+            echo "base=remotes/origin/${{ github.base_ref }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "base=${{ github.event.before }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Compute affected projects
+        id: affected
+        run: |
+          affectedProjects=$(pnpm -s nx show projects --affected --base "${{ steps.base.outputs.base }}" --json)
+          echo "Affected: $affectedProjects"
+          echo "affected=$affectedProjects" >> "$GITHUB_OUTPUT"
+
+      - name: Compute deploy targets
+        id: deploy_targets
+        run: |
+          changedFiles=$(git diff --name-only "${{ steps.base.outputs.base }}" HEAD)
+          echo "Changed files:"
+          echo "$changedFiles"
+
+          deployTargets='${{ steps.affected.outputs.affected }}'
+          allProjects=$(pnpm -s nx show projects --json)
+
+          for project in $(echo "$allProjects" | jq -r '.[]'); do
+            deployPaths=$(pnpm -s nx show project "$project" --json | jq -r '.metadata.deployPaths // [] | .[]')
+            [ -z "$deployPaths" ] && continue
+            while IFS= read -r pattern; do
+              regex=$(echo "$pattern" | sed -e 's|/\*\*|/.*|g' -e 's|\.|\\.|g')
+              if echo "$changedFiles" | grep -qE "^${regex}$"; then
+                deployTargets=$(echo "$deployTargets" | jq --arg p "$project" '. + [$p] | unique')
+                break
+              fi
+            done <<< "$deployPaths"
+          done
+
+          echo "Deploy targets: $deployTargets"
+          echo "deploy_targets=$deployTargets" >> "$GITHUB_OUTPUT"
+
+      - name: Build manifest
+        run: |
+          jq -n \
+            --arg sha "${{ github.sha }}" \
+            --arg ref "${{ github.ref }}" \
+            --argjson affected '${{ steps.affected.outputs.affected }}' \
+            --argjson deployTargets '${{ steps.deploy_targets.outputs.deploy_targets }}' \
+            '{sha: $sha, ref: $ref, affected: $affected, deploy_targets: $deployTargets}' \
+            > affected-${{ github.sha }}.json
+          cat affected-${{ github.sha }}.json
+
+      - name: Upload manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: affected-${{ github.sha }}
+          path: affected-${{ github.sha }}.json

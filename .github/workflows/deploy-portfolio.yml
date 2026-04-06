@@ -1,8 +1,12 @@
 name: Deploy portfolio
 
 on:
-  workflow_dispatch:
   workflow_call:
+    inputs:
+      image_tag:
+        description: 'Image tag to build and deploy'
+        required: true
+        type: string
 
 concurrency:
   group: deploy-portfolio
@@ -34,7 +38,7 @@ jobs:
         with:
           context: .
           file: apps/portfolio/frontend/Dockerfile
-          tag: kbntx/portfolio:latest
+          tag: kbntx/portfolio:${{ inputs.image_tag }}
 
       - name: Deploy
         env:
@@ -42,6 +46,6 @@ jobs:
           ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_TOKEN }}
           ARGOCD_OPTS: '--grpc-web'
         run: |
+          argocd app set portfolio -p image.tag=${{ inputs.image_tag }}
           argocd app sync portfolio --prune
           argocd app wait portfolio --sync --health --operation --timeout 500
-          argocd app actions run portfolio restart --kind Deployment --resource-name portfolio --namespace portfolio

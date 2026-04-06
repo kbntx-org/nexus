@@ -1,4 +1,6 @@
-image: kbntx/documentation:latest
+image:
+  repository: kbntx/documentation
+  tag: latest
 containerPort: 80
 replicas: 2
 ingressHosts:

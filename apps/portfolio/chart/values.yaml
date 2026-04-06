@@ -1,4 +1,6 @@
-image: kbntx/portfolio:latest
+image:
+  repository: kbntx/portfolio
+  tag: latest
 containerPort: 4200
 replicas: 2
 healthProbes: true

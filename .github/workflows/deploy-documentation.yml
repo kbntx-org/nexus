@@ -1,8 +1,12 @@
 name: Deploy documentation
 
 on:
-  workflow_dispatch:
   workflow_call:
+    inputs:
+      image_tag:
+        description: 'Image tag to build and deploy'
+        required: true
+        type: string
 
 concurrency:
   group: deploy-documentation
@@ -28,7 +32,7 @@ jobs:
         with:
           context: docs
           file: docs/Dockerfile
-          tag: kbntx/documentation:latest
+          tag: kbntx/documentation:${{ inputs.image_tag }}
 
       - name: Deploy
         env:
@@ -36,6 +40,6 @@ jobs:
           ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_TOKEN }}
           ARGOCD_OPTS: '--grpc-web'
         run: |
+          argocd app set documentation -p image.tag=${{ inputs.image_tag }}
           argocd app sync documentation --prune
           argocd app wait documentation --sync --health --operation --timeout 500
-          argocd app actions run documentation restart --kind Deployment --resource-name documentation --namespace documentation

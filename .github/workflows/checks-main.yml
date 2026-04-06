@@ -9,6 +9,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  affected:
+    name: Affected
+    uses: ./.github/workflows/compute-affected.yml
+    secrets: inherit
+
   lint-and-format:
     name: Lint & Format
     uses: ./.github/workflows/lint-and-format-main.yaml
@@ -21,12 +26,18 @@ jobs:
 
   deploy-portfolio:
     name: Deploy Portfolio
-    needs: [lint-and-format, test]
+    needs: [affected, lint-and-format, test]
+    if: contains(fromJSON(needs.affected.outputs.deploy_targets), 'portfolio')
     uses: ./.github/workflows/deploy-portfolio.yml
     secrets: inherit
+    with:
+      image_tag: ${{ github.sha }}
 
   deploy-documentation:
     name: Deploy Documentation
-    needs: [lint-and-format, test]
+    needs: [affected, lint-and-format, test]
+    if: contains(fromJSON(needs.affected.outputs.deploy_targets), 'documentation')
     uses: ./.github/workflows/deploy-documentation.yml
     secrets: inherit
+    with:
+      image_tag: ${{ github.sha }}
