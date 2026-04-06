@@ -22,11 +22,6 @@ import { EXPERIENCES, Experience } from './data/experiences.data';
         </div>
 
         <div class="relative">
-          <div
-            class="absolute bottom-0 left-4 top-8 w-0.5 -translate-x-1/2 transform animate-fade-in bg-gradient-to-b from-night-purple to-night-purple-deep opacity-0 md:left-1/2"
-            style="animation-delay: 1.2s; animation-fill-mode: forwards;"
-          ></div>
-
           <div class="space-y-12">
             @for (experience of experiences; track experience; let i = $index) {
               <div class="relative">

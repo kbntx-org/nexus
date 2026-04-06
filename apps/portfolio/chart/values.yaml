@@ -4,4 +4,5 @@ replicas: 2
 healthProbes: true
 ingressHosts:
   - portfolio.kbntx.com
+  - kbntx.com
 deploymentStrategy: RollingUpdate
