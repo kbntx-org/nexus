@@ -31,5 +31,5 @@ services:
     command: tunnel --no-autoupdate run
 
 volumes:
-  vault-data:
+  vault-logs:
   postgres_data:
