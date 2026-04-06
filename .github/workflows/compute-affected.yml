@@ -28,36 +28,29 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Resolve base ref
-        id: base
+      - name: Resolve refs
+        id: refs
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             git fetch origin "${{ github.base_ref }}" --depth=1
             echo "base=remotes/origin/${{ github.base_ref }}" >> "$GITHUB_OUTPUT"
+            echo "build_sha=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"
           else
             echo "base=${{ github.event.before }}" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Resolve build sha
-        id: build_sha
-        run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            echo "sha=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"
-          else
-            echo "sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+            echo "build_sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Compute affected projects
         id: affected
         run: |
-          affectedProjects=$(pnpm -s nx show projects --affected --base "${{ steps.base.outputs.base }}" --json)
+          affectedProjects=$(pnpm -s nx show projects --affected --base "${{ steps.refs.outputs.base }}" --json)
           echo "Affected: $affectedProjects"
           echo "affected=$affectedProjects" >> "$GITHUB_OUTPUT"
 
       - name: Compute deploy targets
         id: deploy_targets
         run: |
-          changedFiles=$(git diff --name-only "${{ steps.base.outputs.base }}" "${{ github.sha }}")
+          changedFiles=$(git diff --name-only "${{ steps.refs.outputs.base }}" "${{ github.sha }}")
           echo "Changed files:"
           echo "$changedFiles"
 
@@ -70,10 +63,10 @@ jobs:
             for project in $(echo "$allProjects" | jq -r '.[]'); do
               projectType=$(pnpm -s nx show project "$project" --json | jq -r '.projectType // ""')
               if [ "$projectType" = "application" ]; then
-                allApplications=$(echo "$allApplications" | jq --arg p "$project" '. + [$p]')
+                allApplications=$(echo "$allApplications" | jq -c --arg p "$project" '. + [$p]')
               fi
             done
-            deployTargets=$(echo "$deployTargets $allApplications" | jq -s 'add | unique')
+            deployTargets=$(echo "$deployTargets $allApplications" | jq -cs 'add | unique')
           fi
 
           for project in $(echo "$allProjects" | jq -r '.[]'); do
@@ -88,7 +81,7 @@ jobs:
                   fi
                 done)
             if [ "$matched" = "yes" ]; then
-              deployTargets=$(echo "$deployTargets" | jq --arg p "$project" '. + [$p] | unique')
+              deployTargets=$(echo "$deployTargets" | jq -c --arg p "$project" '. + [$p] | unique')
             fi
           done
 
@@ -98,17 +91,17 @@ jobs:
       - name: Build manifest
         run: |
           jq -n \
-            --arg sha "${{ steps.build_sha.outputs.sha }}" \
+            --arg sha "${{ steps.refs.outputs.build_sha }}" \
             --arg mergeSha "${{ github.sha }}" \
             --arg ref "${{ github.ref }}" \
             --argjson affected '${{ steps.affected.outputs.affected }}' \
             --argjson deployTargets '${{ steps.deploy_targets.outputs.deploy_targets }}' \
             '{sha: $sha, merge_sha: $mergeSha, ref: $ref, affected: $affected, deploy_targets: $deployTargets}' \
-            > affected-${{ steps.build_sha.outputs.sha }}.json
-          cat affected-${{ steps.build_sha.outputs.sha }}.json
+            > affected-${{ steps.refs.outputs.build_sha }}.json
+          cat affected-${{ steps.refs.outputs.build_sha }}.json
 
       - name: Upload manifest
         uses: actions/upload-artifact@v4
         with:
-          name: affected-${{ steps.build_sha.outputs.sha }}
-          path: affected-${{ steps.build_sha.outputs.sha }}.json
+          name: affected-${{ steps.refs.outputs.build_sha }}
+          path: affected-${{ steps.refs.outputs.build_sha }}.json

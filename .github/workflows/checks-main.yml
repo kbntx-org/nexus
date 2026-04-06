@@ -41,3 +41,17 @@ jobs:
     secrets: inherit
     with:
       image_tag: ${{ github.sha }}
+
+  deploy-vault:
+    name: Deploy Vault
+    needs: [affected, lint-and-format, test]
+    if: contains(fromJSON(needs.affected.outputs.deploy_targets), 'vault')
+    uses: ./.github/workflows/deploy-vault.yml
+    secrets: inherit
+
+  deploy-bastion:
+    name: Deploy Bastion
+    needs: [affected, lint-and-format, test]
+    if: contains(fromJSON(needs.affected.outputs.deploy_targets), 'bastion')
+    uses: ./.github/workflows/deploy-bastion.yml
+    secrets: inherit

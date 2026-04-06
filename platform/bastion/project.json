@@ -1,0 +1,15 @@
+{
+  "name": "bastion",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "platform/bastion",
+  "tags": [],
+  "metadata": {
+    "deployPaths": [".github/workflows/deploy-bastion.yml"]
+  },
+  "targets": {
+    "build": {
+      "executor": "nx:noop"
+    }
+  }
+}
