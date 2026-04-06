@@ -36,34 +36,9 @@ import { FileTreeService } from './services/file-tree.service';
   ],
   styles: `
     :host {
-      --scrollbar-thumb: hsl(var(--muted-foreground) / 0.3);
-      --scrollbar-thumb-hover: hsl(var(--muted-foreground) / 0.5);
       display: flex;
       width: 100%;
       height: 100%;
-    }
-
-    :host ::ng-deep *::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-
-    :host ::ng-deep *::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    :host ::ng-deep *::-webkit-scrollbar-thumb {
-      background-color: var(--scrollbar-thumb);
-      border-radius: 4px;
-    }
-
-    :host ::ng-deep *::-webkit-scrollbar-thumb:hover {
-      background-color: var(--scrollbar-thumb-hover);
-    }
-
-    :host ::ng-deep * {
-      scrollbar-width: thin;
-      scrollbar-color: var(--scrollbar-thumb) transparent;
     }
   `,
   template: `

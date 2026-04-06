@@ -17,28 +17,7 @@ const MOBILE_BREAKPOINT_PX = 1024;
 @Component({
   selector: 'app-project-modal',
   imports: [RouterModule, LucideAngularModule],
-  templateUrl: './project-modal.component.html',
-  styles: [
-    `
-      .custom-scrollbar::-webkit-scrollbar {
-        width: 8px;
-      }
-      .custom-scrollbar::-webkit-scrollbar-track {
-        background: transparent;
-      }
-      .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: hsl(var(--muted-foreground) / 0.3);
-        border-radius: 4px;
-      }
-      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: hsl(var(--muted-foreground) / 0.5);
-      }
-      .custom-scrollbar {
-        scrollbar-width: thin;
-        scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
-      }
-    `
-  ]
+  templateUrl: './project-modal.component.html'
 })
 export class ProjectModalComponent implements OnInit, OnDestroy {
   @Input() public project!: Project;
