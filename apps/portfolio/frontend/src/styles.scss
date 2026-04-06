@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap');
+
+@layer components {
+  .glass-card {
+    @apply rounded-xl border border-white/10 bg-night-card/40 shadow-xl backdrop-blur-xl;
+  }
+  .glass-card-sm {
+    @apply rounded-lg border border-white/10 bg-night-card/40 shadow-lg backdrop-blur-sm;
+  }
+  .glass-scrim {
+    @apply bg-black/60 backdrop-blur-sm;
+  }
+  .gold-gradient {
+    @apply bg-gradient-to-r from-night-gold to-night-gold-deep;
+  }
+}
+
+:root {
+  --background: 230 65% 7%;
+  --foreground: 225 20% 92%;
+  --card: 225 55% 12%;
+  --card-foreground: 225 20% 92%;
+  --popover: 225 55% 12%;
+  --popover-foreground: 225 20% 92%;
+  --primary: 38 86% 56%;
+  --primary-foreground: 230 65% 7%;
+  --secondary: 225 55% 16%;
+  --secondary-foreground: 225 20% 92%;
+  --muted: 225 40% 14%;
+  --muted-foreground: 225 30% 65%;
+  --accent: 225 55% 16%;
+  --accent-foreground: 225 20% 92%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 225 20% 92%;
+  --border: 225 30% 20%;
+  --input: 225 30% 20%;
+  --ring: 225 30% 65%;
+  --radius: 0.5rem;
+}
+
+html,
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  margin: 0;
+  padding: 0;
+  height: 100dvh;
+  overflow: hidden;
+  font-family:
+    'Roboto',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+app-root {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}

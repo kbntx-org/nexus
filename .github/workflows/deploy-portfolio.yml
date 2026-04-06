@@ -33,7 +33,7 @@ jobs:
         uses: ./.github/actions/buildkit-and-push
         with:
           context: .
-          file: apps/portfolio/Dockerfile
+          file: apps/portfolio/frontend/Dockerfile
           tag: kbntx/portfolio:latest
 
       - name: Deploy

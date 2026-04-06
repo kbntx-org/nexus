@@ -1,0 +1,78 @@
+<div class="relative z-10 py-8 md:py-12">
+  <div class="mx-auto max-w-6xl px-4">
+    <header
+      class="animate-slide-in-up opacity-0"
+      style="animation-delay: 0.1s; animation-fill-mode: forwards"
+    >
+      <h1 class="mb-4 text-center text-4xl font-bold text-night-text sm:text-5xl lg:text-6xl">
+        My Projects
+      </h1>
+      <p class="mb-12 text-center text-lg text-night-text-muted sm:text-xl">
+        A showcase of my recent work and technical expertise
+      </p>
+    </header>
+
+    <section
+      class="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8 lg:grid-cols-3"
+      aria-label="Projects"
+    >
+      @for (project of projectsService.projects(); track project.title; let index = $index) {
+        <article
+          class="glass-card-sm flex animate-slide-in-up flex-col overflow-hidden opacity-0 transition hover:border-white/20 hover:shadow-xl"
+          style="animation-delay: 0.5s; animation-fill-mode: forwards"
+        >
+          <div class="flex flex-1 flex-col p-6">
+            <header class="mb-3 flex items-center gap-3">
+              @if (project.logo) {
+                <img
+                  [src]="project.logo"
+                  [alt]="project.title + ' logo'"
+                  class="h-12 w-12 flex-shrink-0 object-contain"
+                />
+              } @else {
+                <div
+                  class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full text-lg font-semibold text-white shadow-lg"
+                  [class]="getLogoGradient(index)"
+                >
+                  {{ project.title.charAt(0) }}
+                </div>
+              }
+              <h3 class="text-xl font-semibold text-night-text">{{ project.title }}</h3>
+            </header>
+
+            <p class="mb-4 leading-relaxed text-night-text-muted">{{ project.description }}</p>
+
+            <div class="mb-6 flex flex-wrap gap-2">
+              @for (tech of project.tech.slice(0, 6); track tech) {
+                <span class="rounded-full bg-white/10 px-3 py-1 text-sm font-medium text-night-text-soft">
+                  {{ tech }}
+                </span>
+              }
+            </div>
+
+            <div class="mt-auto flex justify-start gap-3">
+              <button
+                class="rounded-md border border-white/15 bg-white/5 px-4 py-2 font-medium text-night-text transition hover:bg-white/10"
+                (click)="openProjectModal(project)"
+              >
+                View Project
+              </button>
+              @if (project.githubUrl) {
+                <button
+                  class="rounded-md border border-white/10 bg-transparent px-4 py-2 font-medium text-night-text-muted transition hover:bg-white/10 hover:text-night-text"
+                  (click)="openSourceCode(project.githubUrl)"
+                >
+                  Source Code
+                </button>
+              }
+            </div>
+          </div>
+        </article>
+      }
+    </section>
+  </div>
+</div>
+
+@if (selectedProject) {
+  <app-project-modal [project]="selectedProject" (modalClose)="closeProjectModal()"></app-project-modal>
+}

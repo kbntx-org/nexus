@@ -203,7 +203,7 @@ importers:
         specifier: ^8.29.0
         version: 8.50.1(eslint@9.39.2(jiti@1.21.7))(typescript@5.9.3)
 
-  apps/portfolio:
+  apps/portfolio/frontend:
     dependencies:
       '@angular/animations':
         specifier: 20.3.16
@@ -253,12 +253,6 @@ importers:
       zone.js:
         specifier: 0.16.0
         version: 0.16.0
-
-  platform/cloudflare-ingress-controller:
-    dependencies:
-      '@kubernetes/client-node':
-        specifier: ^1.0.0
-        version: 1.4.0(encoding@0.1.13)
 
 packages:
 
