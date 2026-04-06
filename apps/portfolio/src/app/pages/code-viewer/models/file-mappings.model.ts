@@ -141,8 +141,14 @@ export const EXTENSION_TO_ICON_TYPE: Record<string, string> = {
   dockerfile: 'docker'
 };
 
+export const FILENAME_TO_LANGUAGE: Record<string, string> = {
+  tiltfile: 'python',
+  dockerfile: 'dockerfile'
+};
+
 export const FILENAME_TO_ICON_TYPE: Record<string, string> = {
   dockerfile: 'docker',
+  tiltfile: 'python',
   '.gitignore': 'git',
   'package.json': 'npm',
   'tsconfig.json': 'typescript',
@@ -226,6 +232,10 @@ export function getIconName(path: string): string {
 }
 
 export function getLanguage(path: string): string {
+  const filename = path.split('/').pop()?.toLowerCase() || '';
+  if (FILENAME_TO_LANGUAGE[filename]) {
+    return FILENAME_TO_LANGUAGE[filename];
+  }
   const ext = getFileExtension(path);
   return EXTENSION_TO_LANGUAGE[ext] || 'text';
 }

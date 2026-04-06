@@ -5,11 +5,12 @@ import { Subject, takeUntil } from 'rxjs';
 
 import { ThemeService } from '../../../../shared/services/theme.service';
 import { FileTreeService } from '../../services/file-tree.service';
+import { TabBarComponent } from '../tab-bar/tab-bar.component';
 
 @Component({
   selector: 'app-code-preview',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule],
+  imports: [CommonModule, LucideAngularModule, TabBarComponent],
   providers: [
     {
       provide: LUCIDE_ICONS,
@@ -25,17 +26,9 @@ import { FileTreeService } from '../../services/file-tree.service';
     }
   `,
   template: `
-    @if (service.selectedNode$ | async; as selectedNode) {
-      <header
-        class="flex shrink-0 items-center gap-2 overflow-hidden border-b border-border bg-muted/30 px-4 py-3"
-      >
-        <lucide-angular
-          name="file-code"
-          class="h-4 w-4 shrink-0 text-muted-foreground"
-        ></lucide-angular>
-        <span class="truncate text-sm font-medium text-foreground">{{ selectedNode.path }}</span>
-      </header>
+    <app-tab-bar class="shrink-0"></app-tab-bar>
 
+    @if (service.selectedNode$ | async; as selectedNode) {
       <main class="flex-1 overflow-auto">
         @if (service.isImage$ | async) {
           <div class="flex items-center justify-center p-8 text-center">

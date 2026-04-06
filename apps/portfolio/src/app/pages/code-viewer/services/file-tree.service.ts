@@ -6,6 +6,7 @@ import { BehaviorSubject, combineLatest, map } from 'rxjs';
 import { codeToHtml } from 'shiki';
 
 import { ThemeService } from '../../../shared/services/theme.service';
+import { CodeViewerTab } from '../models/code-viewer-tab.model';
 import { getLanguage, isImageFile } from '../models/file-mappings.model';
 import { FileTreeNode } from '../models/file-tree.model';
 
@@ -24,6 +25,8 @@ export class FileTreeService {
   private isLoadingSubject = new BehaviorSubject<boolean>(false);
   private codeHtmlSubject = new BehaviorSubject<SafeHtml>('');
   private isCodeLoadingSubject = new BehaviorSubject<boolean>(false);
+  private openTabsSubject = new BehaviorSubject<CodeViewerTab[]>([]);
+  private activeTabIndexSubject = new BehaviorSubject<number>(-1);
 
   public tree$ = this.treeSubject.asObservable();
   public selectedNode$ = this.selectedNodeSubject.asObservable();
@@ -32,6 +35,8 @@ export class FileTreeService {
   public isLoading$ = this.isLoadingSubject.asObservable();
   public codeHtml$ = this.codeHtmlSubject.asObservable();
   public isCodeLoading$ = this.isCodeLoadingSubject.asObservable();
+  public openTabs$ = this.openTabsSubject.asObservable();
+  public activeTabIndex$ = this.activeTabIndexSubject.asObservable();
 
   public filteredTree$ = combineLatest([this.tree$, this.searchQuery$]).pipe(
     map(([tree, query]) => {
@@ -68,6 +73,9 @@ export class FileTreeService {
     this.repoNameSubject.next(name);
     this.selectedNodeSubject.next(null);
     this.searchQuerySubject.next('');
+    this.openTabsSubject.next([]);
+    this.activeTabIndexSubject.next(-1);
+    this.codeHtmlSubject.next('');
     this.isLoadingSubject.next(true);
 
     this.http.get(url, { responseType: 'arraybuffer' }).subscribe({
@@ -88,13 +96,71 @@ export class FileTreeService {
   }
 
   public selectFile(node: FileTreeNode): void {
-    this.selectedNodeSubject.next(node);
-    if (
-      node.content &&
-      !isImageFile(node.path) &&
-      node.content !== '[Binary file - cannot display]'
-    ) {
-      this.loadCodeHighlighting(node.content, node.path);
+    const currentTabs = this.openTabsSubject.value;
+    const existingIndex = currentTabs.findIndex(tab => tab.node.path === node.path);
+
+    if (existingIndex >= 0) {
+      this.activateTabByIndex(existingIndex);
+      return;
+    }
+
+    const newTab: CodeViewerTab = {
+      node,
+      cachedCodeHtml: null,
+      isImage: isImageFile(node.path),
+      isBinaryFile: node.content === '[Binary file - cannot display]'
+    };
+
+    const updatedTabs = [...currentTabs, newTab];
+    const newIndex = updatedTabs.length - 1;
+    this.openTabsSubject.next(updatedTabs);
+    this.activateTabByIndex(newIndex);
+
+    if (node.content && !newTab.isImage && !newTab.isBinaryFile) {
+      this.loadCodeHighlightingForTab(newIndex, node.content, node.path);
+    }
+  }
+
+  public activateTabByIndex(index: number): void {
+    const tabs = this.openTabsSubject.value;
+    if (index < 0 || index >= tabs.length) {
+      return;
+    }
+
+    this.activeTabIndexSubject.next(index);
+    const tab = tabs[index];
+    this.selectedNodeSubject.next(tab.node);
+
+    if (tab.cachedCodeHtml !== null) {
+      this.codeHtmlSubject.next(tab.cachedCodeHtml);
+      this.isCodeLoadingSubject.next(false);
+    } else if (!tab.isImage && !tab.isBinaryFile && tab.node.content) {
+      this.loadCodeHighlightingForTab(index, tab.node.content, tab.node.path);
+    }
+  }
+
+  public closeTab(index: number): void {
+    const currentTabs = this.openTabsSubject.value;
+    if (index < 0 || index >= currentTabs.length) {
+      return;
+    }
+
+    const updatedTabs = currentTabs.filter((_, tabIndex) => tabIndex !== index);
+    this.openTabsSubject.next(updatedTabs);
+
+    if (updatedTabs.length === 0) {
+      this.activeTabIndexSubject.next(-1);
+      this.selectedNodeSubject.next(null);
+      this.codeHtmlSubject.next('');
+      return;
+    }
+
+    const currentActiveIndex = this.activeTabIndexSubject.value;
+    if (index === currentActiveIndex) {
+      const newIndex = index >= updatedTabs.length ? updatedTabs.length - 1 : index;
+      this.activateTabByIndex(newIndex);
+    } else if (index < currentActiveIndex) {
+      this.activeTabIndexSubject.next(currentActiveIndex - 1);
     }
   }
 
@@ -106,13 +172,22 @@ export class FileTreeService {
   }
 
   public async reloadCodeHighlighting(): Promise<void> {
-    const node = this.selectedNodeSubject.value;
-    if (
-      node?.content &&
-      !isImageFile(node.path) &&
-      node.content !== '[Binary file - cannot display]'
-    ) {
-      await this.loadCodeHighlighting(node.content, node.path);
+    const currentTabs = this.openTabsSubject.value;
+    currentTabs.forEach(tab => {
+      tab.cachedCodeHtml = null;
+    });
+    this.openTabsSubject.next([...currentTabs]);
+
+    const activeIndex = this.activeTabIndexSubject.value;
+    if (activeIndex >= 0 && activeIndex < currentTabs.length) {
+      const activeTab = currentTabs[activeIndex];
+      if (activeTab.node.content && !activeTab.isImage && !activeTab.isBinaryFile) {
+        await this.loadCodeHighlightingForTab(
+          activeIndex,
+          activeTab.node.content,
+          activeTab.node.path
+        );
+      }
     }
   }
 
@@ -159,13 +234,27 @@ export class FileTreeService {
     }
   }
 
-  private async loadCodeHighlighting(content: string, path: string): Promise<void> {
+  private async loadCodeHighlightingForTab(
+    tabIndex: number,
+    content: string,
+    path: string
+  ): Promise<void> {
     this.isCodeLoadingSubject.next(true);
     try {
       const language = getLanguage(path);
       const theme = this.themeService.theme() === 'dark' ? 'github-dark' : 'github-light';
       const result = await codeToHtml(content, { lang: language, theme });
-      this.codeHtmlSubject.next(this.sanitizer.bypassSecurityTrustHtml(result));
+      const safeHtml = this.sanitizer.bypassSecurityTrustHtml(result);
+
+      const currentTabs = this.openTabsSubject.value;
+      if (tabIndex < currentTabs.length && currentTabs[tabIndex].node.path === path) {
+        currentTabs[tabIndex].cachedCodeHtml = safeHtml;
+        this.openTabsSubject.next([...currentTabs]);
+      }
+
+      if (this.activeTabIndexSubject.value === tabIndex) {
+        this.codeHtmlSubject.next(safeHtml);
+      }
     } finally {
       this.isCodeLoadingSubject.next(false);
     }

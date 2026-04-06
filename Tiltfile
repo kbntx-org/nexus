@@ -113,27 +113,6 @@ helm_resource(
   labels=['infra'],
 )
 
-# ── Cloudflare Ingress Controller ─────────────────────────────────────────────
-docker_build(
-  'cloudflare-ingress-controller',
-  'platform/cloudflare-ingress-controller',
-  dockerfile='platform/cloudflare-ingress-controller/Dockerfile',
-)
-
-helm_resource(
-  'cloudflare-ingress-controller',
-  'platform/cloudflare-ingress-controller/helm',
-  deps=['platform/cloudflare-ingress-controller/helm'],
-  image_deps=['cloudflare-ingress-controller'],
-  image_keys=[('image.repository', 'image.tag')],
-  namespace='default',
-  flags=[
-    '--values', 'platform/cloudflare-ingress-controller/helm/values.local.yaml',
-    '--create-namespace',
-  ] + dotenv_helm_flags('platform/cloudflare-ingress-controller/.env'),
-  labels=['infra'],
-)
-
 # ── Docs ──────────────────────────────────────────────────────────────────────
 docker_build(
   'documentation',
