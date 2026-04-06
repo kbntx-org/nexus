@@ -7,7 +7,6 @@ services:
       dockerfile: Dockerfile.vault
     restart: always
     volumes:
-      - vault-data:/vault/file:rw
       - vault-logs:/vault/logs:rw
     command: server
     cap_add:
@@ -33,5 +32,4 @@ services:
 
 volumes:
   vault-data:
-  vault-logs:
   postgres_data:
