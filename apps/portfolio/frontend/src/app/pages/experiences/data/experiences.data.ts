@@ -1,8 +1,8 @@
 export interface Role {
   title: string;
   duration: string;
-  responsibilities: string[];
-  achievements: string[];
+  description: string;
+  highlights: string[];
   technologies: string[];
 }
 
@@ -24,83 +24,102 @@ export const EXPERIENCES: Experience[] = [
       'PowerUs helps workers find the best jobs, discover new companies & industries, connect with other workers and get further education. On the other side, PowerUs helps attractive employers find these workers to fulfill their projects and grow.',
     roles: [
       {
+        title: 'Staff Platform Engineer',
+        duration: 'March 2026 - Present',
+        description:
+          'Defining platform strategy and technical direction across the engineering organization, driving cross-team alignment on infrastructure, developer experience, and delivery standards.',
+        highlights: [],
+        technologies: [
+          'Kubernetes',
+          'AWS',
+          'Terraform',
+          'ArgoCD',
+          'Helm',
+          'Karpenter',
+          'GitHub Actions',
+          'Cloudflare',
+          'HashiCorp Vault',
+          'Sentry',
+          'Datadog',
+          'Grafana',
+          'VictoriaMetrics',
+          'Docker',
+          'Nginx',
+          'Linux',
+          'Bash',
+          'Jsonnet',
+          'TypeScript',
+          'Go',
+          'NestJS',
+          'Angular',
+          'NX',
+          'MongoDB',
+          'RabbitMQ',
+          'REST APIs',
+          'Node.js',
+          'Amazon S3'
+        ]
+      },
+      {
         title: 'Senior Platform Engineer',
-        duration: 'November 2024 - Present',
-        responsibilities: [
-          'Lead initiatives around developer experience, observability, self-service, cloud services and CI/CD acceleration',
-          'Build and maintain foundational systems, tools, and services that empower product teams',
-          'Ensure engineers can focus on delivering value without worrying about underlying infrastructure',
-          'Participate in weekly on-call rotation to ensure systems are up and running'
-        ],
-        achievements: [
-          'Participated in continuous deployment project, improving deployment frequency from 1-2 per day to every 30 minutes',
-          'Led migration to Kubernetes with ArgoCD for GitOps and Karpenter for autoscaling, standardizing deployments and improving incident response',
-          'Spearheaded infrastructure migration from DigitalOcean to AWS with zero downtime, providing broader range of services',
-          'Implemented GitHub Actions integrated with Kubernetes to enhance developer experience and reliability'
+        duration: 'November 2024 - March 2026',
+        description:
+          'As a Senior Platform Engineer at PowerUs, I focused on improving developer experience, reliability, and delivery speed by evolving our cloud and Kubernetes platform. I worked across teams to build a fast, safe, and self-service path from idea to production.',
+        highlights: [
+          'Infrastructure & Platform Foundations: Led migration from DigitalOcean to AWS and introduced Kubernetes with zero downtime, enabling self-service, faster experimentation, and improved incident response',
+          'CI/CD & Delivery: Revamped pipelines (P95 20 to 10 min, -40% cost) through caching and E2E sharding, and enabled continuous deployment (1-2 to 20-25 deploys/day)',
+          'Developer Experience: Designed and rolled out PR preview environments and production-like local setups with real domains and Cloudflare tunnels, accelerating onboarding and feedback loops',
+          'Platform Adoption & Security: Strengthened platform usage and autonomy through workshops and a platform guild, while implementing zero-trust access (Cloudflare Access/WARP, private infrastructure, VPC-based access)'
         ],
         technologies: [
           'Sentry',
           'Terraform',
           'RabbitMQ',
-          'Continuous Integration and Continuous Delivery (CI/CD)',
           'REST APIs',
           'MongoDB',
-          'NoSQL',
           'Node.js',
           'Nginx',
-          'Agile Methodologies',
           'Angular',
           'Cypress',
-          'Observability',
-          'CapacitorJS',
-          'DigitalOcean',
           'TypeScript',
-          'Github Actions',
+          'GitHub Actions',
           'Bash',
           'NestJS',
           'Datadog',
-          'Infrastructure as code (IaC)',
-          'jsonnet',
+          'Jsonnet',
           'NX',
           'Docker',
-          'DevOps',
-          'Software as a Service (SaaS)',
           'GitHub',
           'Linux',
-          'Monitoring',
-          'Mobile Application Development',
           'Drone CI',
           'HashiCorp Vault',
-          'Amazon S3'
+          'Amazon S3',
+          'Kubernetes',
+          'AWS',
+          'ArgoCD',
+          'Helm',
+          'Karpenter',
+          'Cloudflare'
         ]
       },
       {
         title: 'Senior Full Stack & DevOps Engineer',
         duration: 'May 2023 - November 2024',
-        responsibilities: [
-          'Work in the Job Match Squad focusing on UI/UX for job presentation and matching quality',
-          'Second in charge of DevOps team and go-to person for mobile development',
-          'Support and iterate on mobile development initiatives',
-          'Enhance user personalization in job searches and optimize job queue system'
-        ],
-        achievements: [
-          'Improved job matching system reducing average execution time by 68%',
-          'Set up Storybook infrastructure and implemented visual testing',
-          'Changed ETL process from MongoDB to BigQuery, reducing costs by switching to data-transferred pricing',
-          'Introduced Terraform to automate environment provisioning and increase infrastructure visibility'
+        description:
+          'As a Senior Full-Stack & DevOps Engineer in the Marketplace squad, I worked on improving product performance and scalability while progressively taking ownership of infrastructure and DevOps topics. This role marked my transition from product engineering to platform-focused work.',
+        highlights: [
+          'Product Performance & Matching: Improved the job matching system, reducing execution time by 68% and enhancing personalization and content delivery',
+          'Infrastructure as Code: Introduced Terraform to manage infrastructure and standardize environment provisioning, improving visibility and reproducibility',
+          'Frontend & Developer Experience: Migrated frontends to Angular 17 and introduced Storybook with visual testing, reducing build times by ~50% and improving design system quality',
+          'DevOps & Team Enablement: Contributed to internal tooling, observability integrations, and supported onboarding and mentoring of engineers across the team'
         ],
         technologies: [
           'RabbitMQ',
-          'Continuous Integration and Continuous Delivery (CI/CD)',
           'REST APIs',
           'MongoDB',
-          'NoSQL',
           'Node.js',
-          'Agile Methodologies',
-          'Progressive Web Applications (PWAs)',
           'Angular',
           'Cypress',
-          'Observability',
           'CapacitorJS',
           'DigitalOcean',
           'TypeScript',
@@ -109,94 +128,66 @@ export const EXPERIENCES: Experience[] = [
           'Datadog',
           'NX',
           'Docker',
-          'DevOps',
-          'Software as a Service (SaaS)',
           'GitHub',
-          'Monitoring',
-          'Mobile Application Development',
           'Drone CI',
           'HashiCorp Vault',
-          'Fastlane'
+          'Fastlane',
+          'Terraform',
+          'Storybook',
+          'GitHub Actions',
+          'Progressive Web Applications (PWAs)',
+          'Mobile Application Development'
         ]
       },
       {
         title: 'Full Stack & DevOps Engineer',
         duration: 'October 2022 - May 2023',
-        responsibilities: [
-          'Work in the Network Squad focusing on community and education projects',
-          'Implement community platform features for blue-collar workers interaction',
-          'Develop education module with courses, videos, PDFs, quizzes, and certification',
-          'Own development and launch of iOS mobile app using CapacitorJS'
-        ],
-        achievements: [
-          'Implemented reporting/blocking system to ensure safe community environment',
-          'Added video upload functionality to community feed',
-          'Implemented continuous updates for non-native code in mobile app',
-          'Automated mobile build process using GitHub Actions and Fastlane',
-          'Upgraded Angular from 12 to 16 and NX monorepo management tool'
+        description:
+          'As a Full-Stack & DevOps Engineer in the Network squad, I contributed to user engagement and retention features while taking ownership of mobile development and improving delivery workflows.',
+        highlights: [
+          'Mobile Development: Led the development and launch of the iOS app using Capacitor, including support for live updates of non-native code',
+          'CI/CD & Delivery: Improved pipelines (50 to 20 min), reduced E2E test flakiness, and automated mobile builds with GitHub Actions and Fastlane',
+          'Product Features: Built community and education features (video uploads, reporting system, learning modules) to improve user engagement and retention',
+          'Platform & DevOps Foundations: Contributed to Angular upgrades (v12 to v16), runtime secret management, and environment setup across the stack'
         ],
         technologies: [
-          'RabbitMQ',
-          'Continuous Integration and Continuous Delivery (CI/CD)',
-          'REST APIs',
-          'MongoDB',
-          'NoSQL',
-          'Node.js',
-          'Agile Methodologies',
-          'Progressive Web Applications (PWAs)',
           'Angular',
-          'Cypress',
-          'Observability',
-          'CapacitorJS',
-          'DigitalOcean',
           'TypeScript',
-          'Bash',
           'NestJS',
-          'Datadog',
+          'CapacitorJS',
           'NX',
-          'Docker',
-          'DevOps',
-          'Software as a Service (SaaS)',
-          'GitHub',
-          'Monitoring',
-          'Mobile Application Development',
+          'Fastlane',
+          'GitHub Actions',
           'Drone CI',
+          'Cypress',
+          'MongoDB',
+          'RabbitMQ',
+          'Docker',
           'HashiCorp Vault',
-          'Fastlane'
+          'DigitalOcean'
         ]
       },
       {
         title: 'Junior Full Stack Engineer',
         duration: 'July 2022 - October 2022',
-        responsibilities: [
-          'Member of Acquisition Squad bridging R&D department and marketing team',
-          'Contribute to development and improvement of critical features',
-          'Develop sign-up funnels, landing page, and public job search functionalities',
-          'Integrate Google Ads to enhance marketing efforts'
-        ],
-        achievements: [
-          'Developed public job search page to streamline user experience',
-          'Integrated Google Ads to fully embrace product marketing efforts',
-          'Conducted frontend refactoring on various components/pages',
-          'Actively participated in ideation and estimation meetings'
+        description:
+          'As a Junior Full-Stack Engineer in the Acquisition squad, I contributed to user acquisition features and frontend improvements supporting growth initiatives.',
+        highlights: [
+          'Built and improved sign-up funnels, landing pages, and the public job search experience',
+          'Integrated Google Ads to align marketing campaigns with product features',
+          'Refactored frontend components to improve maintainability and align with evolving architecture'
         ],
         technologies: [
-          'RabbitMQ',
-          'Mixpanel',
-          'REST APIs',
-          'MongoDB',
-          'Node.js',
-          'Agile Methodologies',
           'Angular',
-          'Cypress',
-          'Google Tag Manager',
           'TypeScript',
           'NestJS',
+          'MongoDB',
+          'RabbitMQ',
+          'Cypress',
           'Docker',
-          'Software as a Service (SaaS)',
-          'GitHub',
           'Drone CI',
-          'Google Ads'
+          'Google Ads',
+          'Google Tag Manager'
         ]
       }
     ]
@@ -206,62 +197,50 @@ export const EXPERIENCES: Experience[] = [
     location: 'Lyon, Auvergne-Rhône-Alpes, France',
     duration: '2020 - 2022',
     description:
-      'Apollo is a Lyon-based IT consulting company specializing in both customer support services and custom software development from scratch. The company operates through an R&D department focused on full-cycle project development and continuous maintenance services.',
+      'Apollo is a Lyon-based IT consulting company specializing in custom software development. The R&D department delivers full-stack solutions across healthcare, energy, and enterprise projects.',
     roles: [
       {
         title: 'Software Engineer',
         duration: 'September 2021 - June 2022',
-        responsibilities: [
-          'Engage in full-stack software development across various projects',
-          'Translate business needs into robust software solutions',
-          'Contribute to projects in healthcare, energy, and enterprise resource sectors',
-          'Work in dynamic, multi-disciplinary environment'
-        ],
-        achievements: [
-          'Engineered internal communication platform with role-based access integrating Microsoft Graph API',
-          'Contributed to health insurance platform redesign (MAGE), upgrading from Angular 6 to 13 and .NET Core 3.1 to 6.0',
-          'Developed SelectClim application for AC system selection with automated quote generation',
-          'Conducted system enhancements and integration into REXEL marketplace'
+        description:
+          'As a Software Engineer at Apollo Coding Life, I worked across multiple projects in healthcare, energy, and enterprise, delivering full-stack solutions and contributing to system modernisation efforts in Agile teams.',
+        highlights: [
+          'Full-Stack Development: Built internal platforms with role-based access and Microsoft Graph integration (React, .NET, Azure)',
+          'Product & UX Improvements: Contributed to redesign of a health insurance sign-up and quote flow, improving performance and user experience',
+          'System Modernisation: Participated in Angular (v6 to v13) and .NET upgrades across projects, improving maintainability and scalability',
+          'Project Delivery: Developed a quote generation tool later integrated into the REXEL marketplace'
         ],
         technologies: [
-          'Continuous Integration and Continuous Delivery (CI/CD)',
-          'REST APIs',
-          'Microsoft Azure',
-          'NoSQL',
-          'Node.js',
-          'Agile Methodologies',
           'Angular',
+          'React',
           'TypeScript',
-          'Docker',
-          'DevOps',
-          '.NET Core',
+          '.NET 6',
+          'SQL Server',
+          'Microsoft Azure',
           'Azure DevOps',
-          'Entity Framework'
+          'Entity Framework',
+          'Cucumber.js',
+          'Docker',
+          'REST APIs'
         ]
       },
       {
         title: 'Software Engineer Intern',
         duration: 'June 2020 - August 2020',
-        responsibilities: [
-          'Participate in ground-up redesign of back-office application',
-          'Manage catalog of courses pivotal for WordPress site integration',
-          'Co-develop initial modules for course and module management',
-          'Engage in requirement discussions and database design'
-        ],
-        achievements: [
-          'Co-developed initial modules using Angular 10 and .NET Core 3.1',
-          'Contributed to database design and feature development',
-          'Operated within SCRUM framework with team collaboration',
-          'Enhanced teamwork and project delivery'
+        description:
+          'As a Software Engineer Intern, I contributed to the redesign of a back-office application used to manage course catalogs, working in a SCRUM team on both frontend and backend features.',
+        highlights: [
+          'Developed frontend and backend features using Angular and .NET',
+          'Participated in database design and feature discussions to align with business needs',
+          'Collaborated in an Agile team to deliver a more maintainable and scalable system'
         ],
         technologies: [
-          'REST APIs',
-          'Agile Methodologies',
           'Angular',
           'TypeScript',
           '.NET Core',
           'Azure DevOps',
-          'Entity Framework'
+          'Entity Framework',
+          'REST APIs'
         ]
       }
     ]

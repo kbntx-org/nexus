@@ -60,36 +60,23 @@
 
                 @if (isRoleExpanded(experienceIndex, roleIndex)) {
                   <div class="space-y-6 pb-4">
-                    <section>
-                      <h4 class="mb-3 text-lg font-medium">Key Responsibilities</h4>
+                    <p class="leading-relaxed text-night-text-soft">{{ role.description }}</p>
+
+                    @if (role.highlights.length > 0) {
                       <ul class="space-y-2">
-                        @for (responsibility of role.responsibilities; track responsibility) {
+                        @for (highlight of role.highlights; track highlight) {
                           <li class="flex items-start gap-3 text-night-text-muted">
                             <span
                               class="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-night-purple"
                             ></span>
-                            <span>{{ responsibility }}</span>
+                            <span>{{ highlight }}</span>
                           </li>
                         }
                       </ul>
-                    </section>
+                    }
 
                     <section>
-                      <h4 class="mb-3 text-lg font-medium">Major Achievements</h4>
-                      <ul class="space-y-2">
-                        @for (achievement of role.achievements; track achievement) {
-                          <li class="flex items-start gap-3 text-night-text-muted">
-                            <span
-                              class="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-night-purple-deep"
-                            ></span>
-                            <span>{{ achievement }}</span>
-                          </li>
-                        }
-                      </ul>
-                    </section>
-
-                    <section>
-                      <h4 class="mb-3 text-lg font-medium">Technologies Used</h4>
+                      <h4 class="mb-3 text-lg font-medium">Technologies</h4>
                       <div class="flex flex-wrap items-center gap-2">
                         @for (
                           tech of isTechExpanded(experienceIndex, roleIndex)
