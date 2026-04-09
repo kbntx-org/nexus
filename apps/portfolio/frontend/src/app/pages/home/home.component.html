@@ -1,94 +1,96 @@
 <div class="font-roboto">
-  <section class="relative z-10 min-h-dvh overflow-hidden sm:min-h-[calc(100dvh-4rem)]">
-    <div
-      class="relative mx-auto flex min-h-dvh max-w-6xl items-center px-4 py-16 sm:min-h-[calc(100dvh-4rem)]"
-    >
-      <div class="max-w-2xl animate-slide-in-up">
-        <div class="mb-6 flex items-center gap-4">
-          <div
-            class="h-16 w-16 shrink-0 overflow-hidden rounded-full border-4 border-transparent bg-gradient-to-br from-night-purple to-night-purple-deep bg-clip-border shadow-lg shadow-purple-500/20"
-          >
-            <img src="assets/images/kenny.png" alt="Kenny" class="h-full w-full object-cover" />
-          </div>
-          <h1 class="text-4xl font-bold leading-tight text-night-text sm:text-5xl lg:text-6xl">
-            Hi, I'm
-            <span
-              class="relative bg-gradient-to-r from-night-purple to-night-purple-deep bg-clip-text text-transparent"
+  @if (homeService.hero(); as hero) {
+    <section class="relative z-10 min-h-dvh overflow-hidden sm:min-h-[calc(100dvh-4rem)]">
+      <div
+        class="relative mx-auto flex min-h-dvh max-w-6xl items-center px-4 py-16 sm:min-h-[calc(100dvh-4rem)]"
+      >
+        <div class="max-w-2xl animate-slide-in-up">
+          <div class="mb-6 flex items-center gap-4">
+            <div
+              class="h-16 w-16 shrink-0 overflow-hidden rounded-full border-4 border-transparent bg-gradient-to-br from-night-purple to-night-purple-deep bg-clip-border shadow-lg shadow-purple-500/20"
             >
-              {{ heroData.name }}
+              <img src="assets/images/kenny.png" alt="Kenny" class="h-full w-full object-cover" />
+            </div>
+            <h1 class="text-4xl font-bold leading-tight text-night-text sm:text-5xl lg:text-6xl">
+              Hi, I'm
+              <span
+                class="relative bg-gradient-to-r from-night-purple to-night-purple-deep bg-clip-text text-transparent"
+              >
+                {{ hero.name }}
+                <div
+                  class="absolute -bottom-2 left-0 h-1 w-full scale-x-0 transform animate-expand-width bg-gradient-to-r from-night-purple to-night-purple-deep"
+                ></div>
+              </span>
+            </h1>
+          </div>
+          <p class="mb-4 text-sm text-night-text-muted">{{ hero.title }}</p>
+          <p class="mb-8 text-lg leading-relaxed text-night-text-soft sm:text-xl">
+            {{ hero.subtitle }}
+          </p>
+          <div class="flex flex-wrap items-center gap-4">
+            <button
+              class="group relative inline-flex items-center gap-2 overflow-hidden rounded-lg bg-gradient-to-r from-night-gold to-night-gold-deep px-6 py-3 font-medium text-night-sky shadow-lg shadow-amber-500/20 transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/30"
+              (click)="navigateToExperiences()"
+            >
+              <span class="relative z-10">View Experiences</span>
               <div
-                class="absolute -bottom-2 left-0 h-1 w-full scale-x-0 transform animate-expand-width bg-gradient-to-r from-night-purple to-night-purple-deep"
+                class="absolute inset-0 -translate-x-full transform bg-gradient-to-r from-night-gold-deep to-night-gold transition-transform duration-500 group-hover:translate-x-0"
               ></div>
-            </span>
-          </h1>
-        </div>
-        <p class="mb-4 text-sm text-night-text-muted">{{ heroData.title }}</p>
-        <p class="mb-8 text-lg leading-relaxed text-night-text-soft sm:text-xl">
-          {{ heroData.subtitle }}
-        </p>
-        <div class="flex flex-wrap items-center gap-4">
-          <button
-            class="group relative inline-flex items-center gap-2 overflow-hidden rounded-lg bg-gradient-to-r from-night-gold to-night-gold-deep px-6 py-3 font-medium text-night-sky shadow-lg shadow-amber-500/20 transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/30"
-            (click)="navigateToExperiences()"
-          >
-            <span class="relative z-10">View Experiences</span>
-            <div
-              class="absolute inset-0 -translate-x-full transform bg-gradient-to-r from-night-gold-deep to-night-gold transition-transform duration-500 group-hover:translate-x-0"
-            ></div>
-          </button>
-          <a
-            href="assets/pdfs/cv-kenny-talbi.pdf"
-            download="cv-kenny-talbi.pdf"
-            class="group relative inline-flex items-center gap-2 overflow-hidden rounded-lg border border-white/15 bg-white/5 px-6 py-3 font-medium text-night-text shadow-lg backdrop-blur-sm transition-all duration-300 hover:bg-white/10 hover:shadow-xl"
-          >
-            <span class="relative z-10">Download CV</span>
-            <div
-              class="absolute inset-0 -translate-x-full transform bg-white/5 transition-transform duration-500 group-hover:translate-x-0"
-            ></div>
-          </a>
-          <a
-            href="https://www.linkedin.com/in/kennytalbi"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-[#0077b5]/80 text-white shadow-lg backdrop-blur-sm transition-all duration-300 hover:bg-[#0077b5] hover:shadow-xl sm:flex"
-          >
-            <lucide-angular [img]="LinkedinIcon" [size]="16"></lucide-angular>
-          </a>
-          <a
-            href="https://github.com/kbntx"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white shadow-lg backdrop-blur-sm transition-all duration-300 hover:bg-white/20 hover:shadow-xl sm:flex"
-          >
-            <lucide-angular [img]="GithubIcon" [size]="16"></lucide-angular>
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="relative z-10 py-12 md:py-8">
-    <div
-      class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-night-purple/30 to-transparent"
-    ></div>
-    <div class="mx-auto max-w-6xl px-4">
-      <div class="animate-slide-in-up">
-        <h2 class="relative mb-12 text-center text-3xl font-bold text-night-text sm:text-4xl">
-          About Me
-          <div
-            class="absolute -bottom-3 left-1/2 h-1 w-16 -translate-x-1/2 transform rounded-full bg-gradient-to-r from-night-purple to-night-purple-deep"
-          ></div>
-        </h2>
-        <div class="mx-auto max-w-4xl">
-          <div
-            class="rounded-xl border border-white/10 bg-night-card/40 p-8 text-lg leading-relaxed text-night-text-soft shadow-xl backdrop-blur-sm"
-          >
-            <div [innerHTML]="heroData.description"></div>
+            </button>
+            <a
+              href="assets/pdfs/cv-kenny-talbi.pdf"
+              download="cv-kenny-talbi.pdf"
+              class="group relative inline-flex items-center gap-2 overflow-hidden rounded-lg border border-white/15 bg-white/5 px-6 py-3 font-medium text-night-text shadow-lg backdrop-blur-sm transition-all duration-300 hover:bg-white/10 hover:shadow-xl"
+            >
+              <span class="relative z-10">Download CV</span>
+              <div
+                class="absolute inset-0 -translate-x-full transform bg-white/5 transition-transform duration-500 group-hover:translate-x-0"
+              ></div>
+            </a>
+            <a
+              href="https://www.linkedin.com/in/kennytalbi"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-[#0077b5]/80 text-white shadow-lg backdrop-blur-sm transition-all duration-300 hover:bg-[#0077b5] hover:shadow-xl sm:flex"
+            >
+              <lucide-angular [img]="LinkedinIcon" [size]="16"></lucide-angular>
+            </a>
+            <a
+              href="https://github.com/kbntx"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white shadow-lg backdrop-blur-sm transition-all duration-300 hover:bg-white/20 hover:shadow-xl sm:flex"
+            >
+              <lucide-angular [img]="GithubIcon" [size]="16"></lucide-angular>
+            </a>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+
+    <section class="relative z-10 py-12 md:py-8">
+      <div
+        class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-night-purple/30 to-transparent"
+      ></div>
+      <div class="mx-auto max-w-6xl px-4">
+        <div class="animate-slide-in-up">
+          <h2 class="relative mb-12 text-center text-3xl font-bold text-night-text sm:text-4xl">
+            About Me
+            <div
+              class="absolute -bottom-3 left-1/2 h-1 w-16 -translate-x-1/2 transform rounded-full bg-gradient-to-r from-night-purple to-night-purple-deep"
+            ></div>
+          </h2>
+          <div class="mx-auto max-w-4xl">
+            <div
+              class="rounded-xl border border-white/10 bg-night-card/40 p-8 text-lg leading-relaxed text-night-text-soft shadow-xl backdrop-blur-sm"
+            >
+              <div [innerHTML]="hero.description"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  }
 
   <div class="relative z-10">
     <app-skills></app-skills>
