@@ -151,20 +151,27 @@ export const EXPERIENCES: Experience[] = [
           'Platform & DevOps Foundations: Contributed to Angular upgrades (v12 to v16), runtime secret management, and environment setup across the stack'
         ],
         technologies: [
+          'RabbitMQ',
+          'REST APIs',
+          'MongoDB',
+          'Node.js',
+          'Progressive Web Applications (PWAs)',
           'Angular',
-          'TypeScript',
-          'NestJS',
+          'Cypress',
           'CapacitorJS',
+          'DigitalOcean',
+          'TypeScript',
+          'Bash',
+          'NestJS',
+          'Datadog',
           'NX',
+          'Docker',
+          'GitHub',
+          'Drone CI',
+          'HashiCorp Vault',
           'Fastlane',
           'GitHub Actions',
-          'Drone CI',
-          'Cypress',
-          'MongoDB',
-          'RabbitMQ',
-          'Docker',
-          'HashiCorp Vault',
-          'DigitalOcean'
+          'Mobile Application Development'
         ]
       },
       {
@@ -178,16 +185,20 @@ export const EXPERIENCES: Experience[] = [
           'Refactored frontend components to improve maintainability and align with evolving architecture'
         ],
         technologies: [
+          'RabbitMQ',
+          'Mixpanel',
+          'REST APIs',
+          'MongoDB',
+          'Node.js',
           'Angular',
+          'Cypress',
+          'Google Tag Manager',
           'TypeScript',
           'NestJS',
-          'MongoDB',
-          'RabbitMQ',
-          'Cypress',
           'Docker',
+          'GitHub',
           'Drone CI',
-          'Google Ads',
-          'Google Tag Manager'
+          'Google Ads'
         ]
       }
     ]
@@ -211,17 +222,18 @@ export const EXPERIENCES: Experience[] = [
           'Project Delivery: Developed a quote generation tool later integrated into the REXEL marketplace'
         ],
         technologies: [
+          'REST APIs',
+          'Microsoft Azure',
+          'Node.js',
           'Angular',
           'React',
           'TypeScript',
+          'Docker',
           '.NET 6',
           'SQL Server',
-          'Microsoft Azure',
           'Azure DevOps',
           'Entity Framework',
-          'Cucumber.js',
-          'Docker',
-          'REST APIs'
+          'Cucumber.js'
         ]
       },
       {
