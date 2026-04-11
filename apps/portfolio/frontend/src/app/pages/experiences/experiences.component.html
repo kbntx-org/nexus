@@ -62,7 +62,7 @@
                   <div class="space-y-6 pb-4">
                     <p class="leading-relaxed text-night-text-soft">{{ role.description }}</p>
 
-                    @if (role.highlights.length > 0) {
+                    @if (role.highlights && role.highlights.length > 0) {
                       <ul class="space-y-2">
                         @for (highlight of role.highlights; track highlight) {
                           <li class="flex items-start gap-3 text-night-text-muted">
