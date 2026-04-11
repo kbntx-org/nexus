@@ -142,9 +142,9 @@ helm_resource(
 docker_build(
   'portfolio',
   '.',
-  dockerfile='apps/portfolio/frontend/Dockerfile.local',
+  dockerfile='apps/portfolio/Dockerfile.local',
   only=[
-    'apps/portfolio/frontend',
+    'apps/portfolio',
     'tsconfig.base.json',
     'nx.json',
     'tools',
@@ -154,10 +154,10 @@ docker_build(
     'pnpm-workspace.yaml',
   ],
   live_update=[
-    sync('apps/portfolio/frontend/package.json', '/usr/src/app/apps/portfolio/frontend/package.json'),
-    sync('apps/portfolio/frontend/src', '/usr/src/app/apps/portfolio/frontend/src'),
+    sync('apps/portfolio/package.json', '/usr/src/app/apps/portfolio/package.json'),
+    sync('apps/portfolio/src', '/usr/src/app/apps/portfolio/src'),
     sync('tsconfig.base.json', '/usr/src/app/tsconfig.base.json'),
-    run('cd /usr/src/app && pnpm install --no-frozen-lockfile', trigger=['apps/portfolio/frontend/package.json']),
+    run('cd /usr/src/app && pnpm install --no-frozen-lockfile', trigger=['apps/portfolio/package.json']),
   ],
 )
 

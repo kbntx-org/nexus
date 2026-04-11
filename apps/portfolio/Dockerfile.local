@@ -8,7 +8,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 RUN pnpm install --frozen-lockfile
 
 COPY nx.json tsconfig.base.json ./
-COPY apps/portfolio/frontend ./apps/portfolio/frontend
+COPY apps/portfolio ./apps/portfolio
 
 EXPOSE 4200
 

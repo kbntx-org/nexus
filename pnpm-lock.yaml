@@ -203,7 +203,7 @@ importers:
         specifier: ^8.29.0
         version: 8.50.1(eslint@9.39.2(jiti@1.21.7))(typescript@5.9.3)
 
-  apps/portfolio/frontend:
+  apps/portfolio:
     dependencies:
       '@angular/animations':
         specifier: 20.3.16
