@@ -314,7 +314,7 @@ hide:
     <a class="nexus-cta nexus-cta--primary" href="getting-started/01-overview/">
       Get started &rarr;
     </a>
-    <a class="nexus-cta nexus-cta--ghost" href="https://github.com/kbntx-org/nexus" target="_blank" rel="noopener noreferrer">
+    <a class="nexus-cta nexus-cta--ghost" href="https://github.com/kbntx/nexus" target="_blank" rel="noopener noreferrer">
       View on GitHub
     </a>
   </div>
