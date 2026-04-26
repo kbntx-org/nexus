@@ -1,0 +1,108 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: n8n
+spec:
+  serviceName: n8n
+  replicas: 1
+  selector:
+    matchLabels:
+      app: n8n
+  template:
+    metadata:
+      labels:
+        app: n8n
+    spec:
+      initContainers:
+        - name: fix-permissions
+          image: busybox
+          command: ["sh", "-c", "chown -R 1000:1000 /home/node/.n8n"]
+          volumeMounts:
+            - name: n8n-data
+              mountPath: /home/node/.n8n
+      containers:
+        - name: n8n
+          image: n8nio/n8n:2.14.2
+          ports:
+            - containerPort: 5678
+              name: http
+          env:
+            - name: N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS
+              value: "true"
+            - name: N8N_PORT
+              value: "5678"
+            - name: N8N_RUNNERS_ENABLED
+              value: "true"
+            - name: GENERIC_TIMEZONE
+              value: "Europe/London"
+            - name: TZ
+              value: "Europe/London"
+            - name: DB_TYPE
+              value: postgresdb
+            - name: DB_POSTGRESDB_HOST
+              value: n8n-postgres
+            - name: DB_POSTGRESDB_PORT
+              value: "5432"
+            - name: DB_POSTGRESDB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: n8n-secret
+                  key: postgresDatabase
+            - name: DB_POSTGRESDB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: n8n-secret
+                  key: postgresUser
+            - name: DB_POSTGRESDB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: n8n-secret
+                  key: postgresPassword
+            - name: DB_POSTGRESDB_SCHEMA
+              valueFrom:
+                secretKeyRef:
+                  name: n8n-secret
+                  key: postgresSchema
+          volumeMounts:
+            - name: n8n-data
+              mountPath: /home/node/.n8n
+  volumeClaimTemplates:
+    - metadata:
+        name: n8n-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: hcloud-volumes
+        resources:
+          requests:
+            storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: n8n
+  labels:
+    app: n8n
+spec:
+  ports:
+    - port: 5678
+      targetPort: http
+      name: http
+  selector:
+    app: n8n
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: n8n-ingress
+spec:
+  rules:
+    - host: n8n.kbntx.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: n8n
+                port:
+                  number: 5678
