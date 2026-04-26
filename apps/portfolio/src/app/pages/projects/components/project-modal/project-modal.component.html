@@ -23,15 +23,6 @@
             <lucide-angular [img]="GithubIcon" class="h-4 w-4"></lucide-angular>
           </a>
         }
-        @if (project.codeSourceUrl) {
-          <a
-            [routerLink]="project.codeSourceUrl"
-            (click)="closeModal()"
-            class="flex h-8 w-8 items-center justify-center rounded-full text-night-text-muted transition hover:bg-white/10 hover:text-night-text"
-          >
-            <lucide-angular [img]="Code2Icon" class="h-4 w-4"></lucide-angular>
-          </a>
-        }
         <button
           class="flex h-8 w-8 items-center justify-center rounded-full text-night-text-muted transition hover:bg-white/10 hover:text-night-text"
           (click)="closeModal()"

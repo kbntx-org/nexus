@@ -16,7 +16,7 @@ images:
   - https://fsn1.your-objectstorage.com/nexus-public-statics/images/portfolio-homepage.png
   - https://fsn1.your-objectstorage.com/nexus-public-statics/images/portfolio-projects-dark-mode.png
   - https://fsn1.your-objectstorage.com/nexus-public-statics/images/portfolio-projects-light-mode.png
-codeSourceUrl: /code-source/nexus
+githubUrl: https://github.com/kbntx/nexus
 features:
   - Dark/light theme support
   - Declarative content management to keep a low maintenance cost

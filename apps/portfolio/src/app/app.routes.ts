@@ -1,7 +1,5 @@
 import { Route } from '@angular/router';
 
-import { codeSourceGuard } from './pages/code-viewer/guards/code-source.guard';
-
 export const ROUTES: Route[] = [
   {
     path: '',
@@ -21,11 +19,5 @@ export const ROUTES: Route[] = [
     path: 'projects',
     loadComponent: () =>
       import('./pages/projects/projects.component').then(m => m.ProjectsComponent)
-  },
-  {
-    path: 'code-source/:id',
-    loadComponent: () =>
-      import('./pages/code-viewer/code-viewer.component').then(m => m.CodeViewerComponent),
-    canActivate: [codeSourceGuard]
   }
 ];

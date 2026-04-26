@@ -18,7 +18,6 @@ export interface Project {
   content: string;
   liveUrl?: string;
   githubUrl?: string;
-  codeSourceUrl?: string;
   images?: string[];
   logo?: string;
 }

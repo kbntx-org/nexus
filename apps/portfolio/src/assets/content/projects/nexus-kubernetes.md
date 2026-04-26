@@ -18,7 +18,7 @@ tech:
 logo: https://fsn1.your-objectstorage.com/nexus-public-statics/images/kubernetes-logo.svg
 images:
   - https://fsn1.your-objectstorage.com/nexus-public-statics/images/k3s-cluster-schema.png
-codeSourceUrl: /code-source/nexus
+githubUrl: https://github.com/kbntx/nexus
 features:
   - K3s cluster with multi-node setup
   - Terraform module for minimal initialization
