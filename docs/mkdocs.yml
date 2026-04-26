@@ -1,6 +1,6 @@
 site_name: Nexus documentation
-repo_name: kbntx-org/nexus
-repo_url: https://github.com/kbntx-org/nexus
+repo_name: kbntx/nexus
+repo_url: https://github.com/kbntx/nexus
 site_url: https://docs.kbntx.com
 
 docs_dir: src
@@ -32,6 +32,9 @@ markdown_extensions:
 theme:
   name: material
   logo: https://fsn1.your-objectstorage.com/nexus-public-statics/images/kt-logo.jpg
+  font:
+    text: Roboto
+    code: Roboto Mono
   features:
     - tabs
     - instant
@@ -41,9 +44,20 @@ theme:
     - content.code.copy
 
   palette:
-    - scheme: slate
+    - media: '(prefers-color-scheme: light)'
+      scheme: default
       primary: black
       accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - media: '(prefers-color-scheme: dark)'
+      scheme: slate
+      primary: black
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
 
 plugins:
   - search

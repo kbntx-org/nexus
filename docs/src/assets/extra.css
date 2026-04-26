@@ -1,1 +1,39 @@
-/* Custom documentation styles */
+/* ------------------------------------------------------------------ */
+/*  Nexus palette tokens — referenced by the homepage hero only.      */
+/*  They define no behaviour on their own; non-home pages keep the    */
+/*  default Material slate theme.                                     */
+/* ------------------------------------------------------------------ */
+:root {
+  --nexus-night-sky: #0a0e27;
+  --nexus-night-card: #0f1b3d;
+  --nexus-night-text: #e8eaf0;
+  --nexus-night-text-soft: #c0c8e0;
+  --nexus-night-text-muted: #8a9cc5;
+  --nexus-night-gold: #f0a830;
+  --nexus-night-gold-deep: #e8963a;
+  --nexus-night-purple: #667eea;
+  --nexus-night-purple-deep: #764ba2;
+}
+
+/* Site-wide: translucent night-sky chrome (header + tabs) so every page
+   carries a hint of the homepage theme. The main content area uses a
+   sober, lighter navy that pairs with the chrome without hurting
+   readability. */
+[data-md-color-scheme='slate'] {
+  --md-default-bg-color: #12162e;
+  --md-code-bg-color: #0d1126;
+}
+
+.md-header,
+.md-tabs,
+.md-footer {
+  background-color: rgba(10, 14, 39, 0.85) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Hide the "Made with Material for MkDocs" copyright bar site-wide */
+.md-footer-meta {
+  display: none;
+}
