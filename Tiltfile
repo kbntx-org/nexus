@@ -59,10 +59,9 @@ selectedProfiles = parsedConfig.get("profile", [])
 CORE_RESOURCES = ['traefik', 'metrics-server-repo', 'metrics-server']
 
 SERVICES = {
-  'docs':                        ['docs'],
-  'portfolio':                   ['portfolio'],
-  'cloudflare-ingress-controller': ['cloudflare-ingress-controller'],
-  'all':                         ['docs', 'portfolio'],
+  'docs':      ['docs'],
+  'portfolio': ['portfolio'],
+  'all':       ['docs', 'portfolio'],
 }
 
 if selectedProfiles:

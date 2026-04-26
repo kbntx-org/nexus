@@ -168,4 +168,3 @@ If you are not sure about it, ask me.
 Each project may have its own `CLAUDE.md` with additional rules:
 
 - [`docs/CLAUDE.md`](docs/CLAUDE.md) — Documentation writing guidelines
-- [`platform/cloudflare-ingress-controller/CLAUDE.md`](platform/cloudflare-ingress-controller/CLAUDE.md) — Controller-specific rules
