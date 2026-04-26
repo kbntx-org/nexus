@@ -3,7 +3,7 @@ data "hcloud_network" "main_network" {
 }
 
 module "nexus_cluster" {
-  source = "../terraform-modules/k3s"
+  source = "../../../modules/k3s"
 
   cluster_name            = "nexus"
   vpc_name                = "main-vpc"
@@ -46,7 +46,7 @@ module "nexus_cluster" {
 }
 
 module "control_plane_firewall" {
-  source = "../terraform-modules/firewall"
+  source = "../../../modules/firewall"
   name   = "nexus-control-plane-firewall"
 
   ingress_rules = [
@@ -58,7 +58,7 @@ module "control_plane_firewall" {
 }
 
 module "worker_nodes_firewall" {
-  source = "../terraform-modules/firewall"
+  source = "../../../modules/firewall"
   name   = "nexus-worker-nodes-firewall"
 
   ingress_rules = [

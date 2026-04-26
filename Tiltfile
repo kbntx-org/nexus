@@ -102,12 +102,12 @@ helm_resource(
 # ── Traefik (auto-started as a dependency of all product services) ─────────────
 helm_resource(
   'traefik',
-  'platform/traefik',
-  deps=['platform/traefik'],
+  'platform/core/traefik',
+  deps=['platform/core/traefik'],
   namespace='traefik',
   flags=[
     '--create-namespace',
-    '--values', 'platform/traefik/values.local.yaml',
+    '--values', 'platform/core/traefik/values.local.yaml',
   ],
   labels=['infra'],
 )

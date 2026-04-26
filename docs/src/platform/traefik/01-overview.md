@@ -47,5 +47,5 @@ Once applied, the [Cloudflare Ingress Controller](../networking/01-overview.md) 
 
 ## References
 
-- [`platform/traefik/`](https://github.com/kbntx-org/nexus/tree/main/platform/traefik) — Traefik Helm chart configuration
+- [`platform/core/traefik/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/traefik) — Traefik Helm chart configuration
 - [Traefik documentation](https://doc.traefik.io/traefik/)

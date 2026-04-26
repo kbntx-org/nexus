@@ -17,19 +17,19 @@ k3s cluster on Hetzner, and hosts the apps published under
   [docs.kbntx.com](https://docs.kbntx.com).
 - [platform/](platform/) — everything that makes the platform run:
   - **Infrastructure** — Terraform on Hetzner Cloud:
-    [network/](platform/network/), [kubernetes/](platform/kubernetes/) (k3s),
-    [bastion/](platform/bastion/), [vault/](platform/vault/), and the shared
-    [terraform-modules/](platform/terraform-modules/).
-  - **GitOps** — [argocd/](platform/argocd/) plus an
-    [app-of-apps/](platform/app-of-apps/) chart that reconciles every other
+    [core/network/](platform/core/network/), [core/kubernetes/](platform/core/kubernetes/) (k3s),
+    [services/bastion/](platform/services/bastion/), [core/vault/](platform/core/vault/), and the shared
+    [modules/](platform/modules/).
+  - **GitOps** — [core/argocd/](platform/core/argocd/) plus a
+    [services/app-of-apps/](platform/services/app-of-apps/) chart that reconciles every other
     platform component.
-  - **Ingress & access** — [traefik/](platform/traefik/) for cluster ingress,
-    [cloudflared/](platform/cloudflared/) for Cloudflare Tunnel.
+  - **Ingress & access** — [core/traefik/](platform/core/traefik/) for cluster ingress,
+    [core/cloudflared/](platform/core/cloudflared/) for Cloudflare Tunnel.
   - **Cluster components** — Hetzner Cloud Controller Manager + CSI,
     External Secrets Operator, k3s system upgrade controller, GitHub ARC
     runners, and a custom CI toolkit image
-    ([custom-docker-images/](platform/custom-docker-images/)).
-  - **Observability** — [monitoring/](platform/monitoring/): VictoriaMetrics,
+    ([services/custom-docker-images/](platform/services/custom-docker-images/)).
+  - **Observability** — [services/monitoring/](platform/services/monitoring/): VictoriaMetrics,
     Grafana, Loki, Promtail, kube-state-metrics, node-exporter.
 - [tools/](tools/) — bash helpers (KinD cluster bootstrap, SSH setup).
 - [Tiltfile](Tiltfile) — local dev orchestration (Traefik + apps with live

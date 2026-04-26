@@ -8,7 +8,7 @@ ArgoCD is a **GitOps continuous delivery tool** for Kubernetes. It watches a Git
 
 ## App-of-Apps Pattern
 
-Rather than registering each component in ArgoCD one by one, a single root application (`app-of-apps`) manages all others. To deploy something new to the cluster, you add it to `platform/app-of-apps/values.yaml` — ArgoCD picks it up automatically.
+Rather than registering each component in ArgoCD one by one, a single root application (`app-of-apps`) manages all others. To deploy something new to the cluster, you add it to `platform/services/app-of-apps/values.yaml` — ArgoCD picks it up automatically.
 
 ```mermaid
 %%{init: {'theme':'dark'}}%%
@@ -22,7 +22,7 @@ graph TD
     Root --> apps[portfolio · docs · homepage]
 ```
 
-The root application is deployed at [`platform/app-of-apps/`](https://github.com/kbntx-org/nexus/tree/main/platform/app-of-apps).
+The root application is deployed at [`platform/services/app-of-apps/`](https://github.com/kbntx-org/nexus/tree/main/platform/services/app-of-apps).
 
 ## Sync Strategies
 
@@ -35,8 +35,8 @@ For applications, the CI pipeline calls `argocd app sync` after a successful bui
 
 ## Adding a New Component
 
-1. Create a Helm chart or raw manifests at `platform/<component>/`
-2. Add an entry in [`platform/app-of-apps/values.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/app-of-apps/values.yaml):
+1. Create a Helm chart or raw manifests at `platform/services/<component>/` (or `platform/core/<component>/` if it's required for the cluster to function)
+2. Add an entry in [`platform/services/app-of-apps/values.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/app-of-apps/values.yaml):
 
 ```yaml
 argocd-apps:
@@ -44,7 +44,7 @@ argocd-apps:
     my-component:
       source:
         repoURL: https://github.com/kbntx-org/nexus.git
-        path: platform/my-component
+        path: platform/services/my-component
         targetRevision: main
       destination:
         namespace: my-component
@@ -76,6 +76,6 @@ The `--prune` flag on sync removes Kubernetes resources that no longer exist in 
 
 ## References
 
-- [`platform/argocd/`](https://github.com/kbntx-org/nexus/tree/main/platform/argocd) — ArgoCD Helm chart wrapper
-- [`platform/app-of-apps/`](https://github.com/kbntx-org/nexus/tree/main/platform/app-of-apps) — root application definition
+- [`platform/core/argocd/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/argocd) — ArgoCD Helm chart wrapper
+- [`platform/services/app-of-apps/`](https://github.com/kbntx-org/nexus/tree/main/platform/services/app-of-apps) — root application definition
 - [ArgoCD documentation](https://argo-cd.readthedocs.io/en/stable/)

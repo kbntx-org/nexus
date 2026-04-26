@@ -16,7 +16,7 @@ CI jobs don't run on GitHub-hosted machines — they run on **self-hosted runner
 
 ARC is a Kubernetes operator. When a workflow is triggered, it spins up a runner pod, runs the job, and deletes the pod when done. No idle VMs, no per-minute billing — compute that's already paid for.
 
-The runner configuration lives at [`platform/github-arc-runners/`](https://github.com/kbntx-org/nexus/tree/main/platform/github-arc-runners).
+The runner configuration lives at [`platform/core/github-arc-runners/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/github-arc-runners).
 
 ### Security
 
@@ -24,14 +24,14 @@ CI runners executing arbitrary code inside the cluster is a security concern —
 
 To prevent this, every runner pod gets a **NetworkPolicy** that restricts egress: runner pods can only reach the internet. All cluster-internal CIDRs (pod network and service network) are blocked.
 
-The policy is defined at [`platform/github-arc-runners/runners/templates/network-policy.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/github-arc-runners/runners/templates/network-policy.yaml).
+The policy is defined at [`platform/core/github-arc-runners/runners/templates/network-policy.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/github-arc-runners/runners/templates/network-policy.yaml).
 
 ## CI Toolkit Image
 
 All workflows use a single custom Docker image that bundles every tool needed to run CI:
 
 ```
-platform/custom-docker-images/
+platform/services/custom-docker-images/
 ```
 
 This avoids per-job setup steps and keeps the individual workflow files short. The image includes tools like `kubectl`, the ArgoCD CLI, `buildctl`, `pnpm`, and anything else the pipelines need.
@@ -57,7 +57,7 @@ Deployments are always triggered by CI — applications don't have ArgoCD auto-s
 
 ## References
 
-- [`platform/github-arc-runners/`](https://github.com/kbntx-org/nexus/tree/main/platform/github-arc-runners) — ARC controller and runner Helm charts
-- [`platform/custom-docker-images/`](https://github.com/kbntx-org/nexus/tree/main/platform/custom-docker-images) — CI toolkit image
+- [`platform/core/github-arc-runners/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/github-arc-runners) — ARC controller and runner Helm charts
+- [`platform/services/custom-docker-images/`](https://github.com/kbntx-org/nexus/tree/main/platform/services/custom-docker-images) — CI toolkit image
 - [`.github/workflows/`](https://github.com/kbntx-org/nexus/tree/main/.github/workflows) — workflow definitions
 - [Actions Runner Controller](https://github.com/actions/actions-runner-controller)

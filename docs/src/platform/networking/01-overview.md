@@ -55,7 +55,7 @@ The result: my devices can talk directly to any IP on the Hetzner private networ
 ## References
 
 - [`platform/cloudflare-ingress-controller/`](https://github.com/kbntx-org/nexus/tree/main/platform/cloudflare-ingress-controller) — custom controller managing tunnel lifecycle and syncing Ingress to Cloudflare
-- [`platform/bastion/`](https://github.com/kbntx-org/nexus/tree/main/platform/bastion) — bastion host provisioning and tunnel
-- [`platform/traefik/`](https://github.com/kbntx-org/nexus/tree/main/platform/traefik) — in-cluster ingress controller
+- [`platform/services/bastion/`](https://github.com/kbntx-org/nexus/tree/main/platform/services/bastion) — bastion host provisioning and tunnel
+- [`platform/core/traefik/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/traefik) — in-cluster ingress controller
 - [Cloudflare Tunnel documentation](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/)
 - [Cloudflare WARP](https://developers.cloudflare.com/cloudflare-one/connections/connect-devices/warp/)

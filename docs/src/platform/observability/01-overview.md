@@ -4,7 +4,7 @@ title: Overview
 
 ## Stack
 
-The monitoring stack provides metrics, logs, and dashboards for the cluster and all workloads. Every component is deployed as part of a single Helm chart at [`platform/monitoring/`](https://github.com/kbntx-org/nexus/tree/main/platform/monitoring).
+The monitoring stack provides metrics, logs, and dashboards for the cluster and all workloads. Every component is deployed as part of a single Helm chart at [`platform/services/monitoring/`](https://github.com/kbntx-org/nexus/tree/main/platform/services/monitoring).
 
 | Component              | Role                                                             |
 | ---------------------- | ---------------------------------------------------------------- |
@@ -48,11 +48,11 @@ Loki uses **S3-compatible object storage** for log chunks. This keeps log retent
 
 ## Adding Application Metrics
 
-Any application that exposes a `/metrics` endpoint in Prometheus format can be scraped. Add a scrape target in `platform/monitoring/values.yaml` or use a `ServiceMonitor` if the monitoring chart supports it.
+Any application that exposes a `/metrics` endpoint in Prometheus format can be scraped. Add a scrape target in `platform/services/monitoring/values.yaml` or use a `ServiceMonitor` if the monitoring chart supports it.
 
 ## References
 
-- [`platform/monitoring/`](https://github.com/kbntx-org/nexus/tree/main/platform/monitoring) — full stack Helm chart
+- [`platform/services/monitoring/`](https://github.com/kbntx-org/nexus/tree/main/platform/services/monitoring) — full stack Helm chart
 - [Grafana documentation](https://grafana.com/docs/)
 - [VictoriaMetrics documentation](https://docs.victoriametrics.com/)
 - [Loki documentation](https://grafana.com/docs/loki/latest/)

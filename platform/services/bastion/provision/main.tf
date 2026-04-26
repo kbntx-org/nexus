@@ -2,26 +2,26 @@ data "hcloud_network" "main_vpc" {
   name = "main-vpc"
 }
 
-module "vault" {
-  source = "../../terraform-modules/vps"
+module "bastion" {
+  source = "../../../modules/vps"
 
-  name        = "vault"
+  name        = "bastion"
   server_type = "cx23"
   image       = "ubuntu-24.04"
   location    = "nbg1"
   vpc_id      = data.hcloud_network.main_vpc.id
   labels = {
-    "app" = "vault"
+    "app" = "bastion"
   }
 }
 
-module "vault_firewall" {
-  source = "../../terraform-modules/firewall"
-  name   = "vault-firewall"
+module "bastion_firewall" {
+  source = "../../../modules/firewall"
+  name   = "bastion-firewall"
 
   ingress_rules = [
     { protocol = "tcp", port = "22", source_ips = ["10.0.0.0/16"] },
   ]
 
-  label_selector = "app=vault"
+  label_selector = "app=bastion"
 }

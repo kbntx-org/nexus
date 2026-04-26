@@ -4,7 +4,7 @@ argocd-apps:
       project: default
       source:
         repoURL: https://github.com/kbntx-org/nexus.git
-        path: platform/traefik
+        path: platform/core/traefik
         targetRevision: main
       destination:
         server: https://kubernetes.default.svc
@@ -17,7 +17,7 @@ argocd-apps:
       project: default
       source:
         repoURL: https://github.com/kbntx-org/nexus.git
-        path: platform/argocd
+        path: platform/core/argocd
         targetRevision: main
       destination:
         server: https://kubernetes.default.svc
@@ -30,7 +30,7 @@ argocd-apps:
       project: default
       source:
         repoURL: https://github.com/kbntx-org/nexus.git
-        path: platform/external-secrets
+        path: platform/core/external-secrets
         targetRevision: main
       destination:
         server: https://kubernetes.default.svc
@@ -43,7 +43,7 @@ argocd-apps:
       project: default
       source:
         repoURL: https://github.com/kbntx-org/nexus.git
-        path: platform/cloudflared
+        path: platform/core/cloudflared
         targetRevision: main
       destination:
         server: https://kubernetes.default.svc
@@ -56,7 +56,7 @@ argocd-apps:
       project: default
       source:
         repoURL: https://github.com/kbntx-org/nexus.git
-        path: platform/hetzner-cloud-controller
+        path: platform/core/hetzner-cloud-controller
         targetRevision: main
       destination:
         server: https://kubernetes.default.svc
@@ -69,7 +69,7 @@ argocd-apps:
       project: default
       source:
         repoURL: https://github.com/kbntx-org/nexus.git
-        path: platform/monitoring
+        path: platform/services/monitoring
         targetRevision: main
       destination:
         server: https://kubernetes.default.svc
@@ -82,7 +82,7 @@ argocd-apps:
       project: default
       source:
         repoURL: https://github.com/kbntx-org/nexus.git
-        path: platform/github-arc-runners/controller
+        path: platform/core/github-arc-runners/controller
         targetRevision: main
       destination:
         server: https://kubernetes.default.svc
@@ -95,7 +95,7 @@ argocd-apps:
       project: default
       source:
         repoURL: https://github.com/kbntx-org/nexus.git
-        path: platform/github-arc-runners/runners
+        path: platform/core/github-arc-runners/runners
         targetRevision: main
       destination:
         server: https://kubernetes.default.svc
@@ -108,7 +108,7 @@ argocd-apps:
       project: default
       source:
         repoURL: https://github.com/kbntx-org/nexus.git
-        path: platform/k3s-upgrades/system-upgrade-controller
+        path: platform/core/kubernetes/upgrades/system-upgrade-controller
         targetRevision: main
       destination:
         server: https://kubernetes.default.svc
@@ -121,7 +121,7 @@ argocd-apps:
       project: default
       source:
         repoURL: https://github.com/kbntx-org/nexus.git
-        path: platform/k3s-upgrades/plans
+        path: platform/core/kubernetes/upgrades/plans
         targetRevision: main
       destination:
         server: https://kubernetes.default.svc

@@ -24,7 +24,7 @@ The `ExternalSecret` CRD lives in Git (it only describes _which_ secret to fetch
 
 Vault runs on a **dedicated VPS** — not inside the K3S cluster. This is intentional: if the cluster is compromised, the secret store remains isolated.
 
-It uses **PostgreSQL as the storage backend** for durability, and is deployed via Docker Compose at `platform/vault/deploy/`.
+It uses **PostgreSQL as the storage backend** for durability, and is deployed via Docker Compose at `platform/core/vault/deploy/`.
 
 ### First-Time Setup
 
@@ -100,7 +100,7 @@ Add the annotation `force-sync: <any-value>` to an `ExternalSecret` to trigger a
 
 ## References
 
-- [`platform/vault/`](https://github.com/kbntx-org/nexus/tree/main/platform/vault) — Vault provisioning and Docker Compose deployment
-- [`platform/external-secrets/`](https://github.com/kbntx-org/nexus/tree/main/platform/external-secrets) — ESO Helm chart
+- [`platform/core/vault/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/vault) — Vault provisioning and Docker Compose deployment
+- [`platform/core/external-secrets/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/external-secrets) — ESO Helm chart
 - [HashiCorp Vault documentation](https://developer.hashicorp.com/vault)
 - [External Secrets Operator documentation](https://external-secrets.io/)

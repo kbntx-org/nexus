@@ -30,8 +30,8 @@ jobs:
       - name: nexus-ci-toolkit - build and push
         uses: docker/build-push-action@v6
         with:
-          context: platform/custom-docker-images/nexus-ci-toolkit
-          file: platform/custom-docker-images/nexus-ci-toolkit/Dockerfile
+          context: platform/services/custom-docker-images/nexus-ci-toolkit
+          file: platform/services/custom-docker-images/nexus-ci-toolkit/Dockerfile
           push: true
           tags: |
             kbntx/nexus-ci-toolkit:1.0
