@@ -20,15 +20,25 @@
         Expires "0"
     }
 
-    @assets {
+    @cache-validated-assets {
+        path */assets/extra.css
+    }
+
+    @cached-assets {
         path *.js *.css *.png *.jpg *.jpeg *.gif *.ico *.svg *.webp *.avif *.woff *.woff2 *.ttf *.eot
+        not path */assets/extra.css
     }
 
     @json {
         path *.json
     }
 
-    header @assets {
+    header @cache-validated-assets {
+        Cache-Control "no-cache, must-revalidate"
+        Expires "0"
+    }
+
+    header @cached-assets {
         Cache-Control "public, max-age=31536000, immutable"
     }
 

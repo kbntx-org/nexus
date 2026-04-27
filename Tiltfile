@@ -116,7 +116,8 @@ helm_resource(
 docker_build(
   'documentation',
   'docs',
-  dockerfile='docs/Dockerfile.local',
+  dockerfile='docs/Dockerfile',
+  target='local',
   live_update=[
     sync('docs/src', '/workspace/src'),
     sync('docs/mkdocs.yml', '/workspace/mkdocs.yml'),

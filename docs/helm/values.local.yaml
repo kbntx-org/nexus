@@ -1,4 +1,3 @@
-containerPort: 8000
 replicas: 1
 ingressHosts:
   - docs.localhost

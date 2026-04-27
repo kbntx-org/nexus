@@ -6,9 +6,6 @@ hide:
 ---
 
 <style>
-  /* ---------- Homepage-only theme overrides ---------- */
-  /* The lofi background is integral to the hero design, so the homepage
-     stays night-themed regardless of the user's light/dark preference. */
   [data-md-color-scheme="slate"],
   [data-md-color-scheme="default"] {
     --md-default-bg-color: var(--nexus-night-sky);
@@ -66,7 +63,6 @@ hide:
     background: transparent !important;
   }
 
-  /* Hide Material's auto-generated h1 + edit button on this page only */
   .md-typeset h1:first-child,
   .md-content__button {
     display: none;
@@ -75,13 +71,6 @@ hide:
   .md-tabs,
   .md-footer {
     display: none;
-  }
-
-  @media (min-width: 768px) {
-    html,
-    body {
-      overflow: hidden;
-    }
   }
 
   /* ---------- Hero ---------- */
@@ -158,7 +147,6 @@ hide:
     align-items: center;
   }
 
-  /* ---------- CTAs (gold primary + glass ghost) ---------- */
   .nexus-cta {
     display: inline-flex;
     align-items: center;
@@ -202,7 +190,6 @@ hide:
     transform: translateY(-1px);
   }
 
-  /* ---------- Pillar + link cards ---------- */
   .nexus-pillars {
     position: relative;
     z-index: 1;
@@ -288,7 +275,6 @@ hide:
     line-height: 1.5;
   }
 
-  /* ---------- Animations (mirrored from the portfolio) ---------- */
   @keyframes nexus-slide-in-up {
     from { opacity: 0; transform: translateY(30px); }
     to   { opacity: 1; transform: translateY(0); }
