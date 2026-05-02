@@ -16,7 +16,6 @@ spec:
   bootstrap:
     initdb:
       database: n8n
-      owner: postgres
 {{- if .Values.backup.enabled }}
   backup:
     barmanObjectStore:
