@@ -39,6 +39,19 @@ argocd-apps:
         syncOptions:
           - CreateNamespace=true
 
+    cloudnative-pg:
+      project: default
+      source:
+        repoURL: https://github.com/kbntx/nexus.git
+        path: platform/core/cloudnative-pg
+        targetRevision: main
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: cloudnative-pg
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+
     cloudflared:
       project: default
       source:
