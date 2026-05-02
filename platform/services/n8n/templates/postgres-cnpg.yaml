@@ -12,7 +12,7 @@ spec:
 
   enableSuperuserAccess: true
   superuserSecret:
-    name: n8n-postgres-cnpg-app
+    name: n8n-secret-user-credentials
   bootstrap:
     initdb:
       database: n8n
