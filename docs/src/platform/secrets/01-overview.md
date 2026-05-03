@@ -4,64 +4,42 @@ title: Overview
 
 Secrets in Nexus follow one rule: **the cluster never owns the source of
 truth.** No secret value is committed to Git, and no secret value lives
-exclusively inside the cluster. The credentials, tokens, and connection
-strings every workload needs are kept in
-[HashiCorp Vault](https://developer.hashicorp.com/vault){ target="\_blank" rel="noopener" }
-running on a separate VM, and the cluster reaches in for them through the
+exclusively inside an application's Kubernetes manifest. The credentials,
+tokens, and connection strings every workload needs are kept in
+[HashiCorp Vault](https://developer.hashicorp.com/vault){ target="\_blank" rel="noopener" },
+and the cluster reaches in for them through the
 [External Secrets Operator](https://external-secrets.io/){ target="\_blank" rel="noopener" }.
 What lives in Git is a declarative description of _which_ secret a
 workload needs; the value itself is materialised at runtime by the
 operator.
 
-That split — store outside, materialise inside — is what lets the
-cluster be treated as cattle. It can be torn down and rebuilt without
-losing a single credential, and a fresh cluster comes back up by simply
-re-reading from Vault.
+That split — store centrally, materialise per-workload — is what lets
+the cluster be treated as cattle. Application namespaces can be torn
+down and rebuilt without losing a single credential, and a fresh
+namespace comes back up by simply re-reading from Vault.
 
-## Why Vault sits outside the cluster
+## Vault in the cluster
 
-The hardest secret to bootstrap is the cluster's own credentials. If
-Vault lived inside k3s, recovering from a cluster loss would mean
-recovering the secret store _from the very secrets the secret store is
-supposed to provide_ — a chicken-and-egg problem with no clean answer.
+Vault runs in-cluster as a Helm chart at
+[`platform/core/vault/server/`](https://github.com/kbntx/nexus/tree/main/platform/core/vault/server){ target="\_blank" rel="noopener" }.
+The chart owns three things: the Vault Deployment itself, a
+[CloudNativePG](https://cloudnative-pg.io/){ target="\_blank" rel="noopener" }
+`Cluster` for storage, and the in-cluster `Ingress` that fronts the API.
 
-Putting Vault on its own VM removes the cycle:
+```mermaid
+%%{init: {'theme':'dark'}}%%
+graph LR
+    Ingress[Traefik<br/>Ingress]
+    Vault[Vault<br/>Deployment]
+    CNPG[(vault-postgres-cnpg<br/>CNPG cluster)]
+    R2[(R2 bucket<br/>barman backups)]
 
-- The cluster can be destroyed and rebuilt — wholesale or piecewise —
-  without touching the secret store.
-- A rebuilt cluster reaches Vault the same way it always did and refills
-  itself with no manual key entry.
-- The blast radius of a cluster compromise stops at the cluster: nothing
-  that runs there has ambient access to Vault's storage.
+    Ingress --> Vault
+    Vault -->|kv reads/writes| CNPG
+    CNPG -->|WAL + base| R2
+```
 
-Operator access to Vault uses the same private path as the rest of the
-platform — the bastion + WARP setup described in
-[Networking](../networking/01-overview.md). There is no separate VPN or
-SSH endpoint to manage.
-
-## The Vault VM
-
-Vault is provisioned with
-[Terraform](https://developer.hashicorp.com/terraform){ target="\_blank" rel="noopener" }
-in
-[`platform/core/vault/provision/`](https://github.com/kbntx/nexus/tree/main/platform/core/vault/provision){ target="\_blank" rel="noopener" }
-— a single Hetzner VM joined to the same private VPC as the cluster
-nodes, fronted by a firewall that only admits SSH from inside the VPC.
-The VM has no inbound internet exposure of its own.
-
-The workload on the VM is a small
-[Docker Compose](https://docs.docker.com/compose/){ target="\_blank" rel="noopener" }
-stack
-([`platform/core/vault/deploy/`](https://github.com/kbntx/nexus/tree/main/platform/core/vault/deploy){ target="\_blank" rel="noopener" })
-with three containers:
-
-| Container     | Role                                                                                                                                                                                                                                               |
-| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `vault`       | The Vault server itself, configured by [`config.hcl`](https://github.com/kbntx/nexus/blob/main/platform/core/vault/deploy/config/config.hcl){ target="\_blank" rel="noopener" }                                                                    |
-| `postgres`    | [PostgreSQL](https://www.postgresql.org/){ target="\_blank" rel="noopener" } storage backend, initialised from [`vault.sql`](https://github.com/kbntx/nexus/blob/main/platform/core/vault/deploy/sql/vault.sql){ target="\_blank" rel="noopener" } |
-| `cloudflared` | Outbound Cloudflare Tunnel that publishes the Vault API at a public hostname without opening any inbound port                                                                                                                                      |
-
-### Why a separate Postgres for storage
+### Why Postgres for storage
 
 Vault supports several storage backends; this stack uses Postgres
 deliberately rather than the embedded file or integrated-storage (Raft)
@@ -69,34 +47,73 @@ options:
 
 - **Durability story matches the rest of the platform.** Postgres is
   already a known quantity here — backups, point-in-time recovery, and
-  monitoring are all things the rest of the stack already does for
-  databases. Reusing those tools beats adopting a Vault-specific
-  snapshotting workflow.
+  monitoring are all things CloudNativePG already does for the other
+  databases in the cluster. Reusing those tools beats adopting a
+  Vault-specific snapshotting workflow.
 - **Storage and compute upgrade independently.** The Vault binary can be
-  rebuilt or rolled forward without touching the data volume, and
-  Postgres can be upgraded without rewriting Vault state.
+  rolled forward without touching the data volume, and Postgres can be
+  upgraded without rewriting Vault state.
 - **Schema is trivially understood.** The backend is a single
   key/value-style table — there is no opaque on-disk format, which makes
   inspection and disaster recovery much more straightforward than with
   a black-box embedded store.
 
-The Vault listener itself runs plain HTTP inside the VM. TLS is
-terminated at the Cloudflare edge in front of the tunnel — the same
-pattern the cluster uses for public app traffic.
+The schema is bootstrapped on first init by CNPG's
+`postInitApplicationSQLRefs`, which reads
+[`vault.sql`](https://github.com/kbntx/nexus/blob/main/platform/core/vault/server/files/vault.sql){ target="\_blank" rel="noopener" }
+out of the `vault-postgres-init` ConfigMap and runs it against the
+freshly-created `vault` database. That step only fires the first time
+the cluster bootstraps; recovered or re-attached volumes skip it.
 
-### First-time initialisation
+### The bootstrap secret
+
+There is exactly one secret that does not come from Vault itself: a
+Kubernetes `Secret` named `vault-secret` in the `vault` namespace,
+applied manually by the operator. It carries everything Vault needs
+before it can serve its first request:
+
+- the Postgres connection URI used by the Vault config,
+- the CNPG cluster's superuser username/password,
+- the R2 access key and secret used by barman for backups.
+
+This is the chicken-and-egg of running the secret store in-cluster,
+contained: every other credential in the cluster is reconciled from
+Vault, but Vault's own database connection has to exist before Vault
+can come up. Keeping it to a single, well-known secret (rather than the
+old VM-scoped Vault stack) is the deliberate trade-off — it loses some
+isolation but keeps the recovery story to a single `kubectl apply`.
+
+### Config rendering and sealing
+
+The Vault Deployment runs an init container that `envsubst`s the
+Postgres connection URI from `vault-secret` into
+[`config.hcl`](https://github.com/kbntx/nexus/blob/main/platform/core/vault/server/templates/vault-config.yaml){ target="\_blank" rel="noopener" }
+before the main container starts. The rendered config lives in an
+`emptyDir`, so the URI never lands on disk and is re-resolved on every
+restart.
 
 Vault is sealed on first boot and after every restart. Initialising and
-unsealing is a one-time operator task done over the bastion path; the
-unseal keys and root token produced by `vault operator init` are stored
-out-of-band (password manager) and never re-emitted by Vault. There is
-no auto-unseal configured on this stack — manual unseal after a restart
-is the deliberate trade-off for keeping the keys off the VM.
+unsealing is a one-time operator task; the unseal keys and root token
+produced by `vault operator init` are stored out-of-band (password
+manager) and never re-emitted by Vault. There is no auto-unseal
+configured — manual unseal after a restart is the deliberate trade-off
+for keeping the keys off the cluster.
+
+### Local development
+
+In dev mode (`values.local.yaml` sets `dev: true`), the chart drops the
+CNPG cluster and the config-init container entirely and runs Vault with
+its built-in `-dev` flag against an in-memory backend. A seed init
+container — defined in
+[`seed-script.yaml`](https://github.com/kbntx/nexus/blob/main/platform/core/vault/server/templates/seed-script.yaml){ target="\_blank" rel="noopener" }
+— pre-enables Kubernetes auth, the `admin` policy and role, and the
+`dev` KV mount, so a freshly-up local cluster has a working Vault
+without any operator steps.
 
 ## External Secrets Operator
 
 In-cluster, the
-[External Secrets Operator](https://external-secrets.io/){ target="\_blank" rel="noopener" }
+External Secrets Operator
 (installed from
 [`platform/core/external-secrets/`](https://github.com/kbntx/nexus/tree/main/platform/core/external-secrets){ target="\_blank" rel="noopener" })
 reconciles two CRDs:
@@ -115,7 +132,7 @@ secrets — without ever knowing Vault is in the picture.
 ```mermaid
 %%{init: {'theme':'dark'}}%%
 graph LR
-    Vault[Vault VM<br/>kv v2]
+    Vault[Vault<br/>kv v2]
     ESO[External Secrets<br/>Operator]
     Secret[Kubernetes<br/>Secret]
     App[Application<br/>pod]
@@ -172,26 +189,28 @@ around them.
 
 ## Backups and disaster recovery
 
-Vault's durability today rests on two things: the Postgres volume on
-the VM, and the unseal keys/root token kept out-of-band. There is no
-automated backup of the Postgres volume in
-[`platform/core/vault/deploy/`](https://github.com/kbntx/nexus/tree/main/platform/core/vault/deploy){ target="\_blank" rel="noopener" }
-at the moment — that is a known gap, not a deliberate omission. A
-periodic logical dump shipped off the VM is the obvious next step and
-will land in the deploy stack rather than in this doc.
+Vault's durability rests on two things: the CNPG Postgres cluster
+backing its KV store, and the unseal keys/root token kept out-of-band.
 
-In the meantime, the recovery story is: the VM itself can be re-imaged
-from Terraform, the Compose stack is fully declarative and rebuilds in
-one command, and Vault state lives entirely in the Postgres volume — so
-preserving (or restoring) that volume is sufficient to bring Vault back
-to its last known state, after which the unseal keys complete the
-recovery.
+The Postgres cluster is backed up by CNPG's
+[barman integration](https://cloudnative-pg.io/documentation/current/backup_recovery/){ target="\_blank" rel="noopener" }
+— full base backups plus continuous WAL shipping to an R2 bucket, on
+a daily `ScheduledBackup` and the same retention policy as the other
+in-cluster databases. The barman credentials and destination bucket are
+configured on the `Cluster` resource in
+[`postgres-cnpg.yaml`](https://github.com/kbntx/nexus/blob/main/platform/core/vault/server/templates/postgres-cnpg.yaml){ target="\_blank" rel="noopener" }.
+
+Recovery is a two-step story: restore the CNPG cluster from its backup
+(point-in-time if needed), then re-apply `vault-secret` and unseal Vault
+manually. Nothing in Git needs to change for either step — both the
+chart and the schema bootstrap are idempotent against an existing data
+volume.
 
 ## References
 
-- [`platform/core/vault/provision/`](https://github.com/kbntx/nexus/tree/main/platform/core/vault/provision){ target="\_blank" rel="noopener" } — Terraform for the Vault VM, VPC attachment, and firewall
-- [`platform/core/vault/deploy/`](https://github.com/kbntx/nexus/tree/main/platform/core/vault/deploy){ target="\_blank" rel="noopener" } — Compose stack, Dockerfiles, and Vault config
-- [`platform/core/vault/deploy/config/config.hcl`](https://github.com/kbntx/nexus/blob/main/platform/core/vault/deploy/config/config.hcl){ target="\_blank" rel="noopener" } — listener, storage backend, telemetry
-- [`platform/core/vault/deploy/sql/vault.sql`](https://github.com/kbntx/nexus/blob/main/platform/core/vault/deploy/sql/vault.sql){ target="\_blank" rel="noopener" } — Postgres schema for Vault's storage backend
+- [`platform/core/vault/server/`](https://github.com/kbntx/nexus/tree/main/platform/core/vault/server){ target="\_blank" rel="noopener" } — Vault Helm chart (Deployment, CNPG cluster, Ingress, dev seed)
+- [`platform/core/vault/server/templates/postgres-cnpg.yaml`](https://github.com/kbntx/nexus/blob/main/platform/core/vault/server/templates/postgres-cnpg.yaml){ target="\_blank" rel="noopener" } — CNPG `Cluster` and `ScheduledBackup` for Vault's storage
+- [`platform/core/vault/server/templates/vault-config.yaml`](https://github.com/kbntx/nexus/blob/main/platform/core/vault/server/templates/vault-config.yaml){ target="\_blank" rel="noopener" } — Vault listener, storage backend, telemetry
+- [`platform/core/vault/server/files/vault.sql`](https://github.com/kbntx/nexus/blob/main/platform/core/vault/server/files/vault.sql){ target="\_blank" rel="noopener" } — Postgres schema for Vault's storage backend
 - [`platform/core/external-secrets/`](https://github.com/kbntx/nexus/tree/main/platform/core/external-secrets){ target="\_blank" rel="noopener" } — ESO Helm chart and TokenReview RBAC
 - [`platform/core/cloudflared/templates/secrets.yaml`](https://github.com/kbntx/nexus/blob/main/platform/core/cloudflared/templates/secrets.yaml){ target="\_blank" rel="noopener" } — canonical `SecretStore` + `ExternalSecret` example to copy from

@@ -1,4 +1,5 @@
 DOCKER_CONTEXT = "kind-kind"
+update_settings(max_parallel_updates=6)
 
 default_registry(
   "localhost:5005",
@@ -29,6 +30,43 @@ def dotenv_helm_flags(path):
     index += 1
   return flags
 
+def helm_install(name, chartPath, namespace=None, valueFiles=None, labels=None, resourceDeps=None):
+  namespace    = namespace    or name
+  valueFiles   = valueFiles   or []
+  labels       = labels       or ['infra']
+  resourceDeps = resourceDeps or []
+
+  chartYaml    = read_yaml(chartPath + '/Chart.yaml')
+  dependencies = chartYaml.get('dependencies') or []
+
+  commands = []
+  for dependency in dependencies:
+    repository = dependency.get('repository', '')
+    if repository.startswith('http://') or repository.startswith('https://'):
+      commands.append(
+        'helm repo add %s %s --force-update' % (dependency['name'], repository)
+      )
+
+  commands.append('helm dependency build ' + chartPath)
+
+  upgradeCommand = (
+    'helm upgrade --install %s %s --namespace %s --create-namespace --wait' %
+    (name, chartPath, namespace)
+  )
+  for valueFile in valueFiles:
+    upgradeCommand += ' --values ' + valueFile
+  commands.append(upgradeCommand)
+
+  local_resource(
+    name,
+    cmd=' && '.join(commands),
+    deps=[chartPath],
+    ignore=[chartPath + '/Chart.lock', chartPath + '/charts'],
+    labels=labels,
+    resource_deps=resourceDeps,
+    allow_parallel=True,
+  )
+
 def bootstrap_kubernetes(kubernetesContext):
   availableContexts = [
     contextName
@@ -56,7 +94,7 @@ config.define_string_list("profile", args=False, usage="Dev profiles: docs | por
 parsedConfig = config.parse()
 selectedProfiles = parsedConfig.get("profile", [])
 
-CORE_RESOURCES = ['traefik', 'metrics-server-repo', 'metrics-server']
+CORE_RESOURCES = ['external-secrets', 'traefik', 'metrics-server-repo', 'metrics-server']
 
 SERVICES = {
   'docs':      ['docs'],
@@ -76,10 +114,15 @@ if selectedProfiles:
 else:
   enabledResources = list(SERVICES['all'])
 
-config.set_enabled_resources(CORE_RESOURCES + enabledResources)
-print("🚀 Profiles: %s — enabling: %s" % (selectedProfiles or ['all'], ', '.join(enabledResources)))
+if config.tilt_subcommand != 'down':
+  config.set_enabled_resources(CORE_RESOURCES + enabledResources)
+  print("🚀 Profiles: %s — enabling: %s" % (selectedProfiles or ['all'], ', '.join(enabledResources)))
+else:
+  print("🛑 Cleaning up everything")
 
 bootstrap_kubernetes(DOCKER_CONTEXT)
+
+helm_install('external-secrets', 'platform/core/external-secrets')
 
 helm_repo(
   'metrics-server-repo',
@@ -135,6 +178,7 @@ helm_resource(
     '--values', 'docs/helm/values.local.yaml',
     '--create-namespace',
   ],
+  links=[link('http://docs.localhost', 'docs.localhost')],
   labels=['product'],
 )
 
@@ -172,5 +216,6 @@ helm_resource(
     '--values', 'apps/portfolio/chart/values.local.yaml',
     '--create-namespace',
   ],
+  links=[link('http://portfolio.localhost', 'portfolio.localhost')],
   labels=['product'],
 )
