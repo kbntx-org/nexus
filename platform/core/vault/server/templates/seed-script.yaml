@@ -76,6 +76,17 @@ data:
     echo "Enabling KV engine..."
     vault_enable_if_missing secrets dev kv-v2
 
+    echo "Seeding dev/monitoring KV..."
+    if vault kv get dev/monitoring > /dev/null 2>&1; then
+      echo "KV 'dev/monitoring' already exists, skipping."
+    else
+      vault kv put dev/monitoring \
+        grafanaUser=admin \
+        grafanaPassword=admin \
+        postgresUser=postgres \
+        postgresPassword=grafana
+    fi
+
     echo "Vault seeding complete."
     exec sleep infinity
 {{- end }}

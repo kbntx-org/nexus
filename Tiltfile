@@ -30,42 +30,15 @@ def dotenv_helm_flags(path):
     index += 1
   return flags
 
-def helm_install(name, chartPath, namespace=None, valueFiles=None, labels=None, resourceDeps=None):
-  namespace    = namespace    or name
-  valueFiles   = valueFiles   or []
-  labels       = labels       or ['infra']
-  resourceDeps = resourceDeps or []
-
-  chartYaml    = read_yaml(chartPath + '/Chart.yaml')
-  dependencies = chartYaml.get('dependencies') or []
-
-  commands = []
-  for dependency in dependencies:
+def helm_chart_deps(chartPath):
+  if config.tilt_subcommand == 'down':
+    return
+  chartYaml = read_yaml(chartPath + '/Chart.yaml')
+  for dependency in chartYaml.get('dependencies') or []:
     repository = dependency.get('repository', '')
     if repository.startswith('http://') or repository.startswith('https://'):
-      commands.append(
-        'helm repo add %s %s --force-update' % (dependency['name'], repository)
-      )
-
-  commands.append('helm dependency build ' + chartPath)
-
-  upgradeCommand = (
-    'helm upgrade --install %s %s --namespace %s --create-namespace --wait' %
-    (name, chartPath, namespace)
-  )
-  for valueFile in valueFiles:
-    upgradeCommand += ' --values ' + valueFile
-  commands.append(upgradeCommand)
-
-  local_resource(
-    name,
-    cmd=' && '.join(commands),
-    deps=[chartPath],
-    ignore=[chartPath + '/Chart.lock', chartPath + '/charts'],
-    labels=labels,
-    resource_deps=resourceDeps,
-    allow_parallel=True,
-  )
+      local('helm repo add %s %s --force-update' % (dependency['name'], repository), quiet=True)
+  local('helm dependency build ' + chartPath, quiet=True)
 
 def bootstrap_kubernetes(kubernetesContext):
   availableContexts = [
@@ -90,16 +63,21 @@ def bootstrap_kubernetes(kubernetesContext):
   print("✅ Kubernetes cluster running, starting local dev")
 
 # ── Profiles ──────────────────────────────────────────────────────────────────
-config.define_string_list("profile", args=False, usage="Dev profiles: docs | portfolio | all")
+config.define_string_list("profile", args=False, usage="Dev profiles: docs | portfolio | monitoring | all")
 parsedConfig = config.parse()
 selectedProfiles = parsedConfig.get("profile", [])
 
-CORE_RESOURCES = ['vault', 'external-secrets', 'traefik', 'metrics-server-repo', 'metrics-server']
+CORE_RESOURCES = ['vault', 'external-secrets', 'traefik', 'metrics-server-repo', 'metrics-server', 'cloudnative-pg']
+
+# Stateful infra that should survive `tilt down` so we don't waste minutes
+# re-installing the operator on every cycle.
+PERSISTED_ON_DOWN = ['cloudnative-pg']
 
 SERVICES = {
-  'docs':      ['docs'],
-  'portfolio': ['portfolio'],
-  'all':       ['docs', 'portfolio'],
+  'docs':       ['docs'],
+  'portfolio':  ['portfolio'],
+  'monitoring': ['monitoring'],
+  'all':        ['docs', 'portfolio'],
 }
 
 if selectedProfiles:
@@ -118,11 +96,21 @@ if config.tilt_subcommand != 'down':
   config.set_enabled_resources(CORE_RESOURCES + enabledResources)
   print("🚀 Profiles: %s — enabling: %s" % (selectedProfiles or ['all'], ', '.join(enabledResources)))
 else:
-  print("🛑 Cleaning up everything")
+  resourcesToTearDown = [r for r in CORE_RESOURCES + enabledResources if r not in PERSISTED_ON_DOWN]
+  config.set_enabled_resources(resourcesToTearDown)
+  print("🛑 Cleaning up (preserving: %s)" % ', '.join(PERSISTED_ON_DOWN))
 
 bootstrap_kubernetes(DOCKER_CONTEXT)
 
-helm_install('external-secrets', 'platform/core/external-secrets')
+helm_chart_deps('platform/core/external-secrets')
+helm_resource(
+  'external-secrets',
+  'platform/core/external-secrets',
+  namespace='external-secrets',
+  flags=['--create-namespace'],
+  deps=['platform/core/external-secrets'],
+  labels=['infra'],
+)
 
 helm_repo(
   'metrics-server-repo',
@@ -166,6 +154,33 @@ helm_resource(
     '--values', 'platform/core/traefik/values.local.yaml',
   ],
   labels=['infra'],
+)
+
+# ── CloudNative-PG (Postgres operator, required by monitoring) ────────────────
+helm_chart_deps('platform/core/cloudnative-pg')
+helm_resource(
+  'cloudnative-pg',
+  'platform/core/cloudnative-pg',
+  namespace='cloudnative-pg',
+  flags=['--create-namespace'],
+  deps=['platform/core/cloudnative-pg'],
+  labels=['infra'],
+)
+
+# ── Monitoring (VictoriaMetrics + Grafana + Loki + node/kube-state metrics) ───
+helm_chart_deps('platform/services/monitoring')
+helm_resource(
+  'monitoring',
+  'platform/services/monitoring',
+  namespace='monitoring',
+  flags=[
+    '--values', 'platform/services/monitoring/values.local.yaml',
+    '--create-namespace',
+  ],
+  deps=['platform/services/monitoring'],
+  resource_deps=['vault', 'external-secrets', 'cloudnative-pg', 'traefik'],
+  labels=['infra'],
+  links=[link('http://grafana.localhost', 'grafana.localhost')],
 )
 
 # ── Docs ──────────────────────────────────────────────────────────────────────
