@@ -4,7 +4,7 @@ metadata:
   name: monitoring-ingress
 spec:
   rules:
-    - host: grafana.kbntx.com
+    - host: {{ .Values.ingress.grafanaHost | quote }}
       http:
         paths:
           - path: /
@@ -14,7 +14,7 @@ spec:
                 name: monitoring-grafana
                 port:
                   number: 80
-    - host: prometheus.kbntx.com
+    - host: {{ .Values.ingress.prometheusHost | quote }}
       http:
         paths:
           - path: /

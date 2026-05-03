@@ -6,6 +6,15 @@ backup:
   destinationPath: s3://nexus-database-backups/grafana-cnpg
   endpointURL: https://2bde0126da63a3a9c94029d14ea380db.eu.r2.cloudflarestorage.com
 
+externalSecrets:
+  vaultServer: https://vault.kbntx.com
+  vaultPath: platform
+  vaultRole: monitoring
+
+ingress:
+  grafanaHost: grafana.kbntx.com
+  prometheusHost: prometheus.kbntx.com
+
 victoria-metrics-single:
   server:
     scrape:
