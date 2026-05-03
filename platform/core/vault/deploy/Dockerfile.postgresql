@@ -1,2 +1,0 @@
-FROM postgres:18.1-alpine3.22
-COPY sql/vault.sql /docker-entrypoint-initdb.d/vault.sql
