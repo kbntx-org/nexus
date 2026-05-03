@@ -1,0 +1,81 @@
+{{- if .Values.dev }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vault-seed-script
+data:
+  seed-vault.sh: |
+    #!/bin/sh
+    set -e
+
+    export VAULT_ADDR='http://127.0.0.1:8200'
+    export VAULT_TOKEN='root'
+
+    vault_enable_if_missing() {
+      TYPE=$1
+      MOUNT_PATH=$2
+      MOUNT_TYPE=$3
+      shift 3
+
+      if [ "$TYPE" = "auth" ]; then
+        if vault auth list | grep -q "^${MOUNT_PATH}/"; then
+          echo "Auth method '${MOUNT_PATH}' already enabled, skipping."
+        else
+          vault auth enable "$@" "$MOUNT_TYPE"
+        fi
+      else
+        if vault secrets list | grep -q "^${MOUNT_PATH}/"; then
+          echo "Secrets engine '${MOUNT_PATH}' already enabled, skipping."
+        else
+          vault secrets enable "$@" -path="$MOUNT_PATH" "$MOUNT_TYPE"
+        fi
+      fi
+    }
+
+    vault_write_if_missing() {
+      RESOURCE_PATH=$1
+      shift
+      if vault read "$RESOURCE_PATH" > /dev/null 2>&1; then
+        echo "Resource '${RESOURCE_PATH}' already exists, skipping."
+      else
+        vault write "$RESOURCE_PATH" "$@"
+      fi
+    }
+
+    echo "Waiting for Vault to be ready..."
+    until vault status > /dev/null 2>&1; do
+      sleep 1
+    done
+
+    echo "Enabling Kubernetes auth..."
+    vault_enable_if_missing auth kubernetes kubernetes
+
+    echo "Configuring Kubernetes auth..."
+    vault_write_if_missing auth/kubernetes/config \
+      kubernetes_host="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"
+
+    echo "Creating admin policy..."
+    if vault policy read admin > /dev/null 2>&1; then
+      echo "Policy 'admin' already exists, skipping."
+    else
+      vault policy write admin - <<EOF
+    path "*" {
+      capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+    }
+    EOF
+    fi
+
+    echo "Creating admin Kubernetes role..."
+    vault_write_if_missing auth/kubernetes/role/admin \
+      bound_service_account_names="*" \
+      bound_service_account_namespaces="*" \
+      policies=admin \
+      audience="vault" \
+      ttl=24h
+
+    echo "Enabling KV engine..."
+    vault_enable_if_missing secrets dev kv-v2
+
+    echo "Vault seeding complete."
+    exec sleep infinity
+{{- end }}

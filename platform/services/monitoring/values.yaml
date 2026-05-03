@@ -1,3 +1,11 @@
+postgresCluster:
+  storageClass: hcloud-volumes
+
+backup:
+  enabled: true
+  destinationPath: s3://nexus-database-backups/grafana-cnpg
+  endpointURL: https://2bde0126da63a3a9c94029d14ea380db.eu.r2.cloudflarestorage.com
+
 victoria-metrics-single:
   server:
     scrape:
@@ -46,7 +54,7 @@ grafana:
       disable_login_form: true
     database:
       type: postgres
-      host: postgres:5432
+      host: grafana-postgres-cnpg-rw:5432
       name: grafana
       user: ${POSTGRES_USER}
       password: ${POSTGRES_PASSWORD}

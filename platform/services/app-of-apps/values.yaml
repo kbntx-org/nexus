@@ -39,6 +39,19 @@ argocd-apps:
         syncOptions:
           - CreateNamespace=true
 
+    vault:
+      project: default
+      source:
+        repoURL: https://github.com/kbntx/nexus.git
+        path: platform/core/vault/server
+        targetRevision: main
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: vault
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+
     cloudnative-pg:
       project: default
       source:
@@ -51,6 +64,7 @@ argocd-apps:
       syncPolicy:
         syncOptions:
           - CreateNamespace=true
+          - ServerSideApply=true
 
     cloudflared:
       project: default

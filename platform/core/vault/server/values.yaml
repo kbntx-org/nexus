@@ -1,0 +1,13 @@
+image: hashicorp/vault:1.21.2
+ingressHost: vault.kbntx.com
+args: ['server']
+
+dev: false
+
+postgresCluster:
+  storageClass: hcloud-volumes
+
+backup:
+  enabled: true
+  destinationPath: s3://nexus-database-backups/vault-cnpg
+  endpointURL: https://2bde0126da63a3a9c94029d14ea380db.eu.r2.cloudflarestorage.com
