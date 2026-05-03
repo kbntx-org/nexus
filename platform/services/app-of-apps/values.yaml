@@ -64,6 +64,7 @@ argocd-apps:
       syncPolicy:
         syncOptions:
           - CreateNamespace=true
+          - ServerSideApply=true
 
     cloudflared:
       project: default
