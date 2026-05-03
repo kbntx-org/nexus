@@ -1,0 +1,9 @@
+{{- if not .Values.dev }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vault-postgres-init
+data:
+  vault.sql: |
+{{ .Files.Get "files/vault.sql" | indent 4 }}
+{{- end }}

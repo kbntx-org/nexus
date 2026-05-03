@@ -1,0 +1,3 @@
+ingressHost: vault.localhost
+args: ['server', '-dev', '-dev-root-token-id=root']
+dev: true

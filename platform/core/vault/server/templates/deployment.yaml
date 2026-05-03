@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vault
+  labels:
+    app: vault
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: vault
+  template:
+    metadata:
+      labels:
+        app: vault
+    spec:
+      serviceAccountName: vault-sa
+      initContainers:
+        {{- if .Values.dev }}
+        {{- include "vault.seedContainer" . | nindent 8 }}
+        {{- else }}
+        {{- include "vault.configInitContainer" . | nindent 8 }}
+        {{- end }}
+      containers:
+        - name: vault
+          image: {{ .Values.image }}
+          args: {{ .Values.args | toJson }}
+          securityContext:
+            capabilities:
+              add:
+                - IPC_LOCK
+          ports:
+            - name: http
+              containerPort: 8200
+              protocol: TCP
+          volumeMounts:
+            {{- if .Values.dev }}
+            - name: vault-config-map
+              mountPath: /vault/config/config.hcl
+              subPath: config.hcl
+            {{- else }}
+            - name: vault-config
+              mountPath: /vault/config
+            {{- end }}
+      volumes:
+        - name: vault-config-map
+          configMap:
+            name: vault-config
+            defaultMode: 0755
+        {{- if .Values.dev }}
+        - name: vault-seed-script
+          configMap:
+            name: vault-seed-script
+            defaultMode: 0755
+        {{- else }}
+        - name: vault-config
+          emptyDir: {}
+        {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vault
+  labels:
+    app: vault
+spec:
+  type: ClusterIP
+  selector:
+    app: vault
+  ports:
+    - name: http
+      port: 8200
+      targetPort: http
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vault
+  labels:
+    app: vault
+spec:
+  rules:
+    - host: {{ .Values.ingressHost }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: vault
+                port:
+                  number: 8200
