@@ -94,7 +94,7 @@ config.define_string_list("profile", args=False, usage="Dev profiles: docs | por
 parsedConfig = config.parse()
 selectedProfiles = parsedConfig.get("profile", [])
 
-CORE_RESOURCES = ['external-secrets', 'traefik', 'metrics-server-repo', 'metrics-server']
+CORE_RESOURCES = ['vault', 'external-secrets', 'traefik', 'metrics-server-repo', 'metrics-server']
 
 SERVICES = {
   'docs':      ['docs'],
@@ -140,6 +140,19 @@ helm_resource(
   ],
   resource_deps=['metrics-server-repo'],
   labels=['infra'],
+)
+
+helm_resource(
+  'vault',
+  'platform/core/vault/server',
+  namespace='default',
+  flags=[
+    '--values', 'platform/core/vault/server/values.local.yaml',
+    '--create-namespace',
+  ],
+  deps=['platform/core/vault/server'],
+  labels=['infra'],
+  links=[link('http://vault.localhost', 'vault.localhost')],
 )
 
 # ── Traefik (auto-started as a dependency of all product services) ─────────────
