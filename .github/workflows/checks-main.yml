@@ -5,8 +5,8 @@ on:
     branches: [main]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.sha }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   affected:
@@ -24,27 +24,37 @@ jobs:
     uses: ./.github/workflows/test-main.yml
     secrets: inherit
 
-  deploy-portfolio:
-    name: Deploy Portfolio
-    needs: [affected, lint-and-format, test]
+  build-portfolio:
+    name: Build portfolio
+    needs: [affected]
     if: contains(fromJSON(needs.affected.outputs.deploy_targets), 'portfolio')
-    uses: ./.github/workflows/deploy-portfolio.yml
+    uses: ./.github/workflows/build-portfolio.yml
     secrets: inherit
     with:
-      image_tag: ${{ github.sha }}
+      image_tag: main-${{ github.sha }}
 
-  deploy-documentation:
-    name: Deploy Documentation
-    needs: [affected, lint-and-format, test]
+  build-documentation:
+    name: Build documentation
+    needs: [affected]
     if: contains(fromJSON(needs.affected.outputs.deploy_targets), 'documentation')
-    uses: ./.github/workflows/deploy-documentation.yml
+    uses: ./.github/workflows/build-documentation.yml
     secrets: inherit
     with:
-      image_tag: ${{ github.sha }}
+      image_tag: main-${{ github.sha }}
 
-  deploy-bastion:
-    name: Deploy Bastion
-    needs: [affected, lint-and-format, test]
-    if: contains(fromJSON(needs.affected.outputs.deploy_targets), 'bastion')
-    uses: ./.github/workflows/deploy-bastion.yml
+  bump-manifests:
+    name: Bump nexus-manifests
+    needs: [affected, lint-and-format, test, build-portfolio, build-documentation]
+    if: |
+      always() &&
+      needs.lint-and-format.result == 'success' &&
+      needs.test.result == 'success' &&
+      needs.build-portfolio.result != 'failure' && needs.build-portfolio.result != 'cancelled' &&
+      needs.build-documentation.result != 'failure' && needs.build-documentation.result != 'cancelled' &&
+      (contains(fromJSON(needs.affected.outputs.deploy_targets), 'portfolio') ||
+       contains(fromJSON(needs.affected.outputs.deploy_targets), 'documentation'))
+    uses: ./.github/workflows/bump-manifests.yml
     secrets: inherit
+    with:
+      image_tag: main-${{ github.sha }}
+      deploy_targets: ${{ needs.affected.outputs.deploy_targets }}

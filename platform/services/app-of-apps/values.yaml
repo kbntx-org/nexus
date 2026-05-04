@@ -159,14 +159,24 @@ argocd-apps:
 
     documentation:
       project: default
-      source:
-        repoURL: https://github.com/kbntx/nexus.git
-        path: docs/helm
-        targetRevision: main
+      sources:
+        - repoURL: https://github.com/kbntx/nexus.git
+          path: docs/helm
+          targetRevision: main
+          helm:
+            valueFiles:
+              - values.yaml
+              - $values/documentation/values.yaml
+        - repoURL: https://github.com/kbntx/nexus-manifests.git
+          targetRevision: main
+          ref: values
       destination:
         server: https://kubernetes.default.svc
         namespace: documentation
       syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
         syncOptions:
           - CreateNamespace=true
 
@@ -185,13 +195,23 @@ argocd-apps:
 
     portfolio:
       project: default
-      source:
-        repoURL: https://github.com/kbntx/nexus.git
-        path: apps/portfolio/chart
-        targetRevision: main
+      sources:
+        - repoURL: https://github.com/kbntx/nexus.git
+          path: apps/portfolio/chart
+          targetRevision: main
+          helm:
+            valueFiles:
+              - values.yaml
+              - $values/portfolio/values.yaml
+        - repoURL: https://github.com/kbntx/nexus-manifests.git
+          targetRevision: main
+          ref: values
       destination:
         server: https://kubernetes.default.svc
         namespace: portfolio
       syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
         syncOptions:
           - CreateNamespace=true

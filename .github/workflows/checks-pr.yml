@@ -22,3 +22,37 @@ jobs:
     name: Test
     uses: ./.github/workflows/test-pr.yml
     secrets: inherit
+
+  build-portfolio:
+    name: Build portfolio
+    needs: [affected]
+    if: contains(fromJSON(needs.affected.outputs.deploy_targets), 'portfolio')
+    uses: ./.github/workflows/build-portfolio.yml
+    secrets: inherit
+    with:
+      image_tag: pr-${{ github.event.pull_request.number }}-commit-${{ github.event.pull_request.head.sha }}
+
+  build-documentation:
+    name: Build documentation
+    needs: [affected]
+    if: contains(fromJSON(needs.affected.outputs.deploy_targets), 'documentation')
+    uses: ./.github/workflows/build-documentation.yml
+    secrets: inherit
+    with:
+      image_tag: pr-${{ github.event.pull_request.number }}-commit-${{ github.event.pull_request.head.sha }}
+
+  bump-manifests:
+    name: Bump nexus-manifests (PR branch)
+    needs: [affected, build-portfolio, build-documentation]
+    if: |
+      always() &&
+      needs.build-portfolio.result != 'failure' && needs.build-portfolio.result != 'cancelled' &&
+      needs.build-documentation.result != 'failure' && needs.build-documentation.result != 'cancelled' &&
+      (contains(fromJSON(needs.affected.outputs.deploy_targets), 'portfolio') ||
+       contains(fromJSON(needs.affected.outputs.deploy_targets), 'documentation'))
+    uses: ./.github/workflows/bump-manifests.yml
+    secrets: inherit
+    with:
+      image_tag: pr-${{ github.event.pull_request.number }}-commit-${{ github.event.pull_request.head.sha }}
+      deploy_targets: ${{ needs.affected.outputs.deploy_targets }}
+      branch: pr-${{ github.event.pull_request.number }}

@@ -5,7 +5,16 @@
   "sourceRoot": "docs",
   "tags": [],
   "metadata": {
-    "deployPaths": [".github/workflows/deploy-documentation.yml"]
+    "deployPaths": [
+      "docs/helm/**",
+      "docs/src/**",
+      "docs/Dockerfile",
+      "docs/Caddyfile",
+      "docs/mkdocs.yml",
+      "docs/docker-entrypoint.sh",
+      ".github/workflows/build-documentation.yml"
+    ],
+    "manifestsValuesPath": "documentation/values.yaml"
   },
   "targets": {
     "build": {

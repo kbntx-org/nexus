@@ -6,7 +6,13 @@
   "sourceRoot": "apps/portfolio/src",
   "tags": [],
   "metadata": {
-    "deployPaths": ["apps/portfolio/chart/**", ".github/workflows/deploy-portfolio.yml"]
+    "deployPaths": [
+      "apps/portfolio/chart/**",
+      "apps/portfolio/Dockerfile",
+      "apps/portfolio/Caddyfile",
+      ".github/workflows/build-portfolio.yml"
+    ],
+    "manifestsValuesPath": "portfolio/values.yaml"
   },
   "targets": {
     "build": {

@@ -1,22 +1,28 @@
-name: Deploy documentation
+name: Build documentation image
 
 on:
   workflow_call:
     inputs:
       image_tag:
-        description: 'Image tag to build and deploy'
+        description: 'Image tag to build and push'
         required: true
         type: string
+    outputs:
+      image_tag:
+        description: 'The tag actually pushed (echoes input)'
+        value: ${{ jobs.build.outputs.image_tag }}
 
 concurrency:
-  group: deploy-documentation
+  group: build-documentation-${{ inputs.image_tag }}
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: nexus-runners
     container:
       image: kbntx/nexus-ci-toolkit:1.0
     timeout-minutes: 10
+    outputs:
+      image_tag: ${{ inputs.image_tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,13 +39,3 @@ jobs:
           context: docs
           file: docs/Dockerfile
           tag: kbntx/documentation:${{ inputs.image_tag }}
-
-      - name: Deploy
-        env:
-          ARGOCD_SERVER: argocd.kbntx.com
-          ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_TOKEN }}
-          ARGOCD_OPTS: '--grpc-web'
-        run: |
-          argocd app set documentation -p image.tag=${{ inputs.image_tag }}
-          argocd app sync documentation --prune
-          argocd app wait documentation --sync --health --operation --timeout 500

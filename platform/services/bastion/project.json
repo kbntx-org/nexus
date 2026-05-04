@@ -5,7 +5,7 @@
   "sourceRoot": "platform/bastion",
   "tags": [],
   "metadata": {
-    "deployPaths": [".github/workflows/deploy-bastion.yml"]
+    "deployPaths": []
   },
   "targets": {
     "build": {
