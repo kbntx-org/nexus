@@ -214,7 +214,8 @@ helm_resource(
 docker_build(
   'portfolio',
   '.',
-  dockerfile='apps/portfolio/Dockerfile.local',
+  dockerfile='apps/portfolio/Dockerfile',
+  target='local',
   only=[
     'apps/portfolio',
     'tsconfig.base.json',
