@@ -1,0 +1,42 @@
+name: Cleanup PR manifests branch
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  delete-branch:
+    name: Delete pr-${{ github.event.pull_request.number }} from nexus-manifests
+    runs-on: nexus-runners
+    container:
+      image: kbntx/nexus-ci-toolkit:1.0
+    timeout-minutes: 2
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Mint manifests-repo write token
+        id: manifests_token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.NEXUS_MANIFESTS_APP_ID }}
+          private-key: ${{ secrets.NEXUS_MANIFESTS_APP_PRIVATE_KEY }}
+          owner: kbntx
+          repositories: nexus-manifests
+
+      - name: Delete branch (idempotent)
+        env:
+          MANIFESTS_TOKEN: ${{ steps.manifests_token.outputs.token }}
+          BRANCH: pr-${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          status=$(curl -s -o /dev/null -w '%{http_code}' \
+            -X DELETE \
+            -H "Authorization: Bearer ${MANIFESTS_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/kbntx/nexus-manifests/git/refs/heads/${BRANCH}")
+          case "$status" in
+            204) echo "Deleted branch ${BRANCH}" ;;
+            422) echo "Branch ${BRANCH} did not exist (no preview was built) — nothing to do" ;;
+            *)   echo "Unexpected status ${status} when deleting ${BRANCH}" >&2; exit 1 ;;
+          esac

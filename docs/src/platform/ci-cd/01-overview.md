@@ -182,21 +182,11 @@ or deployed from a PR.
 
 ### Main pipeline
 
-On a push to `main`, the same three steps run, then a deploy job fans out
-**only for the projects flagged for deployment** (see below):
-
-```yaml
-deploy-portfolio:
-  needs: [affected, lint-and-format, test]
-  if: contains(fromJSON(needs.affected.outputs.deploy_targets), 'portfolio')
-```
-
-A deploy workflow builds the image, pushes it, sets the new tag on the
-ArgoCD application via a
-[parameter override](https://argo-cd.readthedocs.io/en/stable/user-guide/parameters/){ target="\_blank" rel="noopener" },
-and waits for the sync to report healthy before exiting. See
-[`deploy-portfolio.yml`](https://github.com/kbntx/nexus/blob/main/.github/workflows/deploy-portfolio.yml){ target="\_blank" rel="noopener" }
-for the canonical example.
+On a push to `main`, the same three steps run, then per-app **build**
+jobs fan out for the projects flagged for deployment, an aggregator
+commits the new image tags to a separate manifests repo, and ArgoCD
+deploys via auto-sync. The full flow is documented in
+[GitOps deploys](02-gitops-deploys.md).
 
 ## Affected detection
 
@@ -214,32 +204,16 @@ pipelines lean on that for two distinct decisions:
 Each project declares its deploy paths in its `project.json` under
 `metadata.deployPaths`, and
 [`compute-affected.yml`](https://github.com/kbntx/nexus/blob/main/.github/workflows/compute-affected.yml){ target="\_blank" rel="noopener" }
-walks them with the changed file list to build `deploy_targets`. The same
-workflow also has a fail-safe: if it modifies itself, it marks **every
-application** as a deploy target — the assumption being that a change to
-the affected logic is risky enough to warrant a full re-deploy.
+walks them with the changed file list to build `deploy_targets`. On
+`main`, the diff base for image-shipping apps is **that app's last
+deployed SHA** (read from the manifests repo), not the previous commit
+— this prevents parallel merges from cross-referencing each other's
+in-flight images. See
+[GitOps deploys](02-gitops-deploys.md) for the full mechanics.
 
-### The affected manifest
-
-`compute-affected.yml` does more than emit two job outputs — it also
-writes a small JSON manifest and uploads it as a workflow artifact:
-
-```json
-{
-  "sha": "<head sha>",
-  "merge_sha": "<merge commit sha>",
-  "ref": "<git ref>",
-  "affected": ["portfolio", "documentation"],
-  "deploy_targets": ["portfolio"]
-}
-```
-
-The manifest is the single source of truth for what a given commit
-affected. Keeping it as a versioned artifact (instead of recomputing
-later) means downstream jobs and humans can answer "what should this
-commit have triggered?" without re-running anything — useful for
-debugging skipped deploys and for any future tooling that wants to react
-to the same signal asynchronously.
+The workflow also has a fail-safe: if it modifies itself, it marks
+**every application** as a deploy target — the assumption being that a
+change to the affected logic is risky enough to warrant a full re-deploy.
 
 ## References
 
@@ -248,4 +222,4 @@ to the same signal asynchronously.
 - [`platform/core/github-arc-runners/runners/templates/hook-extension.yaml`](https://github.com/kbntx/nexus/blob/main/platform/core/github-arc-runners/runners/templates/hook-extension.yaml){ target="\_blank" rel="noopener" } — `github-job-pod` label + BuildKit injection
 - [`platform/services/custom-docker-images/`](https://github.com/kbntx/nexus/tree/main/platform/services/custom-docker-images){ target="\_blank" rel="noopener" } — CI toolkit image
 - [`.github/workflows/`](https://github.com/kbntx/nexus/tree/main/.github/workflows){ target="\_blank" rel="noopener" } — workflow definitions
-- [`.github/workflows/compute-affected.yml`](https://github.com/kbntx/nexus/blob/main/.github/workflows/compute-affected.yml){ target="\_blank" rel="noopener" } — affected detection + manifest artifact
+- [`.github/workflows/compute-affected.yml`](https://github.com/kbntx/nexus/blob/main/.github/workflows/compute-affected.yml){ target="\_blank" rel="noopener" } — affected detection (per-app base from `nexus-manifests` on main)

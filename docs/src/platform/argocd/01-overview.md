@@ -53,78 +53,50 @@ that file.
 
 ## Sync model
 
-Two sync modes live side by side, and the split is intentional.
+Every Application is auto-synced. The source of "what should be live"
+differs by workload type:
 
-| Workload                                                                        | Mode                         | Why                                                                                          |
-| ------------------------------------------------------------------------------- | ---------------------------- | -------------------------------------------------------------------------------------------- |
-| **Platform components** (Traefik, Cloudflared, ESO, monitoring, ARC, upgrades…) | Auto-sync on Git changes     | Their manifests _are_ the source of truth — converging immediately is the desired behavior   |
-| **Custom apps shipping images** (portfolio, docs)                               | Manual sync, triggered by CI | The Git change (image tag bump) and the image push must complete _before_ the rollout starts |
+| Workload                                                                        | Source of truth                             | Why                                                                                                |
+| ------------------------------------------------------------------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| **Platform components** (Traefik, Cloudflared, ESO, monitoring, ARC, upgrades…) | This repo (single-source `Application`)     | Their manifests _are_ the source of truth — converging on every Git change is the desired behavior |
+| **Custom apps shipping images** (portfolio, docs)                               | This repo (chart) + `nexus-manifests` (tag) | The image tag is decoupled from the chart so CI can bump it atomically per commit                  |
 
-For custom apps, leaving auto-sync off keeps deploys
-**imperative-on-demand**: ArgoCD does not race the registry, and the CI
-pipeline is the single thing that decides "this commit is ready to roll
-out." Once CI has built and pushed the image, it explicitly tells ArgoCD
-to sync — see [CI integration](#ci-integration).
+The custom apps use a [multi-source `Application`](https://argo-cd.readthedocs.io/en/stable/user-guide/multiple_sources/){ target="\_blank" rel="noopener" }:
+the chart comes from this repo, and a values overlay
+(`$values/<app>/values.yaml`) comes from
+[`nexus-manifests`](https://github.com/kbntx/nexus-manifests){ target="\_blank" rel="noopener" } —
+a small, dumb repo CI commits image-tag bumps to. ArgoCD is notified of
+those commits via a GitHub webhook for sub-minute sync. See
+[GitOps deploys](../ci-cd/02-gitops-deploys.md) for the full pipeline.
 
 ## Hotfix via parameter overrides
 
-A useful side effect of routing image tags through ArgoCD: production can
-be unblocked from the UI or CLI without touching CI.
+The door is still open when production is on fire and CI is the slow
+path:
 
 ```bash
 argocd app set portfolio -p image.tag=<known-good-tag>
-argocd app sync portfolio
 ```
 
-ArgoCD records the override on the live `Application` and rolls out the
-chosen tag immediately. The Git manifest is now temporarily out of step
-with the cluster — the UI flags it as `OutOfSync` on the parameter — and
-the fix is to **mirror the override back into Git** (a values bump or a
-revert) on the next commit. From that point forward syncs are no-ops
-until the next real change.
+The override lands on the live `Application` and rolls out immediately.
+For multi-source apps, the parameter targets the chart source (index 0)
+and shadows whatever `nexus-manifests` says — so the override is sticky
+until you `argocd app unset` or commit the same tag back to
+`nexus-manifests`.
 
-The point is that the door is there when production is on fire and CI is
-the slow path. Used responsibly, it is an emergency lever, not a
-workflow.
+This works because [`argocd-cm`](https://github.com/kbntx/nexus/blob/main/platform/core/argocd/values.yaml){ target="\_blank" rel="noopener" }
+declares `ignoreApplicationDifferences` for `/spec/sources/0/helm/parameters`
+on portfolio and documentation. Without that, the parent app-of-apps
+reconciler would revert the override on its next sync. Used
+responsibly, it is an emergency lever, not a workflow.
 
 ## CI integration
 
-Custom apps roll out through the same three-step pattern in every deploy
-workflow: bump the image tag as a parameter override, sync, wait for
-healthy.
-
-```yaml
-- name: Deploy
-  env:
-    ARGOCD_SERVER: ${{ vars.ARGOCD_SERVER }}
-    ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_TOKEN }}
-    ARGOCD_OPTS: '--grpc-web'
-  run: |
-    argocd app set portfolio -p image.tag=${{ inputs.image_tag }}
-    argocd app sync portfolio --prune
-    argocd app wait portfolio --sync --health --operation
-```
-
-Excerpted from
-[`deploy-portfolio.yml`](https://github.com/kbntx/nexus/blob/main/.github/workflows/deploy-portfolio.yml){ target="\_blank" rel="noopener" },
-which is the canonical template for any image-shipping app.
-
-A few things to note:
-
-- **GHA bumps the parameter, ArgoCD does the deploy.** The runner does
-  not `kubectl apply` anything — it only nudges ArgoCD. This keeps the
-  cluster reachable from a single identity (the `ci` account, see
-  [Access](#access)) and the rollout logic in one place.
-- **`--prune`** removes resources that no longer exist in the chart.
-  Without it, deleted manifests would linger in the cluster forever.
-- **`app wait --health`** is what makes the workflow fail loudly when a
-  rollout misbehaves: the pipeline does not turn green until ArgoCD
-  reports the `Application` healthy.
-
-Image tags are not committed to Git for these apps — they live as
-parameter overrides on the live `Application`, and the next sync from a
-real Git change will preserve them as long as `image.tag` is the only
-override.
+CI does not touch ArgoCD directly anymore. The deploy pipeline builds
+images, pushes them, and commits the new tags to `nexus-manifests`;
+ArgoCD picks them up on its own. See
+[GitOps deploys](../ci-cd/02-gitops-deploys.md) for the full mechanics
+and the rationale behind the split repo.
 
 ## Adding an application
 
@@ -170,4 +142,4 @@ Two identities exist, and both are configured in
 - [`platform/core/argocd/`](https://github.com/kbntx/nexus/tree/main/platform/core/argocd){ target="\_blank" rel="noopener" } — ArgoCD Helm chart wrapper, ingress template, SSO + RBAC config
 - [`platform/services/app-of-apps/`](https://github.com/kbntx/nexus/tree/main/platform/services/app-of-apps){ target="\_blank" rel="noopener" } — root chart declaring every child `Application`
 - [`platform/services/app-of-apps/values.yaml`](https://github.com/kbntx/nexus/blob/main/platform/services/app-of-apps/values.yaml){ target="\_blank" rel="noopener" } — the catalog of cluster workloads
-- [`.github/workflows/deploy-portfolio.yml`](https://github.com/kbntx/nexus/blob/main/.github/workflows/deploy-portfolio.yml){ target="\_blank" rel="noopener" } — canonical CI deploy pattern (`app set` → `app sync` → `app wait`)
+- [GitOps deploys](../ci-cd/02-gitops-deploys.md) — multi-source `Application` shape and the `nexus-manifests` flow

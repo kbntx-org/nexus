@@ -7,6 +7,9 @@ ENV BUILDKIT_VERSION=v0.23.2
 RUN apt update && apt install --no-install-recommends -y curl unzip netcat-traditional jq gnupg git gettext-base wget openssh-client ca-certificates && \
     rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
+RUN wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.53.2/yq_linux_amd64 && \
+    chmod +x /usr/local/bin/yq
+
 # Install PNPM
 RUN npm install -g pnpm@10.14.0
 
@@ -34,6 +37,9 @@ RUN curl "https://fastdl.mongodb.org/tools/db/mongodb-database-tools-debian12-x8
 
 # Install s5cmd
 COPY --from=peakcom/s5cmd:v2.3.0 /s5cmd /usr/local/bin/s5cmd
+
+# Install yq
+COPY --from=mikefarah/yq:4 /usr/bin/yq /usr/local/bin/yq
 
 # Install ArgoCD CLI (latest stable version)
 RUN curl -sSL -o argocd-linux-amd64 "https://github.com/argoproj/argo-cd/releases/download/v${ARGOCD_VERSION}/argocd-linux-amd64"; \

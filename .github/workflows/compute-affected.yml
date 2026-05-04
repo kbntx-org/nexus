@@ -7,7 +7,7 @@ on:
         description: 'JSON array of nx-affected project names (drives test/lint gating)'
         value: ${{ jobs.compute.outputs.affected }}
       deploy_targets:
-        description: 'JSON array of projects whose code OR deployPaths changed (drives deploy gating)'
+        description: 'JSON array of projects whose code OR deployPaths changed since their last deploy'
         value: ${{ jobs.compute.outputs.deploy_targets }}
 
 jobs:
@@ -16,6 +16,9 @@ jobs:
     container:
       image: kbntx/nexus-ci-toolkit:1.0
     timeout-minutes: 5
+    defaults:
+      run:
+        shell: bash
     outputs:
       affected: ${{ steps.affected.outputs.affected }}
       deploy_targets: ${{ steps.deploy_targets.outputs.deploy_targets }}
@@ -32,77 +35,129 @@ jobs:
         id: refs
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            git fetch origin "${{ github.base_ref }}" --depth=1
-            echo "base=remotes/origin/${{ github.base_ref }}" >> "$GITHUB_OUTPUT"
-            echo "build_sha=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"
+            # Always diff against trunk, regardless of the PR's actual base branch
+            # (this matters for stacked PRs targeting another feature branch).
+            git fetch origin main --depth=1
+            echo "mode=pr" >> "$GITHUB_OUTPUT"
+            echo "affected_base=remotes/origin/main" >> "$GITHUB_OUTPUT"
           else
-            echo "base=${{ github.event.before }}" >> "$GITHUB_OUTPUT"
-            echo "build_sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+            echo "mode=main" >> "$GITHUB_OUTPUT"
+            beforeSha="${{ github.event.before }}"
+            if [ "$beforeSha" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "$beforeSha" 2>/dev/null; then
+              beforeSha=$(git rev-parse HEAD~1)
+            fi
+            echo "affected_base=$beforeSha" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Mint manifests-repo read token (main mode only)
+        if: steps.refs.outputs.mode == 'main'
+        id: manifests_token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.NEXUS_MANIFESTS_APP_ID }}
+          private-key: ${{ secrets.NEXUS_MANIFESTS_APP_PRIVATE_KEY }}
+          owner: kbntx
+          repositories: nexus-manifests
+
+      - name: Clone manifests repo (main mode only)
+        if: steps.refs.outputs.mode == 'main'
+        env:
+          MANIFESTS_TOKEN: ${{ steps.manifests_token.outputs.token }}
+        run: |
+          git clone --depth=1 \
+            "https://x-access-token:${MANIFESTS_TOKEN}@github.com/kbntx/nexus-manifests.git" \
+            /tmp/nexus-manifests
 
       - name: Compute affected projects
         id: affected
+        env:
+          AFFECTED_BASE: ${{ steps.refs.outputs.affected_base }}
         run: |
-          affectedProjects=$(pnpm -s nx show projects --affected --base "${{ steps.refs.outputs.base }}" --json)
+          affectedProjects=$(pnpm -s nx show projects --affected --base "$AFFECTED_BASE" --json)
           echo "Affected: $affectedProjects"
           echo "affected=$affectedProjects" >> "$GITHUB_OUTPUT"
 
       - name: Compute deploy targets
         id: deploy_targets
-        run: |
-          changedFiles=$(git diff --name-only "${{ steps.refs.outputs.base }}" "${{ github.sha }}")
-          echo "Changed files:"
-          echo "$changedFiles"
-          echo "hello world"
-
-          deployTargets='${{ steps.affected.outputs.affected }}'
-          allProjects=$(pnpm -s nx show projects --json)
-
-          if echo "$changedFiles" | grep -qx '\.github/workflows/compute-affected\.yml'; then
-            echo "compute-affected.yml changed — marking all applications as deploy targets"
-            allApplications='[]'
-            for project in $(echo "$allProjects" | jq -r '.[]'); do
-              projectType=$(pnpm -s nx show project "$project" --json | jq -r '.projectType // ""')
-              if [ "$projectType" = "application" ]; then
-                allApplications=$(echo "$allApplications" | jq -c --arg p "$project" '. + [$p]')
-              fi
-            done
-            deployTargets=$(echo "$deployTargets $allApplications" | jq -cs 'add | unique')
-          fi
-
-          for project in $(echo "$allProjects" | jq -r '.[]'); do
-            matched=$(pnpm -s nx show project "$project" --json \
-              | jq -r '.metadata.deployPaths // [] | .[]' \
-              | while read -r pattern; do
-                  [ -z "$pattern" ] && continue
-                  regex=$(echo "$pattern" | sed -e 's|/\*\*|/.*|g' -e 's|\.|\\.|g')
-                  if echo "$changedFiles" | grep -qE "^${regex}$"; then
-                    echo yes
-                    break
-                  fi
-                done)
-            if [ "$matched" = "yes" ]; then
-              deployTargets=$(echo "$deployTargets" | jq -c --arg p "$project" '. + [$p] | unique')
-            fi
-          done
-
-          echo "Deploy targets: $deployTargets"
-          echo "deploy_targets=$deployTargets" >> "$GITHUB_OUTPUT"
-
-      - name: Build manifest
-        run: |
-          jq -n \
-            --arg sha "${{ steps.refs.outputs.build_sha }}" \
-            --arg mergeSha "${{ github.sha }}" \
-            --arg ref "${{ github.ref }}" \
-            --argjson affected '${{ steps.affected.outputs.affected }}' \
-            --argjson deployTargets '${{ steps.deploy_targets.outputs.deploy_targets }}' \
-            '{sha: $sha, merge_sha: $mergeSha, ref: $ref, affected: $affected, deploy_targets: $deployTargets}' \
-            > affected-${{ steps.refs.outputs.build_sha }}.json
-          cat affected-${{ steps.refs.outputs.build_sha }}.json
-
-      - name: Upload manifest
-        uses: actions/upload-artifact@v4
+        uses: actions/github-script@v7
+        env:
+          MODE: ${{ steps.refs.outputs.mode }}
+          AFFECTED_BASE: ${{ steps.refs.outputs.affected_base }}
+          HEAD_SHA: ${{ github.sha }}
+          AFFECTED_PROJECTS: ${{ steps.affected.outputs.affected }}
+          MANIFESTS_REPO_PATH: /tmp/nexus-manifests
         with:
-          name: affected-${{ steps.refs.outputs.build_sha }}
-          path: affected-${{ steps.refs.outputs.build_sha }}.json
+          script: |
+            const { spawnSync } = require('child_process');
+            const fs = require('fs');
+            const path = require('path');
+
+            const run = (cmd, args) => {
+              const r = spawnSync(cmd, args, { encoding: 'utf8' });
+              if (r.status !== 0) throw new Error(`${cmd} ${args.join(' ')} failed:\n${r.stderr}`);
+              return r.stdout.trim();
+            };
+            const runOk = (cmd, args) =>
+              spawnSync(cmd, args, { stdio: 'ignore' }).status === 0;
+            const nxProject = (name) =>
+              JSON.parse(run('pnpm', ['-s', 'nx', 'show', 'project', name, '--json']));
+
+            const mode = process.env.MODE;
+            const affectedBase = process.env.AFFECTED_BASE;
+            const headSha = process.env.HEAD_SHA;
+            const manifestsRepoPath = process.env.MANIFESTS_REPO_PATH;
+
+            const emptyTree = run('git', ['hash-object', '-t', 'tree', '/dev/null']);
+            const allProjects = JSON.parse(run('pnpm', ['-s', 'nx', 'show', 'projects', '--json']));
+            const deployTargets = new Set(JSON.parse(process.env.AFFECTED_PROJECTS));
+
+            const changedSinceBase = run('git', ['diff', '--name-only', affectedBase, headSha])
+              .split('\n').filter(Boolean);
+            if (changedSinceBase.includes('.github/workflows/compute-affected.yml')) {
+              core.info('compute-affected.yml changed — marking all applications as deploy targets');
+              for (const project of allProjects) {
+                if (nxProject(project).projectType === 'application') deployTargets.add(project);
+              }
+            }
+
+            const compilePattern = (pattern) =>
+              new RegExp('^' + pattern.replace(/\./g, '\\.').replace(/\*\*/g, '.*') + '$');
+
+            for (const project of allProjects) {
+              const meta = nxProject(project);
+              const manifestsValuesPath = meta.metadata?.manifestsValuesPath;
+              const deployPaths = meta.metadata?.deployPaths || [];
+              if (deployPaths.length === 0) continue;
+
+              let perAppBase;
+              if (mode === 'main' && manifestsValuesPath) {
+                const valuesFile = path.join(manifestsRepoPath, manifestsValuesPath);
+                if (!fs.existsSync(valuesFile)) {
+                  perAppBase = emptyTree;
+                } else {
+                  const deployedTag = run('yq', ['-r', '.image.tag // ""', valuesFile]);
+                  const deployedSha = deployedTag.split('-').pop();
+                  if (!deployedSha || !runOk('git', ['cat-file', '-e', deployedSha])) {
+                    perAppBase = emptyTree;
+                  } else if (!runOk('git', ['merge-base', '--is-ancestor', deployedSha, headSha])) {
+                    core.info(`Skipping ${project}: deployed ${deployedSha} is newer or unrelated to ${headSha}`);
+                    continue;
+                  } else {
+                    perAppBase = deployedSha;
+                  }
+                }
+              } else {
+                perAppBase = affectedBase;
+              }
+
+              const changedFiles = run('git', ['diff', '--name-only', perAppBase, headSha])
+                .split('\n').filter(Boolean);
+              const matched = deployPaths.some(pattern =>
+                changedFiles.some(file => compilePattern(pattern).test(file))
+              );
+              if (matched) deployTargets.add(project);
+            }
+
+            const result = Array.from(deployTargets);
+            core.info('Deploy targets: ' + JSON.stringify(result));
+            core.setOutput('deploy_targets', JSON.stringify(result));

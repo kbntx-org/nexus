@@ -1,0 +1,142 @@
+name: Bump nexus-manifests
+
+on:
+  workflow_call:
+    inputs:
+      image_tag:
+        description: 'Image tag (SHA) to write into image.tag for each target'
+        required: true
+        type: string
+      deploy_targets:
+        description: 'JSON array of project names to bump'
+        required: true
+        type: string
+      branch:
+        description: 'Branch in nexus-manifests to push to (main for trunk, pr-<number> for previews)'
+        required: false
+        type: string
+        default: main
+
+concurrency:
+  group: bump-nexus-manifests-${{ inputs.branch }}
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    runs-on: nexus-runners
+    container:
+      image: kbntx/nexus-ci-toolkit:1.0
+    timeout-minutes: 5
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout nexus (for nx metadata)
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Mint manifests-repo write token
+        id: manifests_token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.NEXUS_MANIFESTS_APP_ID }}
+          private-key: ${{ secrets.NEXUS_MANIFESTS_APP_PRIVATE_KEY }}
+          owner: kbntx
+          repositories: nexus-manifests
+
+      - name: Clone manifests repo
+        env:
+          MANIFESTS_TOKEN: ${{ steps.manifests_token.outputs.token }}
+          BRANCH: ${{ inputs.branch }}
+        run: |
+          set -euo pipefail
+          git clone "https://x-access-token:${MANIFESTS_TOKEN}@github.com/kbntx/nexus-manifests.git" /tmp/manifests
+          cd /tmp/manifests
+          git config user.name "nexus-ci[bot]"
+          git config user.email "nexus-ci[bot]@users.noreply.github.com"
+          if [ "$BRANCH" != "main" ]; then
+            if git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null 2>&1; then
+              git checkout "$BRANCH"
+            else
+              git checkout -b "$BRANCH"
+            fi
+          fi
+
+      - name: Edit values files
+        uses: actions/github-script@v7
+        env:
+          TAG: ${{ inputs.image_tag }}
+          DEPLOY_TARGETS: ${{ inputs.deploy_targets }}
+          MANIFESTS_DIR: /tmp/manifests
+          COMMIT_BODY_FILE: /tmp/commit-body
+        with:
+          script: |
+            const { spawnSync } = require('child_process');
+            const fs = require('fs');
+            const path = require('path');
+
+            const run = (cmd, args, opts = {}) => {
+              const r = spawnSync(cmd, args, { encoding: 'utf8', ...opts });
+              if (r.status !== 0) throw new Error(`${cmd} ${args.join(' ')} failed:\n${r.stderr}`);
+              return r.stdout.trim();
+            };
+            const nxProject = (name) =>
+              JSON.parse(run('pnpm', ['-s', 'nx', 'show', 'project', name, '--json']));
+
+            const tag = process.env.TAG;
+            const deployTargets = JSON.parse(process.env.DEPLOY_TARGETS);
+            const manifestsDir = process.env.MANIFESTS_DIR;
+            const commitBodyFile = process.env.COMMIT_BODY_FILE;
+
+            const lines = [];
+            for (const project of deployTargets) {
+              const manifestsValuesPath = nxProject(project).metadata?.manifestsValuesPath;
+              if (!manifestsValuesPath) {
+                core.info(`Skipping ${project} (no manifestsValuesPath)`);
+                continue;
+              }
+              const file = path.join(manifestsDir, manifestsValuesPath);
+              fs.mkdirSync(path.dirname(file), { recursive: true });
+              if (!fs.existsSync(file)) {
+                fs.writeFileSync(file, `image:\n  tag: ${tag}\n`);
+              } else {
+                run('yq', ['-i', '.image.tag = strenv(TAG)', file], { env: process.env });
+              }
+              lines.push(`- ${project}: ${tag}`);
+            }
+
+            fs.writeFileSync(commitBodyFile, lines.length ? lines.join('\n') + '\n' : '');
+            if (lines.length === 0) {
+              core.info('No GitOps-managed targets in deploy_targets — nothing to do');
+            }
+
+      - name: Commit and push (rebase retry)
+        working-directory: /tmp/manifests
+        env:
+          IMAGE_TAG: ${{ inputs.image_tag }}
+          BRANCH: ${{ inputs.branch }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          git add -A
+          if git diff --staged --quiet; then
+            echo "No staged changes — exiting clean (idempotent re-run?)"
+            exit 0
+          fi
+          git commit \
+            -m "ci: bump image tags from nexus@${IMAGE_TAG}" \
+            -m "$(cat /tmp/commit-body)" \
+            -m "Source: ${RUN_URL}"
+          for attempt in 1 2 3 4 5; do
+            if git push origin "$BRANCH"; then
+              echo "Pushed on attempt $attempt"
+              exit 0
+            fi
+            echo "Push failed (attempt $attempt) — rebasing"
+            git pull --rebase origin "$BRANCH" || true
+            sleep $((attempt * 2))
+          done
+          echo "Failed to push after 5 attempts" >&2
+          exit 1
