@@ -11,6 +11,13 @@
   "separateMultipleMajor": true,
   "timezone": "Europe/Berlin",
   "npmrc": "frozen-lockfile=false",
+  "packageRules": [
+    {
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
+    }
+  ],
   "customManagers": [
     {
       "customType": "regex",
