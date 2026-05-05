@@ -26,7 +26,7 @@ WORKDIR /
 
 RUN mkdocs build
 
-FROM caddy:2.10.2-alpine AS prod
+FROM caddy:2.11.2-alpine AS prod
 
 COPY Caddyfile /etc/caddy/Caddyfile
 COPY --from=builder /site /srv/app/
