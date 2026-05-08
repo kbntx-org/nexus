@@ -16,6 +16,24 @@
       "matchManagers": ["npm"],
       "matchUpdateTypes": ["minor", "patch"],
       "automerge": true
+    },
+    {
+      "matchManagers": ["helmv3"],
+      "matchFileNames": ["platform/services/monitoring/Chart.yaml"],
+      "groupName": "monitoring sub-charts"
+    },
+    {
+      "matchManagers": ["helmv3"],
+      "matchFileNames": [
+        "platform/core/github-arc-runners/controller/Chart.yaml",
+        "platform/core/github-arc-runners/runners/Chart.yaml"
+      ],
+      "groupName": "github-arc-runners sub-charts"
+    },
+    {
+      "matchManagers": ["helmv3"],
+      "matchFileNames": ["platform/core/hetzner-cloud-controller/Chart.yaml"],
+      "groupName": "hetzner-cloud-controller sub-charts"
     }
   ],
   "customManagers": [
