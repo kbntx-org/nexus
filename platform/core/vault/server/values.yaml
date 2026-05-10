@@ -1,4 +1,4 @@
-image: hashicorp/vault:1.21.2
+image: hashicorp/vault:2.0.0
 ingressHost: vault.kbntx.com
 args: ['server']
 
