@@ -9,13 +9,13 @@ tech:
   - RxJS
   - Pre-rendering
   - S3
-logo: https://fsn1.your-objectstorage.com/nexus-public-statics/images/kt-logo.jpg
+logo: https://nexus-public-assets.kbntx.com/images/kt-logo.jpg
 images:
-  - https://fsn1.your-objectstorage.com/nexus-public-statics/images/portfolio-cv.png
-  - https://fsn1.your-objectstorage.com/nexus-public-statics/images/portfolio-experiences.png
-  - https://fsn1.your-objectstorage.com/nexus-public-statics/images/portfolio-homepage.png
-  - https://fsn1.your-objectstorage.com/nexus-public-statics/images/portfolio-projects-dark-mode.png
-  - https://fsn1.your-objectstorage.com/nexus-public-statics/images/portfolio-projects-light-mode.png
+  - https://nexus-public-assets.kbntx.com/images/portfolio-cv.png
+  - https://nexus-public-assets.kbntx.com/images/portfolio-experiences.png
+  - https://nexus-public-assets.kbntx.com/images/portfolio-homepage.png
+  - https://nexus-public-assets.kbntx.com/images/portfolio-projects-dark-mode.png
+  - https://nexus-public-assets.kbntx.com/images/portfolio-projects-light-mode.png
 githubUrl: https://github.com/kbntx/nexus
 features:
   - Dark/light theme support
