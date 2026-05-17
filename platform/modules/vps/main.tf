@@ -10,6 +10,7 @@ resource "hcloud_server" "this" {
 
   network {
     network_id = var.vpc_id
+    alias_ips  = []
   }
 }
 
