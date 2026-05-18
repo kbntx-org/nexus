@@ -64,7 +64,7 @@
     "jest": "30.3.0",
     "jest-environment-jsdom": "30.3.0",
     "jest-environment-node": "^29.4.1",
-    "jest-preset-angular": "~13.1.4",
+    "jest-preset-angular": "~14.6.0",
     "jest-util": "30.3.0",
     "jsdom": "~22.1.0",
     "jsonc-eslint-parser": "^2.1.0",
