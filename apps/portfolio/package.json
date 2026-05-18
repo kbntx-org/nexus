@@ -15,7 +15,7 @@
     "@angular/router": "20.3.19",
     "front-matter": "^4.0.2",
     "lucide-angular": "^0.577.0",
-    "marked": "^17.0.1",
+    "marked": "^18.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "0.16.1"

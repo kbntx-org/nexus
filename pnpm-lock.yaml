@@ -46,8 +46,8 @@ importers:
         specifier: ^0.577.0
         version: 0.577.0(@angular/common@20.3.19(@angular/core@20.3.19(@angular/compiler@20.3.19)(rxjs@7.8.2)(zone.js@0.16.1))(rxjs@7.8.2))(@angular/core@20.3.19(@angular/compiler@20.3.19)(rxjs@7.8.2)(zone.js@0.16.1))
       marked:
-        specifier: ^17.0.1
-        version: 17.0.6
+        specifier: ^18.0.0
+        version: 18.0.3
       rxjs:
         specifier: ~7.8.0
         version: 7.8.2
@@ -236,8 +236,8 @@ importers:
         specifier: ^0.577.0
         version: 0.577.0(@angular/common@20.3.19(@angular/core@20.3.19(@angular/compiler@20.3.19)(rxjs@7.8.2)(zone.js@0.16.1))(rxjs@7.8.2))(@angular/core@20.3.19(@angular/compiler@20.3.19)(rxjs@7.8.2)(zone.js@0.16.1))
       marked:
-        specifier: ^17.0.1
-        version: 17.0.6
+        specifier: ^18.0.0
+        version: 18.0.3
       rxjs:
         specifier: ~7.8.0
         version: 7.8.2
@@ -6412,6 +6412,7 @@ packages:
 
   lucide-angular@0.577.0:
     resolution: {integrity: sha512-X+W7qnLDnOGKsuG7QedRSEFjLOPb4bU1oE9jZiJYHwbykkEW49g836Ma472NAQ/N4kWGY+5iEo4NvCfPjbRmZA==}
+    deprecated: Package deprecated. Please use @lucide/angular instead.
     peerDependencies:
       '@angular/common': 13.x - 21.x
       '@angular/core': 13.x - 21.x
@@ -6444,8 +6445,8 @@ packages:
   makeerror@1.0.12:
     resolution: {integrity: sha512-JmqCvUhmt43madlpFzG4BQzG2Z3m6tvQDNKdClZnO3VbIudJYmxsT0FNJMeiB2+JTSlTQTSbU8QdesVmwJcmLg==}
 
-  marked@17.0.6:
-    resolution: {integrity: sha512-gB0gkNafnonOw0obSTEGZTT86IuhILt2Wfx0mWH/1Au83kybTayroZ/V6nS25mN7u8ASy+5fMhgB3XPNrOZdmA==}
+  marked@18.0.3:
+    resolution: {integrity: sha512-7VT90JOkDeaRWpfjOReRGPEKn0ecdARBkDGL+tT1wZY0efPPqkUxLUSmzy/C7TIylQYJC9STISEsCHrqb/7VIA==}
     engines: {node: '>= 20'}
     hasBin: true
 
@@ -16983,7 +16984,7 @@ snapshots:
     dependencies:
       tmpl: 1.0.5
 
-  marked@17.0.6: {}
+  marked@18.0.3: {}
 
   math-intrinsics@1.1.0: {}
 
