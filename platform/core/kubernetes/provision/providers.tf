@@ -16,11 +16,11 @@ provider "hcloud" {
 terraform {
   backend "s3" {
     endpoints = {
-      s3 = "https://fsn1.your-objectstorage.com"
+      s3 = "https://2bde0126da63a3a9c94029d14ea380db.eu.r2.cloudflarestorage.com"
     }
     bucket                      = "nexus-terraform-state"
     key                         = "kubernetes/state/terraform.tfstate"
-    region                      = "fra1"
+    region                      = "eeur"
     skip_credentials_validation = true
     skip_region_validation      = true
     skip_requesting_account_id  = true
