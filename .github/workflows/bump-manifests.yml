@@ -52,7 +52,7 @@ jobs:
           BRANCH: ${{ inputs.branch }}
         run: |
           set -euo pipefail
-          git clone "https://x-access-token:${MANIFESTS_TOKEN}@github.com/kbntx/nexus-manifests.git" /tmp/manifests
+          git clone "https://x-access-token:${MANIFESTS_TOKEN}@github.com/kbntx-org/nexus-manifests.git" /tmp/manifests
           cd /tmp/manifests
           git config user.name "nexus-ci[bot]"
           git config user.email "nexus-ci[bot]@users.noreply.github.com"

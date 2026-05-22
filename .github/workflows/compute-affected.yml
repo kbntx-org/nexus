@@ -65,7 +65,7 @@ jobs:
           MANIFESTS_TOKEN: ${{ steps.manifests_token.outputs.token }}
         run: |
           git clone --depth=1 \
-            "https://x-access-token:${MANIFESTS_TOKEN}@github.com/kbntx/nexus-manifests.git" \
+            "https://x-access-token:${MANIFESTS_TOKEN}@github.com/kbntx-org/nexus-manifests.git" \
             /tmp/nexus-manifests
 
       - name: Compute affected projects
