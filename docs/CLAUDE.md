@@ -71,7 +71,7 @@ mkdocs Material already supports:
 
 ```markdown
 [ArgoCD](https://argo-cd.readthedocs.io/){ target="\_blank" rel="noopener" }
-[`Tiltfile`](https://github.com/kbntx/nexus/blob/main/Tiltfile){ target="\_blank" rel="noopener" }
+[`Tiltfile`](https://github.com/kbntx-org/nexus/blob/main/Tiltfile){ target="\_blank" rel="noopener" }
 ```
 
 Internal doc-to-doc links (e.g. `[Local development](02-local-development.md)`)
@@ -82,7 +82,7 @@ there.
 
 **Every doc ends with a `## References` section.** It contains
 **repo-internal links only** — files, folders, charts, workflows, or
-values files in `https://github.com/kbntx/nexus/...` that a reader might
+values files in `https://github.com/kbntx-org/nexus/...` that a reader might
 want to open after finishing the doc. Each entry is one bullet with a
 short trailing description.
 

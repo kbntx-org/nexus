@@ -16,7 +16,7 @@ images:
   - https://nexus-public-assets.kbntx.com/images/portfolio-homepage.png
   - https://nexus-public-assets.kbntx.com/images/portfolio-projects-dark-mode.png
   - https://nexus-public-assets.kbntx.com/images/portfolio-projects-light-mode.png
-githubUrl: https://github.com/kbntx/nexus
+githubUrl: https://github.com/kbntx-org/nexus
 features:
   - Dark/light theme support
   - Declarative content management to keep a low maintenance cost

@@ -19,7 +19,7 @@ images:
   - https://nexus-public-assets.kbntx.com/images/ingress-nginx-dashboard.png
   - https://nexus-public-assets.kbntx.com/images/node-k8s-dashboard.png
   - https://nexus-public-assets.kbntx.com/images/api-server-dashboard.png
-githubUrl: https://github.com/kbntx/nexus
+githubUrl: https://github.com/kbntx-org/nexus
 features:
   - VictoriaMetrics metrics collection with live S3 backups
   - Autodiscovery of cluster metrics with kube-state-metrics and node-exporter

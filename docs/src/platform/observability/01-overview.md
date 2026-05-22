@@ -3,7 +3,7 @@ title: Overview
 ---
 
 Observability in Nexus is a single Helm chart at
-[`platform/services/monitoring/`](https://github.com/kbntx/nexus/tree/main/platform/services/monitoring){ target="\_blank" rel="noopener" }
+[`platform/services/monitoring/`](https://github.com/kbntx-org/nexus/tree/main/platform/services/monitoring){ target="\_blank" rel="noopener" }
 that wires up metrics, logs, and a UI for both. The deliberate split is:
 **[VictoriaMetrics](https://docs.victoriametrics.com/){ target="\_blank" rel="noopener" }**
 for metrics,
@@ -34,7 +34,7 @@ stack swaps it out for VictoriaMetrics on purpose:
 The trade-off is mostly cultural: the Prometheus operator's CRDs
 (`ServiceMonitor`, `PodMonitor`, `PrometheusRule`) are not used here.
 Scrape targets are defined as plain Prometheus scrape configs in
-[`values.yaml`](https://github.com/kbntx/nexus/blob/main/platform/services/monitoring/values.yaml){ target="\_blank" rel="noopener" }
+[`values.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/monitoring/values.yaml){ target="\_blank" rel="noopener" }
 under `victoria-metrics-single.server.scrape.extraScrapeConfigs`.
 
 ## Metrics pipeline
@@ -92,7 +92,7 @@ graph LR
 ## Grafana behind Cloudflare Zero Trust
 
 Grafana is published through the in-cluster Ingress
-([`ingress.yaml`](https://github.com/kbntx/nexus/blob/main/platform/services/monitoring/templates/ingress.yaml){ target="\_blank" rel="noopener" }),
+([`ingress.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/monitoring/templates/ingress.yaml){ target="\_blank" rel="noopener" }),
 which means the same Cloudflare Tunnel + Zero Trust front door
 described in [Networking](../networking/01-overview.md) gates access.
 Authentication, MFA, and identity-aware policy all live at the edge.
@@ -103,7 +103,7 @@ the application itself has no login screen at all. If you reached
 Grafana, Cloudflare already decided you should be there. The only
 local credential is the admin password, pulled from Vault via ESO and
 mounted from the
-[`monitoring-secret`](https://github.com/kbntx/nexus/blob/main/platform/services/monitoring/templates/secrets.yaml){ target="\_blank" rel="noopener" }.
+[`monitoring-secret`](https://github.com/kbntx-org/nexus/blob/main/platform/services/monitoring/templates/secrets.yaml){ target="\_blank" rel="noopener" }.
 
 ## Postgres for Grafana state
 
@@ -122,7 +122,7 @@ is fine until it isn't:
 The chart instead deploys a small dedicated
 [Postgres](https://www.postgresql.org/docs/){ target="\_blank" rel="noopener" }
 StatefulSet
-([`postgres.yaml`](https://github.com/kbntx/nexus/blob/main/platform/services/monitoring/templates/postgres.yaml){ target="\_blank" rel="noopener" })
+([`postgres.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/monitoring/templates/postgres.yaml){ target="\_blank" rel="noopener" })
 on a Hetzner block volume, and points Grafana at it via
 `grafana.ini.database`. Credentials are injected from the same Vault
 secret as the rest of the stack. Grafana itself runs with
@@ -139,7 +139,7 @@ Two paths, both supported:
   persisted to Postgres and survive pod restarts. Good for iterating.
 - **Provisioned via the chart.** Anything that should be source-of-truth
   belongs in the
-  [monitoring values file](https://github.com/kbntx/nexus/blob/main/platform/services/monitoring/values.yaml){ target="\_blank" rel="noopener" }
+  [monitoring values file](https://github.com/kbntx-org/nexus/blob/main/platform/services/monitoring/values.yaml){ target="\_blank" rel="noopener" }
   (or a sibling ConfigMap rendered by the chart) so it is reapplied on
   every ArgoCD sync. UI-edited dashboards should eventually be
   promoted there.
@@ -157,9 +157,9 @@ explicitly out of scope for this stack.
 
 ## References
 
-- [`platform/services/monitoring/`](https://github.com/kbntx/nexus/tree/main/platform/services/monitoring){ target="\_blank" rel="noopener" } — full monitoring Helm chart
-- [`platform/services/monitoring/Chart.yaml`](https://github.com/kbntx/nexus/blob/main/platform/services/monitoring/Chart.yaml){ target="\_blank" rel="noopener" } — subchart dependencies (VictoriaMetrics, Grafana, Loki, Promtail, kube-state-metrics, node-exporter)
-- [`platform/services/monitoring/values.yaml`](https://github.com/kbntx/nexus/blob/main/platform/services/monitoring/values.yaml){ target="\_blank" rel="noopener" } — scrape configs, Loki S3 backend, Grafana database + auth
-- [`platform/services/monitoring/templates/ingress.yaml`](https://github.com/kbntx/nexus/blob/main/platform/services/monitoring/templates/ingress.yaml){ target="\_blank" rel="noopener" } — Grafana Ingress
-- [`platform/services/monitoring/templates/postgres.yaml`](https://github.com/kbntx/nexus/blob/main/platform/services/monitoring/templates/postgres.yaml){ target="\_blank" rel="noopener" } — dedicated Postgres for Grafana state
-- [`platform/services/monitoring/templates/secrets.yaml`](https://github.com/kbntx/nexus/blob/main/platform/services/monitoring/templates/secrets.yaml){ target="\_blank" rel="noopener" } — Vault-backed `ExternalSecret` for credentials
+- [`platform/services/monitoring/`](https://github.com/kbntx-org/nexus/tree/main/platform/services/monitoring){ target="\_blank" rel="noopener" } — full monitoring Helm chart
+- [`platform/services/monitoring/Chart.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/monitoring/Chart.yaml){ target="\_blank" rel="noopener" } — subchart dependencies (VictoriaMetrics, Grafana, Loki, Promtail, kube-state-metrics, node-exporter)
+- [`platform/services/monitoring/values.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/monitoring/values.yaml){ target="\_blank" rel="noopener" } — scrape configs, Loki S3 backend, Grafana database + auth
+- [`platform/services/monitoring/templates/ingress.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/monitoring/templates/ingress.yaml){ target="\_blank" rel="noopener" } — Grafana Ingress
+- [`platform/services/monitoring/templates/postgres.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/monitoring/templates/postgres.yaml){ target="\_blank" rel="noopener" } — dedicated Postgres for Grafana state
+- [`platform/services/monitoring/templates/secrets.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/monitoring/templates/secrets.yaml){ target="\_blank" rel="noopener" } — Vault-backed `ExternalSecret` for credentials
