@@ -8,7 +8,7 @@ concurrency:
 jobs:
   deploy:
     name: Deploy bastion
-    runs-on: nexus-runners
+    runs-on: nexus-org-runners
     container:
       image: kbntx/nexus-ci-toolkit:1.0
     timeout-minutes: 10

@@ -21,7 +21,7 @@ namespace comes back up by simply re-reading from Vault.
 ## Vault in the cluster
 
 Vault runs in-cluster as a Helm chart at
-[`platform/core/vault/server/`](https://github.com/kbntx/nexus/tree/main/platform/core/vault/server){ target="\_blank" rel="noopener" }.
+[`platform/core/vault/server/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/vault/server){ target="\_blank" rel="noopener" }.
 The chart owns three things: the Vault Deployment itself, a
 [CloudNativePG](https://cloudnative-pg.io/){ target="\_blank" rel="noopener" }
 `Cluster` for storage, and the in-cluster `Ingress` that fronts the API.
@@ -60,7 +60,7 @@ options:
 
 The schema is bootstrapped on first init by CNPG's
 `postInitApplicationSQLRefs`, which reads
-[`vault.sql`](https://github.com/kbntx/nexus/blob/main/platform/core/vault/server/files/vault.sql){ target="\_blank" rel="noopener" }
+[`vault.sql`](https://github.com/kbntx-org/nexus/blob/main/platform/core/vault/server/files/vault.sql){ target="\_blank" rel="noopener" }
 out of the `vault-postgres-init` ConfigMap and runs it against the
 freshly-created `vault` database. That step only fires the first time
 the cluster bootstraps; recovered or re-attached volumes skip it.
@@ -87,7 +87,7 @@ isolation but keeps the recovery story to a single `kubectl apply`.
 
 The Vault Deployment runs an init container that `envsubst`s the
 Postgres connection URI from `vault-secret` into
-[`config.hcl`](https://github.com/kbntx/nexus/blob/main/platform/core/vault/server/templates/vault-config.yaml){ target="\_blank" rel="noopener" }
+[`config.hcl`](https://github.com/kbntx-org/nexus/blob/main/platform/core/vault/server/templates/vault-config.yaml){ target="\_blank" rel="noopener" }
 before the main container starts. The rendered config lives in an
 `emptyDir`, so the URI never lands on disk and is re-resolved on every
 restart.
@@ -105,7 +105,7 @@ In dev mode (`values.local.yaml` sets `dev: true`), the chart drops the
 CNPG cluster and the config-init container entirely and runs Vault with
 its built-in `-dev` flag against an in-memory backend. A seed init
 container — defined in
-[`seed-script.yaml`](https://github.com/kbntx/nexus/blob/main/platform/core/vault/server/templates/seed-script.yaml){ target="\_blank" rel="noopener" }
+[`seed-script.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/vault/server/templates/seed-script.yaml){ target="\_blank" rel="noopener" }
 — pre-enables Kubernetes auth, the `admin` policy and role, and the
 `dev` KV mount, so a freshly-up local cluster has a working Vault
 without any operator steps.
@@ -115,7 +115,7 @@ without any operator steps.
 In-cluster, the
 External Secrets Operator
 (installed from
-[`platform/core/external-secrets/`](https://github.com/kbntx/nexus/tree/main/platform/core/external-secrets){ target="\_blank" rel="noopener" })
+[`platform/core/external-secrets/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/external-secrets){ target="\_blank" rel="noopener" })
 reconciles two CRDs:
 
 - **`SecretStore` / `ClusterSecretStore`** — describes _how_ to talk to
@@ -150,7 +150,7 @@ each consuming app has its own `ServiceAccount`, and ESO presents that
 SA's projected token (audience `vault`) to Vault as proof of identity.
 Vault validates the token by calling back to the cluster's TokenReview
 API — which is why
-[`platform/core/external-secrets/templates/rbac.yaml`](https://github.com/kbntx/nexus/blob/main/platform/core/external-secrets/templates/rbac.yaml){ target="\_blank" rel="noopener" }
+[`platform/core/external-secrets/templates/rbac.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/external-secrets/templates/rbac.yaml){ target="\_blank" rel="noopener" }
 binds `system:auth-delegator` to the `external-secrets` ServiceAccount
 and pins a long-lived token Secret it can use.
 
@@ -171,9 +171,9 @@ The end-to-end flow for a new secret has three steps:
    consumer's chart** that points at the Vault server, the right
    Kubernetes auth role, and a `ServiceAccount` whose token Vault will
    accept. The existing app charts under
-   [`platform/core/`](https://github.com/kbntx/nexus/tree/main/platform/core){ target="\_blank" rel="noopener" }
+   [`platform/core/`](https://github.com/kbntx-org/nexus/tree/main/platform/core){ target="\_blank" rel="noopener" }
    and
-   [`platform/services/`](https://github.com/kbntx/nexus/tree/main/platform/services){ target="\_blank" rel="noopener" }
+   [`platform/services/`](https://github.com/kbntx-org/nexus/tree/main/platform/services){ target="\_blank" rel="noopener" }
    ship templates for this — copy the closest one rather than writing
    it from scratch.
 3. **Declare an `ExternalSecret`** that references that store and the
@@ -198,7 +198,7 @@ The Postgres cluster is backed up by CNPG's
 a daily `ScheduledBackup` and the same retention policy as the other
 in-cluster databases. The barman credentials and destination bucket are
 configured on the `Cluster` resource in
-[`postgres-cnpg.yaml`](https://github.com/kbntx/nexus/blob/main/platform/core/vault/server/templates/postgres-cnpg.yaml){ target="\_blank" rel="noopener" }.
+[`postgres-cnpg.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/vault/server/templates/postgres-cnpg.yaml){ target="\_blank" rel="noopener" }.
 
 Recovery is a two-step story: restore the CNPG cluster from its backup
 (point-in-time if needed), then re-apply `vault-secret` and unseal Vault
@@ -208,9 +208,9 @@ volume.
 
 ## References
 
-- [`platform/core/vault/server/`](https://github.com/kbntx/nexus/tree/main/platform/core/vault/server){ target="\_blank" rel="noopener" } — Vault Helm chart (Deployment, CNPG cluster, Ingress, dev seed)
-- [`platform/core/vault/server/templates/postgres-cnpg.yaml`](https://github.com/kbntx/nexus/blob/main/platform/core/vault/server/templates/postgres-cnpg.yaml){ target="\_blank" rel="noopener" } — CNPG `Cluster` and `ScheduledBackup` for Vault's storage
-- [`platform/core/vault/server/templates/vault-config.yaml`](https://github.com/kbntx/nexus/blob/main/platform/core/vault/server/templates/vault-config.yaml){ target="\_blank" rel="noopener" } — Vault listener, storage backend, telemetry
-- [`platform/core/vault/server/files/vault.sql`](https://github.com/kbntx/nexus/blob/main/platform/core/vault/server/files/vault.sql){ target="\_blank" rel="noopener" } — Postgres schema for Vault's storage backend
-- [`platform/core/external-secrets/`](https://github.com/kbntx/nexus/tree/main/platform/core/external-secrets){ target="\_blank" rel="noopener" } — ESO Helm chart and TokenReview RBAC
-- [`platform/core/cloudflared/templates/secrets.yaml`](https://github.com/kbntx/nexus/blob/main/platform/core/cloudflared/templates/secrets.yaml){ target="\_blank" rel="noopener" } — canonical `SecretStore` + `ExternalSecret` example to copy from
+- [`platform/core/vault/server/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/vault/server){ target="\_blank" rel="noopener" } — Vault Helm chart (Deployment, CNPG cluster, Ingress, dev seed)
+- [`platform/core/vault/server/templates/postgres-cnpg.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/vault/server/templates/postgres-cnpg.yaml){ target="\_blank" rel="noopener" } — CNPG `Cluster` and `ScheduledBackup` for Vault's storage
+- [`platform/core/vault/server/templates/vault-config.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/vault/server/templates/vault-config.yaml){ target="\_blank" rel="noopener" } — Vault listener, storage backend, telemetry
+- [`platform/core/vault/server/files/vault.sql`](https://github.com/kbntx-org/nexus/blob/main/platform/core/vault/server/files/vault.sql){ target="\_blank" rel="noopener" } — Postgres schema for Vault's storage backend
+- [`platform/core/external-secrets/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/external-secrets){ target="\_blank" rel="noopener" } — ESO Helm chart and TokenReview RBAC
+- [`platform/core/cloudflared/templates/secrets.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/cloudflared/templates/secrets.yaml){ target="\_blank" rel="noopener" } — canonical `SecretStore` + `ExternalSecret` example to copy from

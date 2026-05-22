@@ -26,7 +26,7 @@ Registering each `Application` manually would defeat the point — the
 catalog of cluster workloads would itself live outside Git. Instead,
 **a single root `Application` is registered by hand once at bootstrap**,
 and that root points at the
-[`app-of-apps`](https://github.com/kbntx/nexus/tree/main/platform/services/app-of-apps){ target="\_blank" rel="noopener" }
+[`app-of-apps`](https://github.com/kbntx-org/nexus/tree/main/platform/services/app-of-apps){ target="\_blank" rel="noopener" }
 chart. The chart wraps
 [`argocd-apps`](https://github.com/argoproj/argo-helm/tree/main/charts/argocd-apps){ target="\_blank" rel="noopener" }
 and declares every other `Application` the platform needs as a child.
@@ -46,7 +46,7 @@ graph LR
 
 Bootstrapping the platform is a single sync of the root application. Every
 core component declared in
-[`app-of-apps/values.yaml`](https://github.com/kbntx/nexus/blob/main/platform/services/app-of-apps/values.yaml){ target="\_blank" rel="noopener" }
+[`app-of-apps/values.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/app-of-apps/values.yaml){ target="\_blank" rel="noopener" }
 is then materialized by ArgoCD on its own. Adding a new workload — see
 [Adding an application](#adding-an-application) below — is one entry in
 that file.
@@ -64,7 +64,7 @@ differs by workload type:
 The custom apps use a [multi-source `Application`](https://argo-cd.readthedocs.io/en/stable/user-guide/multiple_sources/){ target="\_blank" rel="noopener" }:
 the chart comes from this repo, and a values overlay
 (`$values/<app>/values.yaml`) comes from
-[`nexus-manifests`](https://github.com/kbntx/nexus-manifests){ target="\_blank" rel="noopener" } —
+[`nexus-manifests`](https://github.com/kbntx-org/nexus-manifests){ target="\_blank" rel="noopener" } —
 a small, dumb repo CI commits image-tag bumps to. ArgoCD is notified of
 those commits via a GitHub webhook for sub-minute sync. See
 [GitOps deploys](../ci-cd/02-gitops-deploys.md) for the full pipeline.
@@ -84,7 +84,7 @@ and shadows whatever `nexus-manifests` says — so the override is sticky
 until you `argocd app unset` or commit the same tag back to
 `nexus-manifests`.
 
-This works because [`argocd-cm`](https://github.com/kbntx/nexus/blob/main/platform/core/argocd/values.yaml){ target="\_blank" rel="noopener" }
+This works because [`argocd-cm`](https://github.com/kbntx-org/nexus/blob/main/platform/core/argocd/values.yaml){ target="\_blank" rel="noopener" }
 declares `ignoreApplicationDifferences` for `/spec/sources/0/helm/parameters`
 on portfolio and documentation. Without that, the parent app-of-apps
 reconciler would revert the override on its next sync. Used
@@ -105,7 +105,7 @@ The whole flow for a new cluster-side workload:
 1. Drop the chart or raw manifests under `platform/services/<name>/`
    (or `platform/core/<name>/` if the cluster cannot function without it).
 2. Add an entry under `argocd-apps.applications` in
-   [`app-of-apps/values.yaml`](https://github.com/kbntx/nexus/blob/main/platform/services/app-of-apps/values.yaml){ target="\_blank" rel="noopener" },
+   [`app-of-apps/values.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/app-of-apps/values.yaml){ target="\_blank" rel="noopener" },
    pointing `source.path` at the chart and setting the destination
    namespace.
 3. Push to `main`. The `app-of-apps` `Application` re-syncs, the new
@@ -119,12 +119,12 @@ file.
 ## Access
 
 The ArgoCD UI and gRPC API are exposed through
-[`templates/ingress.yaml`](https://github.com/kbntx/nexus/blob/main/platform/core/argocd/templates/ingress.yaml){ target="\_blank" rel="noopener" },
+[`templates/ingress.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/argocd/templates/ingress.yaml){ target="\_blank" rel="noopener" },
 fronted by Cloudflare like every other public service (see
 [Networking](../networking/01-overview.md)).
 
 Two identities exist, and both are configured in
-[`platform/core/argocd/values.yaml`](https://github.com/kbntx/nexus/blob/main/platform/core/argocd/values.yaml){ target="\_blank" rel="noopener" }:
+[`platform/core/argocd/values.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/argocd/values.yaml){ target="\_blank" rel="noopener" }:
 
 - **Humans** authenticate through GitHub SSO via the bundled
   [Dex](https://dexidp.io/){ target="\_blank" rel="noopener" }
@@ -139,7 +139,7 @@ Two identities exist, and both are configured in
 
 ## References
 
-- [`platform/core/argocd/`](https://github.com/kbntx/nexus/tree/main/platform/core/argocd){ target="\_blank" rel="noopener" } — ArgoCD Helm chart wrapper, ingress template, SSO + RBAC config
-- [`platform/services/app-of-apps/`](https://github.com/kbntx/nexus/tree/main/platform/services/app-of-apps){ target="\_blank" rel="noopener" } — root chart declaring every child `Application`
-- [`platform/services/app-of-apps/values.yaml`](https://github.com/kbntx/nexus/blob/main/platform/services/app-of-apps/values.yaml){ target="\_blank" rel="noopener" } — the catalog of cluster workloads
+- [`platform/core/argocd/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/argocd){ target="\_blank" rel="noopener" } — ArgoCD Helm chart wrapper, ingress template, SSO + RBAC config
+- [`platform/services/app-of-apps/`](https://github.com/kbntx-org/nexus/tree/main/platform/services/app-of-apps){ target="\_blank" rel="noopener" } — root chart declaring every child `Application`
+- [`platform/services/app-of-apps/values.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/app-of-apps/values.yaml){ target="\_blank" rel="noopener" } — the catalog of cluster workloads
 - [GitOps deploys](../ci-cd/02-gitops-deploys.md) — multi-source `Application` shape and the `nexus-manifests` flow

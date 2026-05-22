@@ -18,7 +18,7 @@ tech:
 logo: https://nexus-public-assets.kbntx.com/images/kubernetes-logo.svg
 images:
   - https://nexus-public-assets.kbntx.com/images/k3s-cluster-schema.png
-githubUrl: https://github.com/kbntx/nexus
+githubUrl: https://github.com/kbntx-org/nexus
 features:
   - K3s cluster with multi-node setup
   - Terraform module for minimal initialization

@@ -32,13 +32,13 @@ runner scale set:
 ```yaml
 jobs:
   build:
-    runs-on: nexus-runners
+    runs-on: nexus-org-runners
     container:
-      image: kbntx/nexus-ci-toolkit:1.0
+      image: kbntx-org/nexus-ci-toolkit:1.0
 ```
 
-`nexus-runners` is the
-[`runnerScaleSetName`](https://github.com/kbntx/nexus/blob/main/platform/core/github-arc-runners/runners/values.yaml){ target="\_blank" rel="noopener" }
+`nexus-org-runners` is the
+[`runnerScaleSetName`](https://github.com/kbntx-org/nexus/blob/main/platform/core/github-arc-runners/runners/values.yaml){ target="\_blank" rel="noopener" }
 exposed by the runner chart. The container image is the
 [CI toolkit](#ci-toolkit-image) — the single image used by every workflow.
 
@@ -47,7 +47,7 @@ exposed by the runner chart. The container image is the
 Two long-lived components run in the cluster: a **controller** that
 watches the runner-scale-set CRDs, and a **listener** pod per scale set
 that holds an HTTPS long-poll connection to GitHub. When GitHub queues a
-job for `nexus-runners`, the flow is:
+job for `nexus-org-runners`, the flow is:
 
 ```mermaid
 %%{init: {'theme':'dark'}}%%
@@ -70,7 +70,7 @@ runs, and no opportunity for one job to leave behind something that
 affects the next one.
 
 The pool size scales between `minRunners` and `maxRunners` (configured in
-the [runner values](https://github.com/kbntx/nexus/blob/main/platform/core/github-arc-runners/runners/values.yaml){ target="\_blank" rel="noopener" }):
+the [runner values](https://github.com/kbntx-org/nexus/blob/main/platform/core/github-arc-runners/runners/values.yaml){ target="\_blank" rel="noopener" }):
 the listener creates new ephemeral runners as jobs queue up, the
 controller materializes them as pods, and idle slack is pruned back down.
 
@@ -113,13 +113,13 @@ graph LR
 ```
 
 In Nexus, the template is shipped as a ConfigMap mounted into the runner
-([`hook-extension.yaml`](https://github.com/kbntx/nexus/blob/main/platform/core/github-arc-runners/runners/templates/hook-extension.yaml){ target="\_blank" rel="noopener" })
+([`hook-extension.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/github-arc-runners/runners/templates/hook-extension.yaml){ target="\_blank" rel="noopener" })
 and used for two things — both of which would be painful to solve any
 other way:
 
 - **Network isolation.** The extension adds a `github-job-pod: 'true'`
   label to every job pod. A
-  [`NetworkPolicy`](https://github.com/kbntx/nexus/blob/main/platform/core/github-arc-runners/runners/templates/network-policy.yaml){ target="\_blank" rel="noopener" }
+  [`NetworkPolicy`](https://github.com/kbntx-org/nexus/blob/main/platform/core/github-arc-runners/runners/templates/network-policy.yaml){ target="\_blank" rel="noopener" }
   selects on that label and restricts egress: DNS to `kube-system` and
   the public internet are allowed, the cluster's pod and service
   networks are denied. Even on their own pool, runners execute
@@ -141,7 +141,7 @@ only useful for the main job container.
 ## CI toolkit image
 
 Every workflow uses one image,
-[`kbntx/nexus-ci-toolkit`](https://github.com/kbntx/nexus/tree/main/platform/services/custom-docker-images){ target="\_blank" rel="noopener" },
+[`kbntx-org/nexus-ci-toolkit`](https://github.com/kbntx-org/nexus/tree/main/platform/services/custom-docker-images){ target="\_blank" rel="noopener" },
 that bundles every tool the pipelines need: `pnpm`, `kubectl`, the ArgoCD
 CLI, BuildKit client, `jq`, and so on.
 
@@ -153,9 +153,9 @@ once.
 ## Pipelines
 
 The pipelines are split into a small set of reusable workflows that
-[`checks-pr.yml`](https://github.com/kbntx/nexus/blob/main/.github/workflows/checks-pr.yml){ target="\_blank" rel="noopener" }
+[`checks-pr.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/checks-pr.yml){ target="\_blank" rel="noopener" }
 and
-[`checks-main.yml`](https://github.com/kbntx/nexus/blob/main/.github/workflows/checks-main.yml){ target="\_blank" rel="noopener" }
+[`checks-main.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/checks-main.yml){ target="\_blank" rel="noopener" }
 compose. Both start by computing what changed.
 
 ```mermaid
@@ -203,7 +203,7 @@ pipelines lean on that for two distinct decisions:
 
 Each project declares its deploy paths in its `project.json` under
 `metadata.deployPaths`, and
-[`compute-affected.yml`](https://github.com/kbntx/nexus/blob/main/.github/workflows/compute-affected.yml){ target="\_blank" rel="noopener" }
+[`compute-affected.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/compute-affected.yml){ target="\_blank" rel="noopener" }
 walks them with the changed file list to build `deploy_targets`. On
 `main`, the diff base for image-shipping apps is **that app's last
 deployed SHA** (read from the manifests repo), not the previous commit
@@ -217,9 +217,9 @@ change to the affected logic is risky enough to warrant a full re-deploy.
 
 ## References
 
-- [`platform/core/github-arc-runners/`](https://github.com/kbntx/nexus/tree/main/platform/core/github-arc-runners){ target="\_blank" rel="noopener" } — ARC controller and runner Helm charts
-- [`platform/core/github-arc-runners/runners/templates/network-policy.yaml`](https://github.com/kbntx/nexus/blob/main/platform/core/github-arc-runners/runners/templates/network-policy.yaml){ target="\_blank" rel="noopener" } — runner egress restrictions
-- [`platform/core/github-arc-runners/runners/templates/hook-extension.yaml`](https://github.com/kbntx/nexus/blob/main/platform/core/github-arc-runners/runners/templates/hook-extension.yaml){ target="\_blank" rel="noopener" } — `github-job-pod` label + BuildKit injection
-- [`platform/services/custom-docker-images/`](https://github.com/kbntx/nexus/tree/main/platform/services/custom-docker-images){ target="\_blank" rel="noopener" } — CI toolkit image
-- [`.github/workflows/`](https://github.com/kbntx/nexus/tree/main/.github/workflows){ target="\_blank" rel="noopener" } — workflow definitions
-- [`.github/workflows/compute-affected.yml`](https://github.com/kbntx/nexus/blob/main/.github/workflows/compute-affected.yml){ target="\_blank" rel="noopener" } — affected detection (per-app base from `nexus-manifests` on main)
+- [`platform/core/github-arc-runners/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/github-arc-runners){ target="\_blank" rel="noopener" } — ARC controller and runner Helm charts
+- [`platform/core/github-arc-runners/runners/templates/network-policy.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/github-arc-runners/runners/templates/network-policy.yaml){ target="\_blank" rel="noopener" } — runner egress restrictions
+- [`platform/core/github-arc-runners/runners/templates/hook-extension.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/github-arc-runners/runners/templates/hook-extension.yaml){ target="\_blank" rel="noopener" } — `github-job-pod` label + BuildKit injection
+- [`platform/services/custom-docker-images/`](https://github.com/kbntx-org/nexus/tree/main/platform/services/custom-docker-images){ target="\_blank" rel="noopener" } — CI toolkit image
+- [`.github/workflows/`](https://github.com/kbntx-org/nexus/tree/main/.github/workflows){ target="\_blank" rel="noopener" } — workflow definitions
+- [`.github/workflows/compute-affected.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/compute-affected.yml){ target="\_blank" rel="noopener" } — affected detection (per-app base from `nexus-manifests` on main)

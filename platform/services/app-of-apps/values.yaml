@@ -3,7 +3,7 @@ argocd-apps:
     traefik-ingress:
       project: default
       source:
-        repoURL: https://github.com/kbntx/nexus.git
+        repoURL: https://github.com/kbntx-org/nexus.git
         path: platform/core/traefik
         targetRevision: main
       destination:
@@ -16,7 +16,7 @@ argocd-apps:
     argocd:
       project: default
       source:
-        repoURL: https://github.com/kbntx/nexus.git
+        repoURL: https://github.com/kbntx-org/nexus.git
         path: platform/core/argocd
         targetRevision: main
       destination:
@@ -29,7 +29,7 @@ argocd-apps:
     external-secrets:
       project: default
       source:
-        repoURL: https://github.com/kbntx/nexus.git
+        repoURL: https://github.com/kbntx-org/nexus.git
         path: platform/core/external-secrets
         targetRevision: main
       destination:
@@ -42,7 +42,7 @@ argocd-apps:
     vault:
       project: default
       source:
-        repoURL: https://github.com/kbntx/nexus.git
+        repoURL: https://github.com/kbntx-org/nexus.git
         path: platform/core/vault/server
         targetRevision: main
       destination:
@@ -55,7 +55,7 @@ argocd-apps:
     cloudnative-pg:
       project: default
       source:
-        repoURL: https://github.com/kbntx/nexus.git
+        repoURL: https://github.com/kbntx-org/nexus.git
         path: platform/core/cloudnative-pg
         targetRevision: main
       destination:
@@ -69,7 +69,7 @@ argocd-apps:
     cloudflared:
       project: default
       source:
-        repoURL: https://github.com/kbntx/nexus.git
+        repoURL: https://github.com/kbntx-org/nexus.git
         path: platform/core/cloudflared
         targetRevision: main
       destination:
@@ -82,7 +82,7 @@ argocd-apps:
     hetzner-cloud-controller:
       project: default
       source:
-        repoURL: https://github.com/kbntx/nexus.git
+        repoURL: https://github.com/kbntx-org/nexus.git
         path: platform/core/hetzner-cloud-controller
         targetRevision: main
       destination:
@@ -95,7 +95,7 @@ argocd-apps:
     monitoring:
       project: default
       source:
-        repoURL: https://github.com/kbntx/nexus.git
+        repoURL: https://github.com/kbntx-org/nexus.git
         path: platform/services/monitoring
         targetRevision: main
       destination:
@@ -108,7 +108,7 @@ argocd-apps:
     github-arc-runners-controller:
       project: default
       source:
-        repoURL: https://github.com/kbntx/nexus.git
+        repoURL: https://github.com/kbntx-org/nexus.git
         path: platform/core/github-arc-runners/controller
         targetRevision: main
       destination:
@@ -121,7 +121,7 @@ argocd-apps:
     github-arc-runners:
       project: default
       source:
-        repoURL: https://github.com/kbntx/nexus.git
+        repoURL: https://github.com/kbntx-org/nexus.git
         path: platform/core/github-arc-runners/runners
         targetRevision: main
       destination:
@@ -134,7 +134,7 @@ argocd-apps:
     system-upgrade-controller:
       project: default
       source:
-        repoURL: https://github.com/kbntx/nexus.git
+        repoURL: https://github.com/kbntx-org/nexus.git
         path: platform/core/kubernetes/upgrades/system-upgrade-controller
         targetRevision: main
       destination:
@@ -147,7 +147,7 @@ argocd-apps:
     k3s-upgrades:
       project: default
       source:
-        repoURL: https://github.com/kbntx/nexus.git
+        repoURL: https://github.com/kbntx-org/nexus.git
         path: platform/core/kubernetes/upgrades/plans
         targetRevision: main
       destination:
@@ -160,14 +160,14 @@ argocd-apps:
     documentation:
       project: default
       sources:
-        - repoURL: https://github.com/kbntx/nexus.git
+        - repoURL: https://github.com/kbntx-org/nexus.git
           path: docs/helm
           targetRevision: main
           helm:
             valueFiles:
               - values.yaml
               - $values/documentation/values.yaml
-        - repoURL: https://github.com/kbntx/nexus-manifests.git
+        - repoURL: https://github.com/kbntx-org/nexus-manifests.git
           targetRevision: main
           ref: values
       destination:
@@ -183,7 +183,7 @@ argocd-apps:
     n8n:
       project: default
       source:
-        repoURL: https://github.com/kbntx/nexus.git
+        repoURL: https://github.com/kbntx-org/nexus.git
         path: platform/services/n8n
         targetRevision: main
       destination:
@@ -196,19 +196,41 @@ argocd-apps:
     portfolio:
       project: default
       sources:
-        - repoURL: https://github.com/kbntx/nexus.git
+        - repoURL: https://github.com/kbntx-org/nexus.git
           path: apps/portfolio/chart
           targetRevision: main
           helm:
             valueFiles:
               - values.yaml
               - $values/portfolio/values.yaml
-        - repoURL: https://github.com/kbntx/nexus-manifests.git
+        - repoURL: https://github.com/kbntx-org/nexus-manifests.git
           targetRevision: main
           ref: values
       destination:
         server: https://kubernetes.default.svc
         namespace: portfolio
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+
+    smelt:
+      project: default
+      sources:
+        - repoURL: https://github.com/kbntx-org/smelt.git
+          path: chart
+          targetRevision: main
+          helm:
+            valueFiles:
+              - values.yaml
+        - repoURL: https://github.com/kbntx-org/nexus-manifests.git
+          targetRevision: main
+          ref: values
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: smelt
       syncPolicy:
         automated:
           prune: true

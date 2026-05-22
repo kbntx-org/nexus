@@ -22,7 +22,7 @@ Three tools are needed to run the local environment:
 ## Why Tilt?
 
 Tilt was chosen because it codifies the entire local dev environment in a
-single [`Tiltfile`](https://github.com/kbntx/nexus/blob/main/Tiltfile){ target="\_blank" rel="noopener" }:
+single [`Tiltfile`](https://github.com/kbntx-org/nexus/blob/main/Tiltfile){ target="\_blank" rel="noopener" }:
 
 - **A real programming language** — the `Tiltfile` is written in Starlark
   (a Python dialect), not YAML. That means loops, conditionals, helpers,
@@ -42,7 +42,7 @@ ever reaches production.
 
 ## How Tilt works
 
-Tilt reads the [`Tiltfile`](https://github.com/kbntx/nexus/blob/main/Tiltfile){ target="\_blank" rel="noopener" }
+Tilt reads the [`Tiltfile`](https://github.com/kbntx-org/nexus/blob/main/Tiltfile){ target="\_blank" rel="noopener" }
 at the root of the repository. It defines:
 
 - Which Docker images to build and where to push them (local registry
@@ -64,7 +64,7 @@ no rebuild needed.
 pnpm run cluster:create
 ```
 
-This runs [`tools/bash/cluster.sh`](https://github.com/kbntx/nexus/blob/main/tools/bash/cluster.sh){ target="\_blank" rel="noopener" },
+This runs [`tools/bash/cluster.sh`](https://github.com/kbntx-org/nexus/blob/main/tools/bash/cluster.sh){ target="\_blank" rel="noopener" },
 which uses `kind` directly to create the cluster, starts a local Docker
 image registry alongside it, and wires the cluster's containerd to use it
 as a mirror. The host port mapping in the same script is what lets
@@ -109,6 +109,6 @@ pnpm run cluster:delete
 
 ## References
 
-- [`Tiltfile`](https://github.com/kbntx/nexus/blob/main/Tiltfile){ target="\_blank" rel="noopener" } — local dev orchestration
-- [`package.json`](https://github.com/kbntx/nexus/blob/main/package.json){ target="\_blank" rel="noopener" } — `cluster:create`, `dev:docs`, `dev:portfolio`, `dev:reset`, `cluster:delete`
-- [`tools/bash/`](https://github.com/kbntx/nexus/tree/main/tools/bash){ target="\_blank" rel="noopener" } — cluster bootstrap helpers
+- [`Tiltfile`](https://github.com/kbntx-org/nexus/blob/main/Tiltfile){ target="\_blank" rel="noopener" } — local dev orchestration
+- [`package.json`](https://github.com/kbntx-org/nexus/blob/main/package.json){ target="\_blank" rel="noopener" } — `cluster:create`, `dev:docs`, `dev:portfolio`, `dev:reset`, `cluster:delete`
+- [`tools/bash/`](https://github.com/kbntx-org/nexus/tree/main/tools/bash){ target="\_blank" rel="noopener" } — cluster bootstrap helpers

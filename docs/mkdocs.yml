@@ -1,6 +1,6 @@
 site_name: Nexus documentation
-repo_name: kbntx/nexus
-repo_url: https://github.com/kbntx/nexus
+repo_name: kbntx-org/nexus
+repo_url: https://github.com/kbntx-org/nexus
 site_url: https://docs.kbntx.com
 
 docs_dir: src

@@ -30,10 +30,10 @@ that ArgoCD reads as a values overlay.
 
 ## The two repos
 
-[`nexus`](https://github.com/kbntx/nexus){ target="\_blank" rel="noopener" }
+[`nexus`](https://github.com/kbntx-org/nexus){ target="\_blank" rel="noopener" }
 holds code, charts, and workflows. Unchanged in shape.
 
-[`nexus-manifests`](https://github.com/kbntx/nexus-manifests){ target="\_blank" rel="noopener" }
+[`nexus-manifests`](https://github.com/kbntx-org/nexus-manifests){ target="\_blank" rel="noopener" }
 holds one tiny file per ArgoCD-managed app:
 
 ```
@@ -50,7 +50,7 @@ Rollback is `git revert` on this repo.
 Each image-shipping app is registered as a
 [multi-source ArgoCD Application](https://argo-cd.readthedocs.io/en/stable/user-guide/multiple_sources/){ target="\_blank" rel="noopener" }
 in
-[`platform/services/app-of-apps/values.yaml`](https://github.com/kbntx/nexus/blob/main/platform/services/app-of-apps/values.yaml){ target="\_blank" rel="noopener" }.
+[`platform/services/app-of-apps/values.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/app-of-apps/values.yaml){ target="\_blank" rel="noopener" }.
 Two sources combine:
 
 - The chart from `nexus` at the same path as before
@@ -85,7 +85,7 @@ on top of it own the rollout-health story.
 `build-<app>` jobs build and push images tagged with the commit SHA.
 They no longer talk to ArgoCD.
 
-[`bump-manifests.yml`](https://github.com/kbntx/nexus/blob/main/.github/workflows/bump-manifests.yml){ target="\_blank" rel="noopener" }
+[`bump-manifests.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/bump-manifests.yml){ target="\_blank" rel="noopener" }
 is the aggregator. It depends on every build job, edits each affected
 app's values file in `nexus-manifests`, and produces **one commit per
 wave** (not one per app). The commit message lists each project and its
@@ -98,7 +98,7 @@ can be in.
 
 ## Affected detection per app
 
-[`compute-affected.yml`](https://github.com/kbntx/nexus/blob/main/.github/workflows/compute-affected.yml){ target="\_blank" rel="noopener" }
+[`compute-affected.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/compute-affected.yml){ target="\_blank" rel="noopener" }
 clones `nexus-manifests` shallowly, then for each project:
 
 1. Reads `metadata.manifestsValuesPath` from the project's
@@ -160,7 +160,7 @@ The diff base for the per-app deploy gate stays the PR's merge target
 _not_ consulted for PRs. We want the preview to reflect the PR's diff
 against trunk, not against the live cluster.
 
-[`cleanup-pr-manifests.yml`](https://github.com/kbntx/nexus/blob/main/.github/workflows/cleanup-pr-manifests.yml){ target="\_blank" rel="noopener" }
+[`cleanup-pr-manifests.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/cleanup-pr-manifests.yml){ target="\_blank" rel="noopener" }
 deletes `pr-<number>` from `nexus-manifests` when the PR closes
 (merged or not). The deletion is idempotent — PRs that never built a
 preview return cleanly.
@@ -180,20 +180,20 @@ until the ApplicationSet is added in a follow-up.
 
 ## What is _not_ in this flow
 
-[`platform/core/bastion/`](https://github.com/kbntx/nexus/tree/main/platform/core/bastion){ target="\_blank" rel="noopener" }
+[`platform/core/bastion/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/bastion){ target="\_blank" rel="noopener" }
 is not ArgoCD-managed today (it is a docker-compose deploy SCP'd to a
 host). It has been removed from the auto-deploy gating and is now
-[`workflow_dispatch`-only](https://github.com/kbntx/nexus/blob/main/.github/workflows/deploy-bastion.yml){ target="\_blank" rel="noopener" }.
+[`workflow_dispatch`-only](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/deploy-bastion.yml){ target="\_blank" rel="noopener" }.
 It will be migrated into the cluster as a real ArgoCD app in a separate
 effort.
 
 ## References
 
-- [`platform/services/app-of-apps/values.yaml`](https://github.com/kbntx/nexus/blob/main/platform/services/app-of-apps/values.yaml){ target="\_blank" rel="noopener" } — Application definitions, multi-source for portfolio + documentation
-- [`.github/workflows/checks-main.yml`](https://github.com/kbntx/nexus/blob/main/.github/workflows/checks-main.yml){ target="\_blank" rel="noopener" } — main-pipeline orchestration
-- [`.github/workflows/compute-affected.yml`](https://github.com/kbntx/nexus/blob/main/.github/workflows/compute-affected.yml){ target="\_blank" rel="noopener" } — per-app base resolution from `nexus-manifests`
-- [`.github/workflows/build-portfolio.yml`](https://github.com/kbntx/nexus/blob/main/.github/workflows/build-portfolio.yml){ target="\_blank" rel="noopener" } and [`build-documentation.yml`](https://github.com/kbntx/nexus/blob/main/.github/workflows/build-documentation.yml){ target="\_blank" rel="noopener" } — per-app build-and-push
-- [`.github/workflows/bump-manifests.yml`](https://github.com/kbntx/nexus/blob/main/.github/workflows/bump-manifests.yml){ target="\_blank" rel="noopener" } — aggregator that commits to `nexus-manifests` (any branch)
-- [`.github/workflows/checks-pr.yml`](https://github.com/kbntx/nexus/blob/main/.github/workflows/checks-pr.yml){ target="\_blank" rel="noopener" } — PR pipeline (build + commit to `pr-<n>` branch)
-- [`.github/workflows/cleanup-pr-manifests.yml`](https://github.com/kbntx/nexus/blob/main/.github/workflows/cleanup-pr-manifests.yml){ target="\_blank" rel="noopener" } — deletes the PR branch on PR close
-- [`apps/portfolio/project.json`](https://github.com/kbntx/nexus/blob/main/apps/portfolio/project.json){ target="\_blank" rel="noopener" } and [`docs/project.json`](https://github.com/kbntx/nexus/blob/main/docs/project.json){ target="\_blank" rel="noopener" } — `manifestsValuesPath` and `deployPaths` metadata
+- [`platform/services/app-of-apps/values.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/app-of-apps/values.yaml){ target="\_blank" rel="noopener" } — Application definitions, multi-source for portfolio + documentation
+- [`.github/workflows/checks-main.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/checks-main.yml){ target="\_blank" rel="noopener" } — main-pipeline orchestration
+- [`.github/workflows/compute-affected.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/compute-affected.yml){ target="\_blank" rel="noopener" } — per-app base resolution from `nexus-manifests`
+- [`.github/workflows/build-portfolio.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/build-portfolio.yml){ target="\_blank" rel="noopener" } and [`build-documentation.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/build-documentation.yml){ target="\_blank" rel="noopener" } — per-app build-and-push
+- [`.github/workflows/bump-manifests.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/bump-manifests.yml){ target="\_blank" rel="noopener" } — aggregator that commits to `nexus-manifests` (any branch)
+- [`.github/workflows/checks-pr.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/checks-pr.yml){ target="\_blank" rel="noopener" } — PR pipeline (build + commit to `pr-<n>` branch)
+- [`.github/workflows/cleanup-pr-manifests.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/cleanup-pr-manifests.yml){ target="\_blank" rel="noopener" } — deletes the PR branch on PR close
+- [`apps/portfolio/project.json`](https://github.com/kbntx-org/nexus/blob/main/apps/portfolio/project.json){ target="\_blank" rel="noopener" } and [`docs/project.json`](https://github.com/kbntx-org/nexus/blob/main/docs/project.json){ target="\_blank" rel="noopener" } — `manifestsValuesPath` and `deployPaths` metadata

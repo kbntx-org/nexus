@@ -95,13 +95,13 @@ syncs. **No GitHub Actions involved.**
 
 **Case 2 — custom or extended tools that ship a container image.** The
 portfolio, the docs site, and the
-[CI toolkit image](https://github.com/kbntx/nexus/tree/main/platform/services/custom-docker-images){ target="\_blank" rel="noopener" }
+[CI toolkit image](https://github.com/kbntx-org/nexus/tree/main/platform/services/custom-docker-images){ target="\_blank" rel="noopener" }
 are ours. When their source changes, CI takes over: it uses
 [Nx](https://nx.dev/){ target="\_blank" rel="noopener" } to figure out what
 actually moved (`nx affected` against the base branch), rebuilds only the
 impacted images, and then points ArgoCD at the new commit through a
 parameter override before triggering a sync. The full flow lives in
-[`.github/workflows/`](https://github.com/kbntx/nexus/tree/main/.github/workflows){ target="\_blank" rel="noopener" }.
+[`.github/workflows/`](https://github.com/kbntx-org/nexus/tree/main/.github/workflows){ target="\_blank" rel="noopener" }.
 
 The long-term direction is to push everything into ArgoCD and let GitHub
 Actions do **continuous integration only** — testing, linting, building
@@ -119,6 +119,6 @@ To get started using Nexus, head over to
 
 ## References
 
-- [`platform/services/app-of-apps/`](https://github.com/kbntx/nexus/tree/main/platform/services/app-of-apps){ target="\_blank" rel="noopener" } — every cluster-side workload, declared as an ArgoCD application
-- [`platform/`](https://github.com/kbntx/nexus/tree/main/platform){ target="\_blank" rel="noopener" } — infrastructure, GitOps, ingress, secrets, observability
-- [`.github/workflows/`](https://github.com/kbntx/nexus/tree/main/.github/workflows){ target="\_blank" rel="noopener" } — image builds, the `nx affected` gating, and the imperative Terraform pipelines
+- [`platform/services/app-of-apps/`](https://github.com/kbntx-org/nexus/tree/main/platform/services/app-of-apps){ target="\_blank" rel="noopener" } — every cluster-side workload, declared as an ArgoCD application
+- [`platform/`](https://github.com/kbntx-org/nexus/tree/main/platform){ target="\_blank" rel="noopener" } — infrastructure, GitOps, ingress, secrets, observability
+- [`.github/workflows/`](https://github.com/kbntx-org/nexus/tree/main/.github/workflows){ target="\_blank" rel="noopener" } — image builds, the `nx affected` gating, and the imperative Terraform pipelines

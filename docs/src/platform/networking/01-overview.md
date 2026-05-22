@@ -75,7 +75,7 @@ The cluster nodes and the bastion live inside a private
 provisioned with
 [Terraform](https://developer.hashicorp.com/terraform){ target="\_blank" rel="noopener" }
 in
-[`platform/core/network/`](https://github.com/kbntx/nexus/tree/main/platform/core/network){ target="\_blank" rel="noopener" }.
+[`platform/core/network/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/network){ target="\_blank" rel="noopener" }.
 Public traffic never enters this network — the only ingress path is the
 Cloudflare Tunnel above, which is purely outbound from the cluster's
 point of view.
@@ -122,7 +122,7 @@ reach any private IP in the VPC as if it were on the same LAN — no SSH
 port forwarding, no VPN server to manage, nothing exposed publicly.
 
 The bastion itself is provisioned alongside the rest of the
-infrastructure ([`platform/core/bastion/`](https://github.com/kbntx/nexus/tree/main/platform/core/bastion){ target="\_blank" rel="noopener" })
+infrastructure ([`platform/core/bastion/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/bastion){ target="\_blank" rel="noopener" })
 and runs the tunnel client through a tiny Docker Compose stack.
 
 ## Two tunnels, two purposes
@@ -142,7 +142,7 @@ VPC IPs without ever touching the cluster ingress.
 
 ## References
 
-- [`platform/core/network/`](https://github.com/kbntx/nexus/tree/main/platform/core/network){ target="\_blank" rel="noopener" } — Hetzner VPC + subnet (Terraform)
-- [`platform/core/cloudflared/`](https://github.com/kbntx/nexus/tree/main/platform/core/cloudflared){ target="\_blank" rel="noopener" } — in-cluster `cloudflared` Deployment + PDB for the public tunnel
-- [`platform/core/traefik/`](https://github.com/kbntx/nexus/tree/main/platform/core/traefik){ target="\_blank" rel="noopener" } — in-cluster ingress controller
-- [`platform/core/bastion/`](https://github.com/kbntx/nexus/tree/main/platform/core/bastion){ target="\_blank" rel="noopener" } — bastion VM + private tunnel
+- [`platform/core/network/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/network){ target="\_blank" rel="noopener" } — Hetzner VPC + subnet (Terraform)
+- [`platform/core/cloudflared/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/cloudflared){ target="\_blank" rel="noopener" } — in-cluster `cloudflared` Deployment + PDB for the public tunnel
+- [`platform/core/traefik/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/traefik){ target="\_blank" rel="noopener" } — in-cluster ingress controller
+- [`platform/core/bastion/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/bastion){ target="\_blank" rel="noopener" } — bastion VM + private tunnel

@@ -54,11 +54,11 @@ of view it is just another HTTP client on the cluster network.
 ## Configuration choices
 
 The chart in
-[`platform/core/traefik/`](https://github.com/kbntx/nexus/tree/main/platform/core/traefik){ target="\_blank" rel="noopener" }
+[`platform/core/traefik/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/traefik){ target="\_blank" rel="noopener" }
 wraps the upstream
 [Traefik Helm chart](https://github.com/traefik/traefik-helm-chart){ target="\_blank" rel="noopener" }
 with a small set of opinionated overrides in
-[`values.yaml`](https://github.com/kbntx/nexus/blob/main/platform/core/traefik/values.yaml){ target="\_blank" rel="noopener" }.
+[`values.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/traefik/values.yaml){ target="\_blank" rel="noopener" }.
 The decisions worth calling out:
 
 - **Default `IngressClass`.** The chart registers a `traefik`
@@ -100,7 +100,7 @@ and there is no other source of HTTPS traffic inside the cluster.
 ## Exposing a service
 
 Apps use a standard Kubernetes `Ingress`. The portfolio chart's
-[`template.yaml`](https://github.com/kbntx/nexus/blob/main/apps/portfolio/chart/templates/template.yaml){ target="\_blank" rel="noopener" }
+[`template.yaml`](https://github.com/kbntx-org/nexus/blob/main/apps/portfolio/chart/templates/template.yaml){ target="\_blank" rel="noopener" }
 is a representative example:
 
 ```yaml
@@ -136,7 +136,7 @@ Two things to keep in mind:
 ## Dashboard
 
 The Traefik dashboard is exposed via a small
-[`Service` + `Ingress` template](https://github.com/kbntx/nexus/blob/main/platform/core/traefik/templates/dashboard.yaml){ target="\_blank" rel="noopener" }
+[`Service` + `Ingress` template](https://github.com/kbntx-org/nexus/blob/main/platform/core/traefik/templates/dashboard.yaml){ target="\_blank" rel="noopener" }
 that targets the Traefik API port. The chart also passes
 `--api.insecure=true` so the dashboard does not require its own auth
 layer.
@@ -153,10 +153,10 @@ trusts that anything reaching it has already been vetted.
 The same chart is reused for the [Tilt](https://tilt.dev/){ target="\_blank" rel="noopener" }-driven
 local [`kind`](https://kind.sigs.k8s.io/){ target="\_blank" rel="noopener" }
 cluster, with two overrides in
-[`values.local.yaml`](https://github.com/kbntx/nexus/blob/main/platform/core/traefik/values.local.yaml){ target="\_blank" rel="noopener" }:
+[`values.local.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/traefik/values.local.yaml){ target="\_blank" rel="noopener" }:
 the Traefik `Service` is switched to `NodePort`, and the `web`
 entrypoint is pinned to a known NodePort. The cluster bootstrap script
-[`tools/bash/cluster.sh`](https://github.com/kbntx/nexus/blob/main/tools/bash/cluster.sh){ target="\_blank" rel="noopener" }
+[`tools/bash/cluster.sh`](https://github.com/kbntx-org/nexus/blob/main/tools/bash/cluster.sh){ target="\_blank" rel="noopener" }
 maps that NodePort to `localhost:80` on the host via `kind`'s
 `extraPortMappings`.
 
@@ -187,9 +187,9 @@ only if a bug is ever traced specifically to that hop.
 
 ## References
 
-- [`platform/core/traefik/`](https://github.com/kbntx/nexus/tree/main/platform/core/traefik){ target="\_blank" rel="noopener" } — Traefik Helm chart wrapper
-- [`platform/core/traefik/values.yaml`](https://github.com/kbntx/nexus/blob/main/platform/core/traefik/values.yaml){ target="\_blank" rel="noopener" } — production overrides (ingress class, providers, entrypoint, logs, replicas)
-- [`platform/core/traefik/values.local.yaml`](https://github.com/kbntx/nexus/blob/main/platform/core/traefik/values.local.yaml){ target="\_blank" rel="noopener" } — local-cluster overrides (NodePort + dashboard host)
-- [`platform/core/traefik/templates/dashboard.yaml`](https://github.com/kbntx/nexus/blob/main/platform/core/traefik/templates/dashboard.yaml){ target="\_blank" rel="noopener" } — `Service` + `Ingress` exposing the Traefik dashboard
-- [`apps/portfolio/chart/templates/template.yaml`](https://github.com/kbntx/nexus/blob/main/apps/portfolio/chart/templates/template.yaml){ target="\_blank" rel="noopener" } — example app `Ingress` consuming the `traefik` class
-- [`tools/bash/cluster.sh`](https://github.com/kbntx/nexus/blob/main/tools/bash/cluster.sh){ target="\_blank" rel="noopener" } — local `kind` cluster bootstrap with NodePort-to-host mapping
+- [`platform/core/traefik/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/traefik){ target="\_blank" rel="noopener" } — Traefik Helm chart wrapper
+- [`platform/core/traefik/values.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/traefik/values.yaml){ target="\_blank" rel="noopener" } — production overrides (ingress class, providers, entrypoint, logs, replicas)
+- [`platform/core/traefik/values.local.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/traefik/values.local.yaml){ target="\_blank" rel="noopener" } — local-cluster overrides (NodePort + dashboard host)
+- [`platform/core/traefik/templates/dashboard.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/traefik/templates/dashboard.yaml){ target="\_blank" rel="noopener" } — `Service` + `Ingress` exposing the Traefik dashboard
+- [`apps/portfolio/chart/templates/template.yaml`](https://github.com/kbntx-org/nexus/blob/main/apps/portfolio/chart/templates/template.yaml){ target="\_blank" rel="noopener" } — example app `Ingress` consuming the `traefik` class
+- [`tools/bash/cluster.sh`](https://github.com/kbntx-org/nexus/blob/main/tools/bash/cluster.sh){ target="\_blank" rel="noopener" } — local `kind` cluster bootstrap with NodePort-to-host mapping
