@@ -79,7 +79,7 @@ jobs:
 
       - name: Compute deploy targets
         id: deploy_targets
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         env:
           MODE: ${{ steps.refs.outputs.mode }}
           AFFECTED_BASE: ${{ steps.refs.outputs.affected_base }}
