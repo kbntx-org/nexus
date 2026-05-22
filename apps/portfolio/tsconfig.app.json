@@ -7,5 +7,5 @@
   },
   "files": ["src/main.ts"],
   "include": ["src/**/*.ts"],
-  "exclude": ["jest.config.ts", "**/*.stories.ts", "**/*.spec.ts", "src/test-setup.ts"]
+  "exclude": ["**/*.stories.ts", "**/*.spec.ts", "src/test-setup.ts"]
 }

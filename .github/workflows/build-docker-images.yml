@@ -20,13 +20,6 @@ jobs:
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v4
 
-      - name: Buildkit rootless - build and push
-        uses: ./.github/actions/mirror-docker-image
-        with:
-          source-image: moby/buildkit:v0.24.0-rootless
-          target-tags: kbntx/buildkit:v0.24.0-rootless
-          platforms: linux/amd64
-
       - name: nexus-ci-toolkit - build and push
         uses: docker/build-push-action@v7
         with:
