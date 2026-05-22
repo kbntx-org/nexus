@@ -180,7 +180,7 @@ until the ApplicationSet is added in a follow-up.
 
 ## What is _not_ in this flow
 
-[`platform/services/bastion/`](https://github.com/kbntx/nexus/tree/main/platform/services/bastion){ target="\_blank" rel="noopener" }
+[`platform/core/bastion/`](https://github.com/kbntx/nexus/tree/main/platform/core/bastion){ target="\_blank" rel="noopener" }
 is not ArgoCD-managed today (it is a docker-compose deploy SCP'd to a
 host). It has been removed from the auto-deploy gating and is now
 [`workflow_dispatch`-only](https://github.com/kbntx/nexus/blob/main/.github/workflows/deploy-bastion.yml){ target="\_blank" rel="noopener" }.

@@ -27,4 +27,4 @@ jobs:
           ssh-key: ${{ secrets.NEXUS_CI_PRIVATE_SSH_KEY }}
           ssh-known-hosts: ${{ secrets.BASTION_KNOWN_HOSTS }}
           files: >
-            platform/services/bastion/deploy/docker-compose.yml
+            platform/core/bastion/deploy/docker-compose.yml
