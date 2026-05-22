@@ -18,7 +18,7 @@ k3s cluster on Hetzner, and hosts the apps published under
 - [platform/](platform/) — everything that makes the platform run:
   - **Infrastructure** — Terraform on Hetzner Cloud:
     [core/network/](platform/core/network/), [core/kubernetes/](platform/core/kubernetes/) (k3s),
-    [services/bastion/](platform/services/bastion/), [core/vault/](platform/core/vault/), and the shared
+    [core/bastion/](platform/core/bastion/), [core/vault/](platform/core/vault/), and the shared
     [modules/](platform/modules/).
   - **GitOps** — [core/argocd/](platform/core/argocd/) plus a
     [services/app-of-apps/](platform/services/app-of-apps/) chart that reconciles every other
