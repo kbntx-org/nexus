@@ -28,7 +28,7 @@ jobs:
           platforms: linux/amd64
 
       - name: nexus-ci-toolkit - build and push
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: platform/services/custom-docker-images/nexus-ci-toolkit
           file: platform/services/custom-docker-images/nexus-ci-toolkit/Dockerfile
