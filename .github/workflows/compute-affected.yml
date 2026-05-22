@@ -56,7 +56,7 @@ jobs:
         with:
           app-id: ${{ secrets.NEXUS_MANIFESTS_APP_ID }}
           private-key: ${{ secrets.NEXUS_MANIFESTS_APP_PRIVATE_KEY }}
-          owner: kbntx
+          owner: kbntx-org
           repositories: nexus-manifests
 
       - name: Clone manifests repo (main mode only)
