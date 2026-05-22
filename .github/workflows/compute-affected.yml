@@ -52,7 +52,7 @@ jobs:
       - name: Mint manifests-repo read token (main mode only)
         if: steps.refs.outputs.mode == 'main'
         id: manifests_token
-        uses: actions/create-github-app-token@v1
+        uses: actions/create-github-app-token@v2
         with:
           app-id: ${{ secrets.NEXUS_MANIFESTS_APP_ID }}
           private-key: ${{ secrets.NEXUS_MANIFESTS_APP_PRIVATE_KEY }}
