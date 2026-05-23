@@ -97,3 +97,7 @@ terraform.rc
 *.conf
 *.plan
 
+
+.claude/worktrees
+.nx/polygraph
+.nx/self-healing

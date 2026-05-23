@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 
 import { ProjectModalComponent } from './components/project-modal/project-modal.component';
@@ -6,7 +5,7 @@ import { Project, ProjectsService } from './services/projects.service';
 
 @Component({
   selector: 'app-projects',
-  imports: [CommonModule, ProjectModalComponent],
+  imports: [ProjectModalComponent],
   providers: [ProjectsService],
   templateUrl: './projects.component.html'
 })

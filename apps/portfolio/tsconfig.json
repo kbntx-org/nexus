@@ -8,8 +8,6 @@
   ],
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "target": "es2020",
-    "resolveJsonModule": true,
-    "esModuleInterop": true
+    "lib": ["ESNext", "DOM", "DOM.Iterable"]
   }
 }
