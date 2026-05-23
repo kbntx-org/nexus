@@ -12,3 +12,5 @@ pnpm-lock.yaml
 **/templates/**/*.yml
 
 **/cloud-init.yml
+
+.nx/self-healing
