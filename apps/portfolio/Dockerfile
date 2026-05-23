@@ -1,6 +1,6 @@
-FROM node:22-alpine AS local
+FROM node:24.16.0-alpine AS local
 
-RUN npm install -g pnpm@10.14.0
+RUN npm install -g pnpm@11.2.2
 
 WORKDIR /usr/src/app
 

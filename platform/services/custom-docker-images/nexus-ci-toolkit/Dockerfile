@@ -1,4 +1,4 @@
-FROM node:22.16.0-slim
+FROM node:24.16.0-slim
 
 ENV KUBECTL_VERSION=1.32.0
 ENV ARGOCD_VERSION=2.14.11
@@ -11,7 +11,7 @@ RUN wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download
     chmod +x /usr/local/bin/yq
 
 # Install PNPM
-RUN npm install -g pnpm@10.14.0
+RUN npm install -g pnpm@11.2.2
 
 # Install Docker CLI
 RUN apt remove $(dpkg --get-selections docker.io docker-compose docker-doc podman-docker containerd runc | cut -f1) && \
