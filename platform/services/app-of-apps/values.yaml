@@ -38,6 +38,7 @@ argocd-apps:
       syncPolicy:
         syncOptions:
           - CreateNamespace=true
+          - ServerSideApply=true
 
     vault:
       project: default
