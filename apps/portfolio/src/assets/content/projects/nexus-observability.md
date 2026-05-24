@@ -8,12 +8,7 @@ tech:
   - Loki
   - Promtail
   - PostgreSQL
-  - Hetzner Cloud
-  - Cloudflare
   - S3
-  - Helm
-  - GitOps
-  - ArgoCD
 logo: https://nexus-public-assets.kbntx.com/images/grafana-logo.svg
 images:
   - https://nexus-public-assets.kbntx.com/images/ingress-nginx-dashboard.png

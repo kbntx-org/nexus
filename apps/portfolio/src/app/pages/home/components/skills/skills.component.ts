@@ -37,7 +37,7 @@ interface Particle {
             >
               <img
                 [src]="getIconUrl(skill)"
-                [alt]="skill.simpleIconName || 'Technology icon'"
+                [alt]="skill.name"
                 class="group-hover:scale-120 h-5 w-5 transition-transform duration-300 md:h-6 md:w-6"
               />
             </div>
@@ -52,6 +52,7 @@ export class SkillsComponent implements AfterViewInit, OnDestroy {
 
   public skills: Skill[] = SKILLS;
 
+  private readonly iconsBaseUrl = 'https://nexus-public-assets.kbntx.com/icons';
   private particles: Particle[] = [];
   private animationId: number | null = null;
 
@@ -173,18 +174,6 @@ export class SkillsComponent implements AfterViewInit, OnDestroy {
   }
 
   public getIconUrl(skill: Skill): string {
-    if (skill.customUrl) {
-      return skill.customUrl;
-    }
-
-    if (skill.simpleIconName) {
-      const baseUrl = 'https://cdn.simpleicons.org';
-      if (skill.color) {
-        return `${baseUrl}/${skill.simpleIconName}/${skill.color}`;
-      }
-      return `${baseUrl}/${skill.simpleIconName}`;
-    }
-
-    return '';
+    return `${this.iconsBaseUrl}/${skill.icon}`;
   }
 }

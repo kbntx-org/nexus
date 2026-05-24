@@ -2,19 +2,14 @@
 title: Nexus - Kubernetes & Compute Platform
 description: A production-ready Kubernetes infrastructure built on Hetzner Cloud, featuring K3s cluster, Terraform automation, and comprehensive networking setup.
 tech:
-  - Kubernetes
-  - K3s
+  - Kubernetes (K3S)
   - Terraform
   - Hetzner Cloud
-  - Ingress-nginx
+  - Traefik Ingress
   - Cloudflared
   - ArgoCD
   - GitOps
   - Helm
-  - YAML
-  - Infrastructure as Code
-  - Distributed system
-  - Recovery strategy
 logo: https://nexus-public-assets.kbntx.com/images/kubernetes-logo.svg
 images:
   - https://nexus-public-assets.kbntx.com/images/k3s-cluster-schema.png
