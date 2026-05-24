@@ -4,18 +4,15 @@ description: A modern, responsive portfolio website built with Angular to showca
 tech:
   - Angular
   - TypeScript
-  - Nx
   - Tailwind CSS
-  - RxJS
-  - Pre-rendering
   - S3
+  - Markdown
 logo: https://nexus-public-assets.kbntx.com/images/kt-logo.jpg
 images:
-  - https://nexus-public-assets.kbntx.com/images/portfolio-cv.png
-  - https://nexus-public-assets.kbntx.com/images/portfolio-experiences.png
-  - https://nexus-public-assets.kbntx.com/images/portfolio-homepage.png
-  - https://nexus-public-assets.kbntx.com/images/portfolio-projects-dark-mode.png
-  - https://nexus-public-assets.kbntx.com/images/portfolio-projects-light-mode.png
+  - https://nexus-public-assets.kbntx.com/images/portfolio-landing-page.webp
+  - https://nexus-public-assets.kbntx.com/images/portfolio-experiences.webp
+  - https://nexus-public-assets.kbntx.com/images/portfolio-skills.webp
+  - https://nexus-public-assets.kbntx.com/images/portfolio-projects.webp
 githubUrl: https://github.com/kbntx-org/nexus
 features:
   - Dark/light theme support

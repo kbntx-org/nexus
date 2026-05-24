@@ -1,113 +1,53 @@
 export interface Skill {
-  simpleIconName?: string;
-  customUrl?: string;
-  color?: string;
+  name: string;
+  icon: string;
 }
 
 export const SKILLS: Skill[] = [
-  {
-    simpleIconName: 'javascript'
-  },
-  {
-    simpleIconName: 'nodedotjs'
-  },
-  {
-    simpleIconName: 'typescript'
-  },
-  {
-    simpleIconName: 'mongodb'
-  },
-  {
-    simpleIconName: 'angular',
-    color: 'red'
-  },
-  {
-    simpleIconName: 'react'
-  },
-  {
-    simpleIconName: 'nestjs'
-  },
-  {
-    simpleIconName: 'jest'
-  },
-  {
-    simpleIconName: 'argo'
-  },
-  {
-    simpleIconName: 'hetzner'
-  },
-  {
-    simpleIconName: 'dotnet'
-  },
-  {
-    simpleIconName: 'capacitor'
-  },
-  {
-    simpleIconName: 'nx'
-  },
-  {
-    simpleIconName: 'nginx'
-  },
-  {
-    simpleIconName: 'storybook'
-  },
-  {
-    simpleIconName: 'expo'
-  },
-  {
-    simpleIconName: 'docker'
-  },
-  {
-    simpleIconName: 'digitalOcean'
-  },
-  {
-    customUrl: 'https://cdn.worldvectorlogo.com/logos/amazon-web-services-2.svg'
-  },
-  {
-    simpleIconName: 'cypress'
-  },
-  {
-    simpleIconName: 'mongodb'
-  },
-  {
-    simpleIconName: 'linear'
-  },
-  {
-    simpleIconName: 'datadog'
-  },
-  {
-    simpleIconName: 'terraform'
-  },
-  {
-    simpleIconName: 'redis'
-  },
-  {
-    simpleIconName: 'vault'
-  },
-  {
-    simpleIconName: 'rabbitmq'
-  },
-  {
-    simpleIconName: 'kubernetes'
-  },
-  {
-    simpleIconName: 'grafana'
-  },
-  {
-    simpleIconName: 'victoriametrics'
-  },
-  {
-    simpleIconName: 'prometheus'
-  },
-  {
-    simpleIconName: 'cloudflare'
-  },
-  {
-    simpleIconName: 'drone',
-    color: '0095F7'
-  },
-  {
-    simpleIconName: 'github',
-    color: '181717'
-  }
+  { name: 'TypeScript', icon: 'typescript.svg' },
+  { name: 'Go', icon: 'go.svg' },
+  { name: 'C#', icon: 'csharp.svg' },
+  { name: 'Python', icon: 'python.svg' },
+  { name: 'Bash', icon: 'bash.svg' },
+  { name: 'AWS', icon: 'aws.svg' },
+  { name: 'Kubernetes', icon: 'kubernetes.svg' },
+  { name: 'Terraform', icon: 'terraform.svg' },
+  { name: 'Docker', icon: 'docker.svg' },
+  { name: 'ArgoCD', icon: 'argocd.svg' },
+  { name: 'Helm', icon: 'helm.svg' },
+  { name: 'Karpenter', icon: 'karpenter.svg' },
+  { name: 'Tilt', icon: 'tilt.svg' },
+  { name: 'Linux', icon: 'linux.svg' },
+  { name: 'Cloudflare', icon: 'cloudflare.svg' },
+  { name: 'Vault', icon: 'vault.svg' },
+  { name: 'Traefik', icon: 'traefik.svg' },
+  { name: 'Caddy', icon: 'caddy.svg' },
+  { name: 'Nginx', icon: 'nginx.svg' },
+  { name: 'DigitalOcean', icon: 'digital_ocean.svg' },
+  { name: 'Hetzner', icon: 'hetzner.svg' },
+  { name: 'Datadog', icon: 'datadog.svg' },
+  { name: 'Grafana', icon: 'grafana.svg' },
+  { name: 'Prometheus', icon: 'prometheus.svg' },
+  { name: 'VictoriaMetrics', icon: 'victoriametrics.svg' },
+  { name: 'Loki', icon: 'loki.svg' },
+  { name: 'Sentry', icon: 'sentry.svg' },
+  { name: 'Node.js', icon: 'nodejs.svg' },
+  { name: 'NestJS', icon: 'nest.js.svg' },
+  { name: 'Angular', icon: 'angular.svg' },
+  { name: 'React', icon: 'react.svg' },
+  { name: 'Capacitor', icon: 'capacitor.svg' },
+  { name: 'Sass', icon: 'sass.svg' },
+  { name: 'TailwindCSS', icon: 'tailwindcss.svg' },
+  { name: '.NET', icon: 'dotnet.svg' },
+  { name: 'MongoDB', icon: 'mongodb.svg' },
+  { name: 'Postgres', icon: 'postgressql.svg' },
+  { name: 'RabbitMQ', icon: 'rabbitmq.svg' },
+  { name: 'Redis', icon: 'redis.svg' },
+  { name: 'NX', icon: 'nx.svg' },
+  { name: 'GitHub Actions', icon: 'gha.svg' },
+  { name: 'Drone CI', icon: 'drone.svg' },
+  { name: 'Jest', icon: 'jest.svg' },
+  { name: 'Playwright', icon: 'playwright.svg' },
+  { name: 'Cypress', icon: 'cypress.svg' },
+  { name: 'Storybook', icon: 'storybook.svg' }
 ];
