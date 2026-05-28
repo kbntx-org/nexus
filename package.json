@@ -56,7 +56,7 @@
     "eslint-plugin-import": "2.32.0",
     "glob": "^13.0.0",
     "js-yaml": "^4.1.1",
-    "jsonc-eslint-parser": "^2.1.0",
+    "jsonc-eslint-parser": "^3.0.0",
     "nx": "22.7.3",
     "postcss": "^8.5.2",
     "prettier": "^3.6.2",
