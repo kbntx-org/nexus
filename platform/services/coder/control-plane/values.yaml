@@ -1,0 +1,80 @@
+workspaceNamespace: workspaces
+
+postgresCluster:
+  storageClass: hcloud-volumes
+
+backup:
+  enabled: true
+  destinationPath: s3://nexus-database-backups/coder-cnpg
+  endpointURL: https://2bde0126da63a3a9c94029d14ea380db.eu.r2.cloudflarestorage.com
+
+coder:
+  coder:
+    replicaCount: 1
+
+    serviceAccount:
+      name: coder-sa
+      workspacePerms: false
+      enableDeployments: false
+      disableCreate: true
+
+    service:
+      type: ClusterIP
+
+    ingress:
+      enable: true
+      host: coder.kbntx.com
+
+    resources:
+      limits: {}
+      requests: {}
+
+    env:
+      - name: CODER_PROXY_TRUSTED_HEADERS
+        value: X-Forwarded-For
+      - name: CODER_PROXY_TRUSTED_ORIGINS
+        value: 10.0.0.0/16
+      - name: CODER_ACCESS_URL
+        value: https://coder.kbntx.com
+      - name: CODER_PG_CONNECTION_URL
+        valueFrom:
+          secretKeyRef:
+            name: coder-secret
+            key: postgresUrl
+      - name: CODER_OAUTH2_GITHUB_ALLOW_SIGNUPS
+        value: 'true'
+      - name: CODER_OAUTH2_GITHUB_DEFAULT_PROVIDER_ENABLE
+        value: 'false'
+      - name: CODER_OAUTH2_GITHUB_ALLOWED_ORGS
+        value: 'kbntx-org'
+      - name: CODER_OAUTH2_GITHUB_CLIENT_ID
+        valueFrom:
+          secretKeyRef:
+            name: coder-secret
+            key: githubOAuthClientId
+      - name: CODER_OAUTH2_GITHUB_CLIENT_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: coder-secret
+            key: githubOAuthClientSecret
+      - name: CODER_EXTERNAL_AUTH_0_ID
+        value: primary-github
+      - name: CODER_EXTERNAL_AUTH_0_TYPE
+        value: github
+      - name: CODER_EXTERNAL_AUTH_0_CLIENT_ID
+        valueFrom:
+          secretKeyRef:
+            name: coder-secret
+            key: githubExternalAuthClientId
+      - name: CODER_EXTERNAL_AUTH_0_CLIENT_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: coder-secret
+            key: githubExternalAuthClientSecret
+      - name: CODER_EXTERNAL_AUTH_0_SCOPES
+        value: repo workflow
+      - name: CODER_EXTERNAL_AUTH_0_REVOKE_URL
+        valueFrom:
+          secretKeyRef:
+            name: coder-secret
+            key: githubRevokeUrl

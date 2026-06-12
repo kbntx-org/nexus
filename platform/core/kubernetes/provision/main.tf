@@ -42,6 +42,21 @@ module "nexus_cluster" {
         }
       ]
     }
+    "workspace" = {
+      count       = 1
+      server_type = "cx43"
+      location    = "hel1"
+      labels = {
+        "pool" = "workspace"
+      }
+      taints = [
+        {
+          key    = "workspace"
+          value  = "true"
+          effect = "NoSchedule"
+        }
+      ]
+    }
   }
 }
 

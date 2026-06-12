@@ -1,0 +1,48 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: coder-postgres-cnpg
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.3-system-trixie
+
+  storage:
+    size: 50Gi
+    storageClass: {{ .Values.postgresCluster.storageClass | quote }}
+
+  enableSuperuserAccess: true
+  superuserSecret:
+    name: coder-secret-user-credentials
+  bootstrap:
+    initdb:
+      database: coder
+{{- if .Values.backup.enabled }}
+  backup:
+    barmanObjectStore:
+      destinationPath: {{ .Values.backup.destinationPath | quote }}
+      endpointURL: {{ .Values.backup.endpointURL | quote }}
+      s3Credentials:
+        accessKeyId:
+          name: coder-secret
+          key: backupAccessKeyId
+        secretAccessKey:
+          name: coder-secret
+          key: backupSecretAccessKey
+      wal:
+        compression: gzip
+      data:
+        compression: gzip
+    retentionPolicy: 4d
+{{- end }}
+{{- if .Values.backup.enabled }}
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: coder-postgres-cnpg-daily
+spec:
+  schedule: "0 0 6 * * *"
+  backupOwnerReference: self
+  cluster:
+    name: coder-postgres-cnpg
+{{- end }}

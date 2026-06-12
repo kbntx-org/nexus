@@ -1,0 +1,6 @@
+dependencies:
+- name: coder
+  repository: https://helm.coder.com/v2
+  version: 2.34.2
+digest: sha256:a052592bf3244fa743a89c60df5bccf630f32699f07d3c6ff8819580c2f542d5
+generated: "2026-06-12T22:39:57.682492+01:00"

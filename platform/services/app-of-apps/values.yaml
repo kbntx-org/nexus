@@ -194,6 +194,19 @@ argocd-apps:
         syncOptions:
           - CreateNamespace=true
 
+    coder:
+      project: default
+      source:
+        repoURL: https://github.com/kbntx-org/nexus.git
+        path: platform/services/coder
+        targetRevision: main
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: coder
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+
     portfolio:
       project: default
       sources:

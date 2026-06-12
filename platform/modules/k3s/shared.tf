@@ -1,13 +1,13 @@
 data "archive_file" "chart_hetzner_cloud_controller" {
   type        = "tar.gz"
-  source_dir  = "${path.root}/../hetzner-cloud-controller"
+  source_dir  = "${path.module}/../../core/hetzner-cloud-controller"
   output_path = "${path.root}/.generated/chart-hetzner-cloud-controller.tar.gz"
   excludes    = ["charts"]
 }
 
 data "archive_file" "chart_argocd" {
   type        = "tar.gz"
-  source_dir  = "${path.root}/../argocd"
+  source_dir  = "${path.module}/../../core/argocd"
   output_path = "${path.root}/.generated/chart-argocd.tar.gz"
   excludes    = ["charts"]
 }

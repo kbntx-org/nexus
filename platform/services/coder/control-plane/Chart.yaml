@@ -1,0 +1,7 @@
+apiVersion: v2
+name: coder
+version: 1.0.0
+dependencies:
+  - name: coder
+    version: 2.34.2
+    repository: https://helm.coder.com/v2
