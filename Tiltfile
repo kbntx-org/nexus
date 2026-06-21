@@ -34,7 +34,17 @@ def helm_chart_deps(chartPath):
   if config.tilt_subcommand == 'down':
     return
   chartYaml = read_yaml(chartPath + '/Chart.yaml')
-  for dependency in chartYaml.get('dependencies') or []:
+  dependencies = chartYaml.get('dependencies') or []
+
+  missingDependencies = [
+    dependency
+    for dependency in dependencies
+    if not os.path.exists('%s/charts/%s-%s.tgz' % (chartPath, dependency['name'], dependency['version']))
+  ]
+  if not missingDependencies:
+    return
+
+  for dependency in missingDependencies:
     repository = dependency.get('repository', '')
     if repository.startswith('http://') or repository.startswith('https://'):
       local('helm repo add %s %s --force-update' % (dependency['name'], repository), quiet=True)
