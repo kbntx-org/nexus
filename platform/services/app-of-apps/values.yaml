@@ -10,6 +10,9 @@ argocd-apps:
         server: https://kubernetes.default.svc
         namespace: traefik-ingress
       syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
         syncOptions:
           - CreateNamespace=true
 
@@ -23,6 +26,9 @@ argocd-apps:
         server: https://kubernetes.default.svc
         namespace: argocd
       syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
         syncOptions:
           - CreateNamespace=true
 
@@ -36,6 +42,9 @@ argocd-apps:
         server: https://kubernetes.default.svc
         namespace: external-secrets
       syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
         syncOptions:
           - CreateNamespace=true
           - ServerSideApply=true
@@ -50,6 +59,9 @@ argocd-apps:
         server: https://kubernetes.default.svc
         namespace: vault
       syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
         syncOptions:
           - CreateNamespace=true
 
@@ -63,6 +75,9 @@ argocd-apps:
         server: https://kubernetes.default.svc
         namespace: cloudnative-pg
       syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
         syncOptions:
           - CreateNamespace=true
           - ServerSideApply=true
@@ -77,6 +92,9 @@ argocd-apps:
         server: https://kubernetes.default.svc
         namespace: cloudflare
       syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
         syncOptions:
           - CreateNamespace=true
 
@@ -90,6 +108,9 @@ argocd-apps:
         server: https://kubernetes.default.svc
         namespace: kube-system
       syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
         syncOptions:
           - CreateNamespace=true
 
@@ -103,6 +124,9 @@ argocd-apps:
         server: https://kubernetes.default.svc
         namespace: monitoring
       syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
         syncOptions:
           - CreateNamespace=true
 
@@ -116,6 +140,9 @@ argocd-apps:
         server: https://kubernetes.default.svc
         namespace: arc-systems
       syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
         syncOptions:
           - CreateNamespace=true
 
@@ -129,6 +156,9 @@ argocd-apps:
         server: https://kubernetes.default.svc
         namespace: arc-runners
       syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
         syncOptions:
           - CreateNamespace=true
 
@@ -142,6 +172,9 @@ argocd-apps:
         server: https://kubernetes.default.svc
         namespace: system-upgrade
       syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
         syncOptions:
           - CreateNamespace=true
 
@@ -155,6 +188,9 @@ argocd-apps:
         server: https://kubernetes.default.svc
         namespace: system-upgrade
       syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
         syncOptions:
           - CreateNamespace=true
 
@@ -191,6 +227,9 @@ argocd-apps:
         server: https://kubernetes.default.svc
         namespace: n8n
       syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
         syncOptions:
           - CreateNamespace=true
 
