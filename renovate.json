@@ -13,9 +13,12 @@
   "npmrc": "frozen-lockfile=false",
   "packageRules": [
     {
-      "matchManagers": ["npm"],
       "matchUpdateTypes": ["minor", "patch"],
       "automerge": true
+    },
+    {
+      "matchUpdateTypes": ["major"],
+      "automerge": false
     },
     {
       "matchManagers": ["helmv3"],
