@@ -71,7 +71,9 @@ runcmd:
       --disable-cloud-controller \
       --disable local-storage \
       --node-name="$(hostname -f)" \
-      --flannel-iface=enp7s0 \
+      --flannel-backend=none \
+      --disable-network-policy \
+      --disable-kube-proxy \
       --kubelet-arg="cloud-provider=external" \
       --secrets-encryption \
       --disable=traefik \
