@@ -151,6 +151,8 @@ loki:
     enabled: false
 
 promtail:
+  tolerations:
+    - operator: Exists
   config:
     clients:
       - url: http://monitoring-loki-gateway/loki/api/v1/push

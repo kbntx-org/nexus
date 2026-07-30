@@ -24,8 +24,6 @@ concurrency:
 jobs:
   bump:
     runs-on: nexus-org-runners
-    container:
-      image: kbntx/nexus-ci-toolkit:1.0
     timeout-minutes: 5
     defaults:
       run:

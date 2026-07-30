@@ -7,8 +7,6 @@ jobs:
   lint-and-format:
     name: Lint & Format
     runs-on: nexus-org-runners
-    container:
-      image: kbntx/nexus-ci-toolkit:1.0
     timeout-minutes: 30
 
     steps:

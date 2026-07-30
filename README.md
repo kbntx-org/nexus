@@ -26,9 +26,9 @@ k3s cluster on Hetzner, and hosts the apps published under
   - **Ingress & access** — [core/traefik/](platform/core/traefik/) for cluster ingress,
     [core/cloudflared/](platform/core/cloudflared/) for Cloudflare Tunnel.
   - **Cluster components** — Hetzner Cloud Controller Manager + CSI,
-    External Secrets Operator, k3s system upgrade controller, GitHub ARC
-    runners, and a custom CI toolkit image
-    ([services/custom-docker-images/](platform/services/custom-docker-images/)).
+    External Secrets Operator, k3s system upgrade controller, and the GitHub
+    ARC runners with their CI toolkit image
+    ([core/github-arc-runners/](platform/core/github-arc-runners/)).
   - **Observability** — [services/monitoring/](platform/services/monitoring/): VictoriaMetrics,
     Grafana, Loki, Promtail, kube-state-metrics, node-exporter.
 - [tools/](tools/) — bash helpers (KinD cluster bootstrap, SSH setup).

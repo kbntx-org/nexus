@@ -33,14 +33,13 @@ runner scale set:
 jobs:
   build:
     runs-on: nexus-org-runners
-    container:
-      image: kbntx-org/nexus-ci-toolkit:1.0
 ```
 
 `nexus-org-runners` is the
 [`runnerScaleSetName`](https://github.com/kbntx-org/nexus/blob/main/platform/core/github-arc-runners/runners/values.yaml){ target="\_blank" rel="noopener" }
-exposed by the runner chart. The container image is the
-[CI toolkit](#ci-toolkit-image) — the single image used by every workflow.
+exposed by the runner chart. No per-job `container:` override is needed —
+the runner pod itself runs the [CI toolkit image](#ci-toolkit-image), so
+every tool a workflow needs is already on the pod that executes it.
 
 ### How ARC works
 
@@ -83,67 +82,42 @@ a `nodeSelector` (`pool: ci-runners`) and tolerates a matching taint, so:
 - Application workloads cannot land on runner nodes
 - Resource pressure from a noisy job stays within its blast radius
 
-### Container hooks
+### Docker-in-Docker sidecar
 
-Whenever a workflow uses a job container, a service container, or a
-Docker action, the actions runner does not create those pods itself —
-it delegates to
-[runner-container-hooks](https://github.com/actions/runner-container-hooks){ target="\_blank" rel="noopener" }.
-The Kubernetes implementation of those hooks talks to the Kubernetes API
-and spins up a new pod in the runner's namespace for each one.
+There is no job-container hook mechanism, and no separate pod is created
+for Docker actions or `docker` commands in a step. Each runner pod is a
+**single pod** with two containers sharing the same ephemeral work
+volume: `runner`, which runs the job, and `dind`, a rootless
+[Docker-in-Docker](https://hub.docker.com/_/docker){ target="\_blank" rel="noopener" }
+sidecar. `DOCKER_HOST` on the `runner` container points at the sidecar's
+rootless socket, so `docker build`, Docker actions, and service
+containers all work without the pod itself needing privileged mode.
 
-That covers the _creation_ of job pods, but not _what they look like_.
-For that, ARC supports a
-[**hook extension template**](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners-with-actions-runner-controller/deploying-runner-scale-sets-with-actions-runner-controller#using-hook-extensions){ target="\_blank" rel="noopener" }
-— a YAML file pointed at by the `ACTIONS_RUNNER_CONTAINER_HOOK_TEMPLATE`
-environment variable. Whatever lives in that file is **merged into every
-pod the hooks create**, on top of the defaults the runner would generate.
+Because the pod is single-use and discarded once the job finishes, there
+is no image or container state carried between jobs — every run starts
+from the same clean sidecar.
 
-```mermaid
-%%{init: {'theme':'dark'}}%%
-graph LR
-    Runner[Runner pod]
-    Hook[runner-container-hooks]
-    Tmpl[hook extension<br/>ConfigMap]
-    Job[Job pod<br/>+ label<br/>+ BuildKit sidecar]
-
-    Runner -->|create pod via K8s API| Hook
-    Hook --> Job
-    Tmpl -->|merged into pod spec| Job
-```
-
-In Nexus, the template is shipped as a ConfigMap mounted into the runner
-([`hook-extension.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/github-arc-runners/runners/templates/hook-extension.yaml){ target="\_blank" rel="noopener" })
-and used for two things — both of which would be painful to solve any
-other way:
-
-- **Network isolation.** The extension adds a `github-job-pod: 'true'`
-  label to every job pod. A
-  [`NetworkPolicy`](https://github.com/kbntx-org/nexus/blob/main/platform/core/github-arc-runners/runners/templates/network-policy.yaml){ target="\_blank" rel="noopener" }
-  selects on that label and restricts egress: DNS to `kube-system` and
-  the public internet are allowed, the cluster's pod and service
-  networks are denied. Even on their own pool, runners execute
-  arbitrary user-authored code (workflow YAML, pulled actions, build
-  scripts) — treating them as untrusted is the safe default. In
-  practice, a runner can pull from GitHub, push to a registry, or call
-  ArgoCD over its public ingress, but it cannot reach in-cluster
-  services directly.
-- **BuildKit sidecar.** The extension sideloads a
-  [BuildKit](https://github.com/moby/buildkit){ target="\_blank" rel="noopener" }
-  init container and exports `BUILDKIT_HOST` to the job container. Every
-  workflow gets rootless image builds out of the box, without each one
-  having to set up its own builder.
-
-The same template also detects "step pods" (Docker actions that run as
-their own pod) and skips the BuildKit sidecar for them — the sidecar is
-only useful for the main job container.
+- **Network isolation.** The runner pod carries a `github-job-pod: 'true'`
+  label. A
+  [`CiliumNetworkPolicy`](https://github.com/kbntx-org/nexus/blob/main/platform/core/github-arc-runners/runners/templates/network-policy.yaml){ target="\_blank" rel="noopener" }
+  selects on that label and restricts egress to DNS (`kube-system`) and
+  the public internet — the cluster's other namespaces are denied.
+  Runners execute arbitrary user-authored code (workflow YAML, pulled
+  actions, build scripts), so treating them as untrusted is the safe
+  default. In practice, a runner can pull from GitHub, push to a
+  registry, or call ArgoCD over its public ingress, but it cannot reach
+  other in-cluster services directly.
 
 ## CI toolkit image
 
-Every workflow uses one image,
-[`kbntx-org/nexus-ci-toolkit`](https://github.com/kbntx-org/nexus/tree/main/platform/services/custom-docker-images){ target="\_blank" rel="noopener" },
-that bundles every tool the pipelines need: `pnpm`, `kubectl`, the ArgoCD
-CLI, BuildKit client, `jq`, and so on.
+Every workflow runs on one image,
+[`kbntx-org/nexus-ci-toolkit`](https://github.com/kbntx-org/nexus/tree/main/platform/core/github-arc-runners/base-image){ target="\_blank" rel="noopener" },
+built directly on top of the
+[GitHub Actions runner image](https://github.com/actions/runner/pkgs/container/actions-runner){ target="\_blank" rel="noopener" }
+and layered with every tool the pipelines need: `pnpm`, `kubectl`, the
+ArgoCD CLI, `jq`, and so on. It is not a separate
+job container — it **is** the runner's own image, so the tools are
+already there the moment the pod starts.
 
 This avoids per-job setup steps (no `setup-node`, no `setup-go`, no
 manual installs) and keeps the workflow files short. When a tool needs to
@@ -219,7 +193,6 @@ change to the affected logic is risky enough to warrant a full re-deploy.
 
 - [`platform/core/github-arc-runners/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/github-arc-runners){ target="\_blank" rel="noopener" } — ARC controller and runner Helm charts
 - [`platform/core/github-arc-runners/runners/templates/network-policy.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/github-arc-runners/runners/templates/network-policy.yaml){ target="\_blank" rel="noopener" } — runner egress restrictions
-- [`platform/core/github-arc-runners/runners/templates/hook-extension.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/github-arc-runners/runners/templates/hook-extension.yaml){ target="\_blank" rel="noopener" } — `github-job-pod` label + BuildKit injection
-- [`platform/services/custom-docker-images/`](https://github.com/kbntx-org/nexus/tree/main/platform/services/custom-docker-images){ target="\_blank" rel="noopener" } — CI toolkit image
+- [`platform/core/github-arc-runners/base-image/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/github-arc-runners/base-image){ target="\_blank" rel="noopener" } — CI toolkit image
 - [`.github/workflows/`](https://github.com/kbntx-org/nexus/tree/main/.github/workflows){ target="\_blank" rel="noopener" } — workflow definitions
 - [`.github/workflows/compute-affected.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/compute-affected.yml){ target="\_blank" rel="noopener" } — affected detection (per-app base from `nexus-manifests` on main)

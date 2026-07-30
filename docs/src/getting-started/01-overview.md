@@ -95,7 +95,7 @@ syncs. **No GitHub Actions involved.**
 
 **Case 2 — custom or extended tools that ship a container image.** The
 portfolio, the docs site, and the
-[CI toolkit image](https://github.com/kbntx-org/nexus/tree/main/platform/services/custom-docker-images){ target="\_blank" rel="noopener" }
+[CI toolkit image](https://github.com/kbntx-org/nexus/tree/main/platform/core/github-arc-runners/base-image){ target="\_blank" rel="noopener" }
 are ours. When their source changes, CI takes over: it uses
 [Nx](https://nx.dev/){ target="\_blank" rel="noopener" } to figure out what
 actually moved (`nx affected` against the base branch), rebuilds only the

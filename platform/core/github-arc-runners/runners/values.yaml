@@ -8,19 +8,14 @@ gha-runner-scale-set:
   minRunners: 0
   runnerGroup: 'default'
   runnerScaleSetName: 'nexus-org-runners'
-  containerMode:
-    type: 'kubernetes'
-    kubernetesModeWorkVolumeClaim:
-      accessModes: ['ReadWriteOnce']
-      storageClassName: local-path
-      resources:
-        requests:
-          storage: 10Gi
   listenerTemplate:
     spec:
       containers:
         - name: listener
   template:
+    metadata:
+      labels:
+        github-job-pod: 'true'
     spec:
       initContainers:
         - name: fix-permissions
@@ -34,24 +29,94 @@ gha-runner-scale-set:
           volumeMounts:
             - name: work
               mountPath: /home/runner/_work
+        - name: init-dind-externals
+          image: kbntx/nexus-ci-toolkit:1.1
+          command: ['cp', '-r', '/home/runner/externals/.', '/home/runner/tmpDir/']
+          volumeMounts:
+            - name: dind-externals
+              mountPath: /home/runner/tmpDir
+        - name: init-dind-rootless
+          image: docker:29.6-dind-rootless
+          command:
+            - sh
+            - -c
+            - |
+              set -x
+              cp -a /etc/. /dind-etc/
+              echo 'runner:x:1001:1001:runner:/home/runner:/bin/ash' >> /dind-etc/passwd
+              echo 'runner:x:1001:' >> /dind-etc/group
+              echo 'runner:100000:65536' >> /dind-etc/subgid
+              echo 'runner:100000:65536' >> /dind-etc/subuid
+              chmod 755 /dind-etc
+              chmod u=rwx,g=rx+s,o=rx /dind-home
+              chown 1001:1001 /dind-home
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - name: dind-etc
+              mountPath: /dind-etc
+            - name: dind-home
+              mountPath: /dind-home
       containers:
+        - name: dind
+          image: docker:29.6-dind-rootless
+          args:
+            - dockerd
+            - --host=unix:///run/user/1001/docker.sock
+          env:
+            - name: DOCKER_HOST
+              value: unix:///run/user/1001/docker.sock
+          securityContext:
+            privileged: true
+            seccompProfile:
+              type: Unconfined
+            appArmorProfile:
+              type: Unconfined
+            runAsUser: 1001
+            runAsGroup: 1001
+          restartPolicy: Always
+          startupProbe:
+            exec:
+              command: ['docker', 'info']
+            initialDelaySeconds: 0
+            failureThreshold: 24
+            periodSeconds: 5
+          volumeMounts:
+            - name: work
+              mountPath: /home/runner/_work
+            - name: dind-sock
+              mountPath: /run/user/1001
+            - name: dind-externals
+              mountPath: /home/runner/externals
+            - name: dind-etc
+              mountPath: /etc
+            - name: dind-home
+              mountPath: /home/runner
         - name: runner
-          image: ghcr.io/actions/actions-runner:2.334.0
+          image: kbntx/nexus-ci-toolkit:1.1
           command: ['/home/runner/run.sh']
           env:
-            - name: ACTIONS_RUNNER_CONTAINER_HOOK_TEMPLATE
-              value: /etc/config/github/actions-runner/hooks/hook-extension.yaml
+            - name: DOCKER_HOST
+              value: unix:///run/user/1001/docker.sock
+          securityContext:
+            runAsUser: 1001
+            runAsGroup: 1001
           volumeMounts:
-            - name: hook-extension-config
-              mountPath: /etc/config/github/actions-runner/hooks
-              readOnly: true
+            - name: work
+              mountPath: /home/runner/_work
+            - name: dind-sock
+              mountPath: /run/user/1001
       volumes:
-        - name: hook-extension-config
-          configMap:
-            name: hook-extension
-            items:
-              - key: content
-                path: hook-extension.yaml
+        - name: work
+          emptyDir: {}
+        - name: dind-externals
+          emptyDir: {}
+        - name: dind-sock
+          emptyDir: {}
+        - name: dind-etc
+          emptyDir: {}
+        - name: dind-home
+          emptyDir: {}
       nodeSelector:
         pool: ci-runners
       tolerations:
