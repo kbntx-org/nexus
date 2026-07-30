@@ -1,4 +1,4 @@
-name: Bump nexus-manifests
+name: Deploy
 
 on:
   workflow_call:
@@ -16,27 +16,31 @@ on:
         required: false
         type: string
         default: main
+  workflow_dispatch:
 
 concurrency:
-  group: bump-nexus-manifests-${{ inputs.branch }}
+  group: deploy-${{ inputs.branch || 'bastion' }}
   cancel-in-progress: false
 
 jobs:
-  bump:
+  deploy:
+    name: Deploy
     runs-on: nexus-org-runners
-    timeout-minutes: 5
+    timeout-minutes: 20
     defaults:
       run:
         shell: bash
     steps:
-      - name: Checkout nexus (for nx metadata)
+      - name: Checkout
         uses: actions/checkout@v6
 
       - name: Install dependencies
+        if: github.event_name != 'workflow_dispatch'
         run: pnpm install
 
       - name: Mint manifests-repo write token
         id: manifests_token
+        if: github.event_name != 'workflow_dispatch'
         uses: actions/create-github-app-token@v3
         with:
           app-id: ${{ secrets.NEXUS_MANIFESTS_APP_ID }}
@@ -45,6 +49,7 @@ jobs:
           repositories: nexus-manifests
 
       - name: Clone manifests repo
+        if: github.event_name != 'workflow_dispatch'
         env:
           MANIFESTS_TOKEN: ${{ steps.manifests_token.outputs.token }}
           BRANCH: ${{ inputs.branch }}
@@ -63,6 +68,7 @@ jobs:
           fi
 
       - name: Edit values files
+        if: github.event_name != 'workflow_dispatch'
         uses: actions/github-script@v9
         env:
           TAG: ${{ inputs.image_tag }}
@@ -111,6 +117,7 @@ jobs:
             }
 
       - name: Commit and push (rebase retry)
+        if: github.event_name != 'workflow_dispatch'
         working-directory: /tmp/manifests
         env:
           IMAGE_TAG: ${{ inputs.image_tag }}
@@ -138,3 +145,16 @@ jobs:
           done
           echo "Failed to push after 5 attempts" >&2
           exit 1
+
+      - name: Deploy bastion
+        if: github.event_name == 'workflow_dispatch' || contains(fromJSON(inputs.deploy_targets || '[]'), 'bastion')
+        uses: ./.github/actions/deploy-with-compose
+        env:
+          CLOUDFLARE_TUNNEL_TOKEN: ${{ secrets.BASTION_CLOUDFLARE_TUNNEL_TOKEN }}
+        with:
+          user: ci
+          server: '10.0.0.5'
+          ssh-key: ${{ secrets.NEXUS_CI_PRIVATE_SSH_KEY }}
+          ssh-known-hosts: ${{ secrets.BASTION_KNOWN_HOSTS }}
+          files: >
+            platform/core/bastion/deploy/docker-compose.yml

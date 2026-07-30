@@ -114,6 +114,66 @@ than no doc.
 
 ---
 
+## GitHub Actions Workflows
+
+### Single entrypoint per trigger group, no `-pr`/`-main` file pairs
+
+Don't duplicate a workflow into `-pr.yml`/`-main.yml` variants. Instead, trigger
+on both events from one workflow and branch on `github.event_name` (or an
+explicit input passed down from the entrypoint) wherever behavior needs to
+differ. This context reliably reflects the _original_ triggering event even
+inside a `workflow_call`-reusable workflow, including through nested reusable
+workflow calls.
+
+### Prefer parallel steps over a job-per-unit-of-work
+
+GitHub Actions supports running steps concurrently within a single job (shipped
+2026-06-25): `background: true` on a step runs it async; `wait` / `wait-all`
+blocks until named/all background steps finish; `cancel` terminates a
+background step; `parallel:` is sugar that wraps a list of steps into
+background steps with an implicit `wait-all`. Composite actions (`uses:` a
+local `./.github/actions/...`) can run as a background/parallel step, but a
+composite action cannot declare `background` steps internally, and a
+`parallel:` group cannot be used inside a composite action. Each entry in a
+`parallel:` list is exactly one step (one `run:` or `uses:`) — there is no
+nested sequential sub-chain per lane, so independent multi-command lanes need
+either a single consolidated `run:` script or to accept some serialization
+for steps that must precede the parallel block. Prefer this over spinning up
+one job (one ARC runner pod) per independent unit of work when the units are
+cheap enough to share a runner — e.g. [`build.yml`](.github/workflows/build.yml)
+builds the portfolio and documentation images as parallel steps in one job
+instead of two separate jobs.
+
+### Composite actions over reusable workflows for single-consumer step sequences
+
+If a `workflow_call` reusable workflow has exactly one caller, prefer converting
+it to a composite action (`.github/actions/<name>/action.yaml`) instead. A
+reusable workflow always gets its own job (its own ARC runner pod); a composite
+action's steps run inline in the caller's job, so invoking it is just one more
+step. See [`compute-affected`](.github/actions/compute-affected/action.yaml),
+inlined as a step in [`build.yml`](.github/workflows/build.yml) rather than a
+separate `affected` job. Two gotchas when doing this conversion:
+
+- Composite actions have **no implicit access to the `secrets` context** (no
+  `secrets: inherit` equivalent). Any secret the action's steps need must be
+  declared as an explicit `inputs:` entry and passed via `with:` at the call
+  site — referencing `${{ secrets.X }}` directly inside the action silently
+  resolves to empty.
+- Composite action `run:` steps need an explicit `shell:` on every step (no
+  job-level `defaults: run: shell:` to inherit from).
+
+### Self-invalidating fail-safe on pipeline-critical files
+
+[`compute-affected`](.github/actions/compute-affected/action.yaml) marks every
+application as a deploy target if any file in its own hardcoded
+`pipelineCriticalFiles` list changed (currently: the action itself, `build.yml`,
+`deploy.yml`). When a workflow file takes over responsibility for build/deploy
+correctness in a way that other pipeline logic depends on, add it to that list
+— the assumption is that a change to pipeline-critical logic is risky enough to
+warrant a full re-deploy rather than trusting incremental affected-detection.
+
+---
+
 ## Package Management
 
 This repo uses **pnpm**. When adding or updating a dependency in any

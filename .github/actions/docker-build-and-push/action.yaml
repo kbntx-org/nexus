@@ -1,5 +1,5 @@
 name: Docker build and push
-description: Build and push Docker images using the Docker CLI against the runner's dind sidecar
+description: Build, and optionally push, Docker images using the Docker CLI against the runner's dind sidecar
 inputs:
   tag:
     description: 'Image tag'
@@ -10,14 +10,18 @@ inputs:
   context:
     description: 'Build context path'
     required: true
+  push:
+    description: 'Whether to push the built image to the registry'
+    required: false
+    default: 'true'
 runs:
   using: 'composite'
   steps:
-    - name: Build and push with docker buildx
+    - name: Build (and push) with docker buildx
       shell: bash
       run: |
-        docker buildx build \
-          --file "${{ inputs.file }}" \
-          --tag "${{ inputs.tag }}" \
-          --push \
-          "${{ inputs.context }}"
+        buildArgs=(--file "${{ inputs.file }}" --tag "${{ inputs.tag }}")
+        if [ "${{ inputs.push }}" = "true" ]; then
+          buildArgs+=(--push)
+        fi
+        docker buildx build "${buildArgs[@]}" "${{ inputs.context }}"
