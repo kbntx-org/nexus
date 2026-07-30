@@ -98,6 +98,23 @@ argocd-apps:
         syncOptions:
           - CreateNamespace=true
 
+    cilium:
+      project: default
+      source:
+        repoURL: https://github.com/kbntx-org/nexus.git
+        path: platform/core/cilium
+        targetRevision: main
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: kube-system
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true
+
     hetzner-cloud-controller:
       project: default
       source:
