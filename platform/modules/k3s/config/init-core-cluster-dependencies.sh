@@ -23,7 +23,7 @@ install_chart_repos() {
 
 # Extract bootstrap charts archives
 echo "Extracting bootstrap charts..."
-for chart in hetzner-cloud-controller argocd; do
+for chart in cilium hetzner-cloud-controller argocd; do
   mkdir -p "${CHARTS_DIR}/${chart}"
   tar -xzf "${CHARTS_DIR}/${chart}.tar.gz" -C "${CHARTS_DIR}/${chart}"
   rm -f "${CHARTS_DIR}/${chart}.tar.gz"
@@ -64,6 +64,14 @@ mkdir -p /home/engineer/.kube
 cp /etc/rancher/k3s/k3s.yaml /home/engineer/.kube/config
 chown -R engineer:engineer /home/engineer/.kube
 chmod 600 /home/engineer/.kube/config
+
+# Install cilium from repo chart
+install_chart_repos "${CHARTS_DIR}/cilium"
+helm dependency build "${CHARTS_DIR}/cilium"
+helm install cilium "${CHARTS_DIR}/cilium" -n kube-system
+
+echo "Waiting for Cilium to be ready..."
+kubectl -n kube-system rollout status daemonset/cilium --timeout=180s
 
 # Install hetzner-cloud-controller from repo chart
 echo "Installing Hetzner Cloud Controller..."

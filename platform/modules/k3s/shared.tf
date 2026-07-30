@@ -12,6 +12,13 @@ data "archive_file" "chart_argocd" {
   excludes    = ["charts"]
 }
 
+data "archive_file" "chart_cilium" {
+  type        = "tar.gz"
+  source_dir  = "${path.module}/../../core/cilium"
+  output_path = "${path.root}/.generated/chart-cilium.tar.gz"
+  excludes    = ["charts"]
+}
+
 locals {
   cluster_token = random_password.cluster_token.result
 
@@ -26,6 +33,7 @@ locals {
     cloudflare_tunnel_token             = var.cloudflare_tunnel_token
     chart_hetzner_cloud_controller_b64  = filebase64(data.archive_file.chart_hetzner_cloud_controller.output_path)
     chart_argocd_b64                    = filebase64(data.archive_file.chart_argocd.output_path)
+    chart_cilium_b64                    = filebase64(data.archive_file.chart_cilium.output_path)
   }
 
   node_pool_defaults = {

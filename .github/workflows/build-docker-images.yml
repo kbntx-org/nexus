@@ -23,9 +23,9 @@ jobs:
       - name: nexus-ci-toolkit - build and push
         uses: docker/build-push-action@v7
         with:
-          context: platform/services/custom-docker-images/nexus-ci-toolkit
-          file: platform/services/custom-docker-images/nexus-ci-toolkit/Dockerfile
+          context: platform/core/github-arc-runners/base-image
+          file: platform/core/github-arc-runners/base-image/Dockerfile
           push: true
           tags: |
-            kbntx/nexus-ci-toolkit:1.0
+            kbntx/nexus-ci-toolkit:1.1
           platforms: linux/amd64

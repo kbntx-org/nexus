@@ -46,6 +46,12 @@ write_files:
     permissions: '0644'
     encoding: b64
     content: ${chart_argocd_b64}
+
+  - path: /tmp/charts/cilium.tar.gz
+    owner: root:root
+    permissions: '0644'
+    encoding: b64
+    content: ${chart_cilium_b64}
   %{ endif }
   %{ if docker_hub_username != "" && docker_hub_password != "" }
   - path: /etc/rancher/k3s/registries.yaml
@@ -83,6 +89,9 @@ runcmd:
       --token=${cluster_token}
   - /opt/scripts/init-core-cluster-dependencies.sh "${hcloud_token}" "${vpc_name}" "${cloudflare_tunnel_token}"
   %{ else }
+  - sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+  - echo "kernel.apparmor_restrict_unprivileged_userns=0" > /etc/sysctl.d/99-rootless-docker.conf
+  - sysctl --system
   - |
     curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.34.3+k3s1 sh -s - agent \
     --server "https://${server_address}:6443" \
