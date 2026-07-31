@@ -90,7 +90,7 @@ argocd-apps:
         targetRevision: main
       destination:
         server: https://kubernetes.default.svc
-        namespace: cloudflare
+        namespace: cloudflared
       syncPolicy:
         automated:
           prune: true
