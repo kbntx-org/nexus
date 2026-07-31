@@ -14,6 +14,21 @@ RUN apt-get update && \
       xz-utils ca-certificates && \
     rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
+# Install Docker CLI, Buildx and Compose plugins
+RUN install -m 0755 -d /etc/apt/keyrings && \
+    curl -fsSL "https://download.docker.com/linux/$(. /etc/os-release && echo "$ID")/gpg" -o /etc/apt/keyrings/docker.asc && \
+    chmod a+r /etc/apt/keyrings/docker.asc && \
+    printf '%s\n' \
+      "Types: deb" \
+      "URIs: https://download.docker.com/linux/$(. /etc/os-release && echo "$ID")" \
+      "Suites: $(. /etc/os-release && echo "$VERSION_CODENAME")" \
+      "Components: stable" \
+      "Signed-By: /etc/apt/keyrings/docker.asc" \
+    > /etc/apt/sources.list.d/docker.sources && \
+    apt-get update && \
+    apt-get install --no-install-recommends -y docker-ce-cli docker-buildx-plugin docker-compose-plugin && \
+    rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
+
 # Install Node.js
 RUN ARCH="$(dpkg --print-architecture)" && \
     case "$ARCH" in \

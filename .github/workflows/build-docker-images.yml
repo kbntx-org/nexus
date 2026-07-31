@@ -27,5 +27,5 @@ jobs:
           file: platform/core/github-arc-runners/base-image/Dockerfile
           push: true
           tags: |
-            kbntx/nexus-ci-toolkit:1.1
+            kbntx/nexus-ci-toolkit:1.2
           platforms: linux/amd64
