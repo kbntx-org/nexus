@@ -4,6 +4,45 @@ resource "cloudflare_zero_trust_tunnel_cloudflared" "k3s_tunnel" {
   config_src = "cloudflare"
 }
 
+resource "cloudflare_zero_trust_tunnel_cloudflared_config" "k3s_tunnel_config" {
+  account_id = var.cloudflare_account_id
+  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.k3s_tunnel.id
+
+  config = {
+    ingress = [
+      {
+        hostname = "kbntx.com"
+        service  = "http://traefik-ingress.traefik-ingress.svc.cluster.local"
+      },
+      {
+        hostname = "*.kbntx.com"
+        service  = "http://traefik-ingress.traefik-ingress.svc.cluster.local"
+      },
+      {
+        service = "http_status:404"
+      }
+    ]
+  }
+}
+
+resource "cloudflare_dns_record" "apex_root" {
+  zone_id = var.cloudflare_zone_id
+  name    = "kbntx.com"
+  type    = "CNAME"
+  content = "${cloudflare_zero_trust_tunnel_cloudflared.k3s_tunnel.id}.cfargotunnel.com"
+  proxied = true
+  ttl     = 1
+}
+
+resource "cloudflare_dns_record" "apex_wildcard" {
+  zone_id = var.cloudflare_zone_id
+  name    = "*.kbntx.com"
+  type    = "CNAME"
+  content = "${cloudflare_zero_trust_tunnel_cloudflared.k3s_tunnel.id}.cfargotunnel.com"
+  proxied = true
+  ttl     = 1
+}
+
 data "cloudflare_zero_trust_tunnel_cloudflared_token" "k3s_tunnel_token" {
   account_id = var.cloudflare_account_id
   tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.k3s_tunnel.id
@@ -38,6 +77,6 @@ resource "vault_kv_secret_v2" "cloudflared_tunnel" {
   name  = "cloudflared"
 
   data_json = jsonencode({
-    token = data.cloudflare_zero_trust_tunnel_cloudflared_token.k3s_tunnel_token.token
+    tunnelToken = data.cloudflare_zero_trust_tunnel_cloudflared_token.k3s_tunnel_token.token
   })
 }

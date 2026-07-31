@@ -18,7 +18,7 @@ provider "cloudflare" {
 }
 
 provider "vault" {
-  address = "https://vault.kbntx.com"
+  address = "http://localhost:8200"
   token   = var.vault_token
 }
 
