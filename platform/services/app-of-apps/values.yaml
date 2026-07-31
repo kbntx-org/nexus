@@ -86,7 +86,7 @@ argocd-apps:
       project: default
       source:
         repoURL: https://github.com/kbntx-org/nexus.git
-        path: platform/core/cloudflared
+        path: platform/core/cloudflared/chart
         targetRevision: main
       destination:
         server: https://kubernetes.default.svc
