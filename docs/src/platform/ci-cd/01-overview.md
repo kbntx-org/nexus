@@ -126,38 +126,44 @@ once.
 
 ## Pipelines
 
-The pipelines are split into a small set of reusable workflows that
-[`checks-pr.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/checks-pr.yml){ target="\_blank" rel="noopener" }
-and
-[`checks-main.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/checks-main.yml){ target="\_blank" rel="noopener" }
-compose. Both start by computing what changed.
+The pipelines are composed of a small set of reusable workflows that
+[`checks.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/checks.yml){ target="\_blank" rel="noopener" }
+orchestrates. It is the single entrypoint for both pull requests and
+pushes to `main` — there is no separate PR/main workflow pair. Each
+called workflow branches on `github.event_name` internally where its
+behavior needs to differ, and independent jobs (`lint-and-format`,
+`test`, `build`) run in parallel rather than chained.
 
 ```mermaid
 %%{init: {'theme':'dark'}}%%
 graph LR
-    Push[push / PR] --> Affected
-    Affected --> Lint[Lint & format]
-    Affected --> Test
-    Affected --> Deploy[Deploy<br/>main branch only]
+    Push[push / PR] --> Lint[Lint & format]
+    Push --> Test
+    Push --> Build[Build<br/>affected + build, in parallel]
+    Build --> Deploy[Deploy<br/>main + PR preview branch]
 ```
 
-### PR pipeline
+### On every trigger
 
-On a pull request:
+A pull request and a push to `main` both run:
 
-1. **Affected** — figure out which Nx projects are impacted by the diff
-   against the base branch.
-2. **Lint & format** — run `nx affected --target=lint` and a global
-   `nx format:check` on the affected set.
-3. **Test** — run `nx affected --target=test` on the same set.
+1. **Lint & format** — `nx affected --target=lint` plus `nx format:check`
+   on a PR, or the `--all` equivalents on `main`.
+2. **Test** — `nx affected --target=test` on a PR, or `nx run-many
+--target=test --all` on `main`.
+3. **Build** — figure out which Nx projects are affected (as a step, not
+   a separate job — see below), then build (and, outside a PR, push) the
+   portfolio and documentation images as parallel steps in the same job.
+   See [GitOps deploys](02-gitops-deploys.md). On a PR the images are
+   built but never pushed, so a broken Dockerfile still fails the check
+   without publishing anything.
 
-Branch protection blocks merging until all three pass. Nothing is built
-or deployed from a PR.
+On a pull request, branch protection blocks merging until lint, test,
+and build all pass.
 
-### Main pipeline
+### Main-only continuation
 
-On a push to `main`, the same three steps run, then per-app **build**
-jobs fan out for the projects flagged for deployment, an aggregator
+On a push to `main`, once lint/test/build succeed, the **deploy** job
 commits the new image tags to a separate manifests repo, and ArgoCD
 deploys via auto-sync. The full flow is documented in
 [GitOps deploys](02-gitops-deploys.md).
@@ -176,18 +182,21 @@ pipelines lean on that for two distinct decisions:
   should still trigger a redeploy.
 
 Each project declares its deploy paths in its `project.json` under
-`metadata.deployPaths`, and
-[`compute-affected.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/compute-affected.yml){ target="\_blank" rel="noopener" }
-walks them with the changed file list to build `deploy_targets`. On
-`main`, the diff base for image-shipping apps is **that app's last
-deployed SHA** (read from the manifests repo), not the previous commit
-— this prevents parallel merges from cross-referencing each other's
-in-flight images. See
+`metadata.deployPaths`, and the
+[`compute-affected`](https://github.com/kbntx-org/nexus/blob/main/.github/actions/compute-affected/action.yaml){ target="\_blank" rel="noopener" }
+composite action walks them with the changed file list to build
+`deploy_targets`. It runs as a step inside the `build` job — not its own
+job — since it has exactly one caller and starting a separate runner pod
+for it would just add latency. On `main`, the diff base for
+image-shipping apps is **that app's last deployed SHA** (read from the
+manifests repo), not the previous commit — this prevents parallel merges
+from cross-referencing each other's in-flight images. See
 [GitOps deploys](02-gitops-deploys.md) for the full mechanics.
 
-The workflow also has a fail-safe: if it modifies itself, it marks
-**every application** as a deploy target — the assumption being that a
-change to the affected logic is risky enough to warrant a full re-deploy.
+The action also has a fail-safe: if any pipeline-critical file changes
+(the action itself, `build.yml`, or `deploy.yml`), it marks **every
+application** as a deploy target — the assumption being that a change to
+the build/deploy logic is risky enough to warrant a full re-deploy.
 
 ## References
 
@@ -195,4 +204,4 @@ change to the affected logic is risky enough to warrant a full re-deploy.
 - [`platform/core/github-arc-runners/runners/templates/network-policy.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/github-arc-runners/runners/templates/network-policy.yaml){ target="\_blank" rel="noopener" } — runner egress restrictions
 - [`platform/core/github-arc-runners/base-image/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/github-arc-runners/base-image){ target="\_blank" rel="noopener" } — CI toolkit image
 - [`.github/workflows/`](https://github.com/kbntx-org/nexus/tree/main/.github/workflows){ target="\_blank" rel="noopener" } — workflow definitions
-- [`.github/workflows/compute-affected.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/compute-affected.yml){ target="\_blank" rel="noopener" } — affected detection (per-app base from `nexus-manifests` on main)
+- [`.github/actions/compute-affected/action.yaml`](https://github.com/kbntx-org/nexus/blob/main/.github/actions/compute-affected/action.yaml){ target="\_blank" rel="noopener" } — affected detection (per-app base from `nexus-manifests` on main)

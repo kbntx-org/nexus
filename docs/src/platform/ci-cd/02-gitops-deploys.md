@@ -70,27 +70,33 @@ longer in the picture.
 ```mermaid
 %%{init: {'theme':'dark'}}%%
 graph LR
-    Push[push to main] --> Affected
-    Affected --> BuildP[build-portfolio]
-    Affected --> BuildD[build-documentation]
-    BuildP --> Bump[bump-manifests<br/>single commit]
-    BuildD --> Bump
-    Bump --> Sync[ArgoCD sync<br/>via webhook]
+    Push[push to main] --> Build[build<br/>affected + portfolio + docs, in parallel]
+    Build --> Deploy[deploy<br/>bump-manifests: single commit]
+    Deploy --> Sync[ArgoCD sync<br/>via webhook]
 ```
 
 CI is fire-and-forget: it pushes images, commits the new tags, and
 exits. Watching the rollout is ArgoCD's job — its UI and any monitoring
 on top of it own the rollout-health story.
 
-`build-<app>` jobs build and push images tagged with the commit SHA.
-They no longer talk to ArgoCD.
+[`build.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/build.yml){ target="\_blank" rel="noopener" }
+computes affected (via the
+[`compute-affected`](https://github.com/kbntx-org/nexus/blob/main/.github/actions/compute-affected/action.yaml){ target="\_blank" rel="noopener" }
+composite action, as the first step of the job), then builds and pushes
+images tagged with the commit SHA. Portfolio and documentation build as
+parallel steps in the same job (via GitHub Actions' `parallel:` step
+keyword) rather than as separate jobs — each is skipped individually if
+it isn't a deploy target. The build job no longer talks to ArgoCD.
 
-[`bump-manifests.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/bump-manifests.yml){ target="\_blank" rel="noopener" }
-is the aggregator. It depends on every build job, edits each affected
+[`deploy.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/deploy.yml){ target="\_blank" rel="noopener" }
+runs the `bump-manifests` job as the aggregator when called from the
+`checks.yml` pipeline. It depends on the build job, edits each affected
 app's values file in `nexus-manifests`, and produces **one commit per
 wave** (not one per app). The commit message lists each project and its
 new tag. Push uses a rebase-retry loop so two waves landing back-to-back
-serialize cleanly at the git layer.
+serialize cleanly at the git layer. The same file also holds a `bastion`
+job that only runs on a manual `workflow_dispatch` — see
+[What is not in this flow](#what-is-not-in-this-flow).
 
 The job is **all-or-nothing**: any build failure short-circuits the
 gate and no commit is made. Partial deploys are not a state the system
@@ -98,8 +104,8 @@ can be in.
 
 ## Affected detection per app
 
-[`compute-affected.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/compute-affected.yml){ target="\_blank" rel="noopener" }
-clones `nexus-manifests` shallowly, then for each project:
+The [`compute-affected`](https://github.com/kbntx-org/nexus/blob/main/.github/actions/compute-affected/action.yaml){ target="\_blank" rel="noopener" }
+composite action clones `nexus-manifests` shallowly, then for each project:
 
 1. Reads `metadata.manifestsValuesPath` from the project's
    `project.json` (the per-app file in `nexus-manifests`).
@@ -121,9 +127,9 @@ A `nexus-ci` GitHub App is installed on both repos with `Contents:
 Read & write` on `nexus-manifests`. Workflows mint short-lived
 installation tokens via
 [`actions/create-github-app-token`](https://github.com/actions/create-github-app-token){ target="\_blank" rel="noopener" }
-on the fly — `compute-affected` for the read-side clone, `bump-manifests`
-for the write. The App ID and private key live as repo secrets in
-`nexus`.
+on the fly — the `compute-affected` action for the read-side clone,
+`bump-manifests` for the write. The App ID and private key live as repo
+secrets in `nexus`.
 
 ## Rollback and hotfix
 
@@ -144,9 +150,12 @@ manifests repo is the source of truth.
 
 ## Pull requests
 
-PRs run the same `compute-affected → build → bump-manifests` chain as
-`main`, with two differences:
+PRs run the same `build (incl. compute-affected) → deploy` chain as
+`main`, with three differences:
 
+- **The build step does not push.** `docker buildx build` runs without
+  `--push` on a PR, so the image is validated for buildability but
+  never published to the registry.
 - **Image tag = PR head SHA** (`github.event.pull_request.head.sha`),
   so the image is reproducible to the exact code under review rather
   than the artificial merge commit.
@@ -154,6 +163,9 @@ PRs run the same `compute-affected → build → bump-manifests` chain as
   instead of `main`. The branch is created from `main` on the first
   PR build, then re-used for subsequent pushes — so unchanged apps in
   the preview inherit `main`'s tag, and changed apps carry the PR head.
+  Since the image is never pushed, this tag is not yet consumable by
+  anything — it stays scaffolding until the PR-preview ApplicationSet
+  below is wired up.
 
 The diff base for the per-app deploy gate stays the PR's merge target
 (`origin/<base_ref>`) — ArgoCD's last-deployed SHA from `main` is
@@ -182,18 +194,20 @@ until the ApplicationSet is added in a follow-up.
 
 [`platform/core/bastion/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/bastion){ target="\_blank" rel="noopener" }
 is not ArgoCD-managed today (it is a docker-compose deploy SCP'd to a
-host). It has been removed from the auto-deploy gating and is now
-[`workflow_dispatch`-only](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/deploy-bastion.yml){ target="\_blank" rel="noopener" }.
-It will be migrated into the cluster as a real ArgoCD app in a separate
-effort.
+host). It has been removed from the auto-deploy gating and lives as the
+`bastion` job in
+[`deploy.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/deploy.yml){ target="\_blank" rel="noopener" },
+gated to run only on a manual `workflow_dispatch` (`if:
+github.event_name == 'workflow_dispatch'`) — the mutually exclusive
+`bump-manifests` job runs on every other trigger instead. It will be
+migrated into the cluster as a real ArgoCD app in a separate effort.
 
 ## References
 
 - [`platform/services/app-of-apps/values.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/app-of-apps/values.yaml){ target="\_blank" rel="noopener" } — Application definitions, multi-source for portfolio + documentation
-- [`.github/workflows/checks-main.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/checks-main.yml){ target="\_blank" rel="noopener" } — main-pipeline orchestration
-- [`.github/workflows/compute-affected.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/compute-affected.yml){ target="\_blank" rel="noopener" } — per-app base resolution from `nexus-manifests`
-- [`.github/workflows/build-portfolio.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/build-portfolio.yml){ target="\_blank" rel="noopener" } and [`build-documentation.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/build-documentation.yml){ target="\_blank" rel="noopener" } — per-app build-and-push
-- [`.github/workflows/bump-manifests.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/bump-manifests.yml){ target="\_blank" rel="noopener" } — aggregator that commits to `nexus-manifests` (any branch)
-- [`.github/workflows/checks-pr.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/checks-pr.yml){ target="\_blank" rel="noopener" } — PR pipeline (build + commit to `pr-<n>` branch)
+- [`.github/workflows/checks.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/checks.yml){ target="\_blank" rel="noopener" } — single entrypoint for both the PR and main pipelines
+- [`.github/actions/compute-affected/action.yaml`](https://github.com/kbntx-org/nexus/blob/main/.github/actions/compute-affected/action.yaml){ target="\_blank" rel="noopener" } — per-app base resolution from `nexus-manifests`
+- [`.github/workflows/build.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/build.yml){ target="\_blank" rel="noopener" } — computes affected, builds portfolio + documentation as parallel steps, pushes only on non-PR runs
+- [`.github/workflows/deploy.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/deploy.yml){ target="\_blank" rel="noopener" } — `bump-manifests` job (aggregator, commits to `nexus-manifests` on any branch) and `bastion` job (manual docker-compose deploy)
 - [`.github/workflows/cleanup-pr-manifests.yml`](https://github.com/kbntx-org/nexus/blob/main/.github/workflows/cleanup-pr-manifests.yml){ target="\_blank" rel="noopener" } — deletes the PR branch on PR close
 - [`apps/portfolio/project.json`](https://github.com/kbntx-org/nexus/blob/main/apps/portfolio/project.json){ target="\_blank" rel="noopener" } and [`docs/project.json`](https://github.com/kbntx-org/nexus/blob/main/docs/project.json){ target="\_blank" rel="noopener" } — `manifestsValuesPath` and `deployPaths` metadata
