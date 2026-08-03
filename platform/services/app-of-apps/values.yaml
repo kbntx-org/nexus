@@ -131,6 +131,22 @@ argocd-apps:
         syncOptions:
           - CreateNamespace=true
 
+    sysbox:
+      project: default
+      source:
+        repoURL: https://github.com/kbntx-org/nexus.git
+        path: platform/core/sysbox/deploy
+        targetRevision: main
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: kube-system
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+
     monitoring:
       project: default
       source:

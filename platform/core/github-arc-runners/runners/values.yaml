@@ -17,64 +17,20 @@ gha-runner-scale-set:
       labels:
         github-job-pod: 'true'
     spec:
-      initContainers:
-        - name: fix-permissions
-          image: busybox:1.37
-          command:
-            [
-              'sh',
-              '-c',
-              'mkdir -p /home/runner/_work/_tool && chown -R 1001:1001 /home/runner/_work'
-            ]
-          volumeMounts:
-            - name: work
-              mountPath: /home/runner/_work
-        - name: init-dind-externals
-          image: kbntx/nexus-ci-toolkit:1.2
-          command: ['cp', '-r', '/home/runner/externals/.', '/home/runner/tmpDir/']
-          volumeMounts:
-            - name: dind-externals
-              mountPath: /home/runner/tmpDir
-        - name: init-dind-rootless
-          image: docker:29.6-dind-rootless
+      runtimeClassName: sysbox-runc
+      hostUsers: false
+      containers:
+        - name: runner
+          image: kbntx/nexus-ci-toolkit:1.3
           command:
             - sh
             - -c
             - |
-              set -x
-              cp -a /etc/. /dind-etc/
-              echo 'runner:x:1001:1001:runner:/home/runner:/bin/ash' >> /dind-etc/passwd
-              echo 'runner:x:1001:' >> /dind-etc/group
-              echo 'runner:100000:65536' >> /dind-etc/subgid
-              echo 'runner:100000:65536' >> /dind-etc/subuid
-              chmod 755 /dind-etc
-              chmod u=rwx,g=rx+s,o=rx /dind-home
-              chown 1001:1001 /dind-home
-          securityContext:
-            runAsUser: 0
-          volumeMounts:
-            - name: dind-etc
-              mountPath: /dind-etc
-            - name: dind-home
-              mountPath: /dind-home
-      containers:
-        - name: dind
-          image: docker:29.6-dind-rootless
-          args:
-            - dockerd
-            - --host=unix:///run/user/1001/docker.sock
-          env:
-            - name: DOCKER_HOST
-              value: unix:///run/user/1001/docker.sock
-          securityContext:
-            privileged: true
-            seccompProfile:
-              type: Unconfined
-            appArmorProfile:
-              type: Unconfined
-            runAsUser: 1001
-            runAsGroup: 1001
-          restartPolicy: Always
+              sudo dockerd &
+              echo 'Waiting for dockerd to be ready...'
+              until docker info > /dev/null 2>&1; do sleep 1; done
+              echo 'dockerd is ready'
+              exec /home/runner/run.sh
           startupProbe:
             exec:
               command: ['docker', 'info']
@@ -84,38 +40,8 @@ gha-runner-scale-set:
           volumeMounts:
             - name: work
               mountPath: /home/runner/_work
-            - name: dind-sock
-              mountPath: /run/user/1001
-            - name: dind-externals
-              mountPath: /home/runner/externals
-            - name: dind-etc
-              mountPath: /etc
-            - name: dind-home
-              mountPath: /home/runner
-        - name: runner
-          image: kbntx/nexus-ci-toolkit:1.2
-          command: ['/home/runner/run.sh']
-          env:
-            - name: DOCKER_HOST
-              value: unix:///run/user/1001/docker.sock
-          securityContext:
-            runAsUser: 1001
-            runAsGroup: 1001
-          volumeMounts:
-            - name: work
-              mountPath: /home/runner/_work
-            - name: dind-sock
-              mountPath: /run/user/1001
       volumes:
         - name: work
-          emptyDir: {}
-        - name: dind-externals
-          emptyDir: {}
-        - name: dind-sock
-          emptyDir: {}
-        - name: dind-etc
-          emptyDir: {}
-        - name: dind-home
           emptyDir: {}
       nodeSelector:
         pool: ci-runners
