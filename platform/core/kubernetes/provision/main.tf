@@ -32,7 +32,8 @@ module "nexus_cluster" {
       server_type = "cx33"
       location    = "nbg1"
       labels = {
-        "pool" = "ci-runners"
+        "pool"           = "ci-runners"
+        "sysbox-install" = "yes"
       }
       taints = [
         {

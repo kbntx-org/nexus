@@ -215,6 +215,7 @@ metadata:
   name: system-upgrade-controller
   namespace: system-upgrade
 spec:
+  replicas: 1
   selector:
     matchLabels:
       upgrade.cattle.io/controller: system-upgrade-controller
