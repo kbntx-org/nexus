@@ -27,8 +27,14 @@ export const EXPERIENCES: Experience[] = [
         title: 'Staff Platform Engineer',
         duration: 'March 2026 - Present',
         description:
-          'Defining platform strategy and technical direction across the engineering organization, driving cross-team alignment on infrastructure, developer experience, and delivery standards.',
-
+          "As a Staff Platform Engineer, I'm defining the platform strategy and technical direction across the engineering organization, driving cross-team alignment on infrastructure, distributed systems, developer experience, and delivery standards.",
+        highlights: [
+          'Replaced 5 static staging environments with unlimited on-demand preview environments provisioned in minutes from a GitHub label via a custom Kubernetes controller, used across engineering, design, and product',
+          'Migrated self-hosted RabbitMQ to an HA Amazon MQ cluster with zero downtime, reducing operational burden and enabling future use as an event bus',
+          'Implemented Tilt to make the local environment a real platform product, developing directly on Kubernetes with built-in tooling and the same charts used from local to production; available in under 2 minutes and shareable across peers and stakeholders via Cloudflare tunnels',
+          'Introduced leader election in the monolithic backend, removing the need for two standalone microservices (cron scheduler, Salesforce streaming) previously split out due to high availability incompatibility, simplifying the deployment model',
+          'Decoupled transpilation from typechecking and adopted TSGO, removing 5GB of RAM usage and reducing the process from 30s to 1-2s in the local environment, previously a daily bottleneck'
+        ],
         technologies: [
           'Kubernetes',
           'AWS',
@@ -55,6 +61,8 @@ export const EXPERIENCES: Experience[] = [
           'NX',
           'MongoDB',
           'RabbitMQ',
+          'Amazon MQ',
+          'Tilt',
           'REST APIs',
           'Node.js',
           'Amazon S3'
@@ -66,7 +74,6 @@ export const EXPERIENCES: Experience[] = [
         description:
           'As a Senior Platform Engineer at PowerUs, I focused on improving developer experience, reliability, and delivery speed by evolving our cloud and Kubernetes platform. I worked across teams to build a fast, safe, and self-service path from idea to production.',
         highlights: [
-          'Replaced 5 static staging environments with unlimited on-demand previews via ArgoCD ApplicationSets, provisioned in minutes from a GitHub label, used across engineering, design, and product',
           'Drove the zero-downtime migration from DigitalOcean to AWS, resolving service reliability issues, introducing granular access control, and unlocking a broader cloud services catalog',
           'Migrated from Docker Compose to Kubernetes on EKS, replacing fragmented per-service operations with a unified platform for deployments, recovery, configuration management, and engineer self-service via ArgoCD',
           'Revamped CI/CD pipelines with GitHub Actions and self-hosted ARC runners, cutting P95 from 20 to 10 minutes and reducing CI costs by 40%',
