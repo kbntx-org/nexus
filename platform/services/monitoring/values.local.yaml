@@ -17,10 +17,6 @@ externalSecrets:
   vaultPath: dev
   vaultRole: admin
 
-ingress:
-  grafanaHost: grafana.localhost
-  prometheusHost: prometheus.localhost
-
 grafana:
   grafana.ini:
     server:

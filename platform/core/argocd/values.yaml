@@ -21,6 +21,11 @@ argo-cd:
       requests:
         cpu: 15m
         memory: 60Mi
+    service:
+      labels:
+        external-dns/enabled: "true"
+      annotations:
+        external-dns.kubernetes.io/internal-hostname: argocd.kbntx.com
   repoServer:
     resources:
       requests:

@@ -13,10 +13,6 @@ terraform {
   }
 }
 
-provider "cloudflare" {
-  api_token = var.cloudflare_api_token
-}
-
 provider "vault" {
   address = "https://vault.kbntx.com"
   token   = var.vault_token
@@ -28,7 +24,7 @@ terraform {
       s3 = "https://2bde0126da63a3a9c94029d14ea380db.eu.r2.cloudflarestorage.com"
     }
     bucket                      = "nexus-terraform-state"
-    key                         = "k3s-entrypoint-cloudflared/state/terraform.tfstate"
+    key                         = "external-dns/state/terraform.tfstate"
     region                      = "eeur"
     skip_credentials_validation = true
     skip_region_validation      = true

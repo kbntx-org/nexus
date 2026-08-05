@@ -11,12 +11,13 @@ externalSecrets:
   vaultPath: platform
   vaultRole: monitoring
 
-ingress:
-  grafanaHost: grafana.kbntx.com
-  prometheusHost: prometheus.kbntx.com
-
 victoria-metrics-single:
   server:
+    service:
+      labels:
+        external-dns/enabled: "true"
+      annotations:
+        external-dns.kubernetes.io/internal-hostname: prometheus.kbntx.com
     scrape:
       enabled: true
       extraScrapeConfigs:
@@ -41,6 +42,11 @@ victoria-metrics-single:
               action: keep
 
 grafana:
+  service:
+    labels:
+      external-dns/enabled: "true"
+    annotations:
+      external-dns.kubernetes.io/internal-hostname: grafana.kbntx.com
   admin:
     existingSecret: monitoring-secret
     userKey: grafanaUser

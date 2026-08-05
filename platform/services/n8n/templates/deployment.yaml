@@ -82,6 +82,9 @@ metadata:
   name: n8n
   labels:
     app: n8n
+    external-dns/enabled: "true"
+  annotations:
+    external-dns.kubernetes.io/internal-hostname: n8n.kbntx.com
 spec:
   ports:
     - port: 5678
@@ -89,20 +92,3 @@ spec:
       name: http
   selector:
     app: n8n
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: n8n-ingress
-spec:
-  rules:
-    - host: n8n.kbntx.com
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: n8n
-                port:
-                  number: 5678
