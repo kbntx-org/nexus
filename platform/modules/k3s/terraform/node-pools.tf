@@ -6,6 +6,10 @@ locals {
         index        = i
         cluster_name = var.cluster_name
         name         = "${var.cluster_name}-${pool_key}-${i}"
+        taint_labels = {
+          for taint in coalesce(pool.taints, local.node_pool_defaults.taints) :
+          "taint-${taint.key}" => "${taint.value}.${taint.effect}"
+        }
       })
     }
   ]...)
@@ -33,7 +37,7 @@ resource "hcloud_server" "node_pool" {
     "type" : "worker"
     "pool" : each.value.pool_key
     "cluster-name" : var.cluster_name
-  }, coalesce(each.value.labels, local.node_pool_defaults.labels))
+  }, coalesce(each.value.labels, local.node_pool_defaults.labels), each.value.taint_labels)
 
   lifecycle {
     ignore_changes = [user_data, ssh_keys]
@@ -51,12 +55,7 @@ data "cloudinit_config" "node_pool" {
     content_type = "text/cloud-config"
     filename     = "cloud-config.yml"
     content = templatefile("${path.module}/config/cloud-init.yml", merge(local.cloud_init_base, {
-      server_address      = hcloud_server_network.control_plane_network.ip
-      labels              = merge(coalesce(each.value.labels, {}), local.node_pool_defaults.labels)
-      taints              = coalesce(each.value.taints, local.node_pool_defaults.taints)
-      type                = "worker"
-      docker_hub_username = var.docker_hub_username
-      docker_hub_password = var.docker_hub_password
+      type = "worker"
     }))
   }
 }

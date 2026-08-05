@@ -80,3 +80,22 @@ resource "vault_kv_secret_v2" "cloudflared_tunnel" {
     tunnelToken = data.cloudflare_zero_trust_tunnel_cloudflared_token.k3s_tunnel_token.token
   })
 }
+
+resource "cloudflare_zero_trust_tunnel_cloudflared_route" "k3s_service_route" {
+  account_id = var.cloudflare_account_id
+  network    = local.k3s_service_cidr
+  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.k3s_tunnel.id
+  comment    = "K3S service route"
+}
+
+resource "cloudflare_zero_trust_tunnel_cloudflared_route" "k3s_pod_route" {
+  account_id = var.cloudflare_account_id
+  network    = local.k3s_pod_cidr
+  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.k3s_tunnel.id
+  comment    = "K3S pod route"
+}
+
+locals {
+  k3s_service_cidr = "10.43.0.0/16"
+  k3s_pod_cidr     = "10.42.0.0/16"
+}

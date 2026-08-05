@@ -1,0 +1,6 @@
+{{ ansible_managed | comment }}
+configs:
+  "docker.io":
+    auth:
+      username: {{ k3s_docker_hub_username }}
+      password: {{ k3s_docker_hub_password }}

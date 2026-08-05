@@ -1,0 +1,15 @@
+---
+plugin: hetzner.hcloud.hcloud
+strict: true
+api_token: '{{ hcloud_token }}'
+connect_with: private_ipv4
+network: 'main-vpc'
+label_selector: 'cluster-name=nexus'
+
+compose:
+  private_ipv4: hcloud_private_ipv4
+  public_ipv4: hcloud_ipv4
+
+groups:
+  k3s_server: "hcloud_labels.type == 'control-plane'"
+  k3s_worker: "hcloud_labels.type == 'worker'"
