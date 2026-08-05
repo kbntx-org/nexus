@@ -1,0 +1,21 @@
+[project]
+name = "nexus-k3s-ansible"
+version = "1.0.0"
+requires-python = ">=3.11"
+dependencies = [
+    "ansible-core>=2.16",
+    "requests>=2.20",
+    "python-dateutil>=2.7.5",
+]
+
+[dependency-groups]
+dev = [
+    "ansible-lint>=26.6.0",
+    "poethepoet>=0.48.0",
+]
+
+[tool.poe.tasks]
+install = "ansible-galaxy install -r requirements.yml"
+inventory = "ansible-inventory --list -e @vars.yaml"
+playbook = "ansible-playbook site.yml -e @vars.yaml"
+check = "ansible-playbook site.yml -e @vars.yaml --check --diff"

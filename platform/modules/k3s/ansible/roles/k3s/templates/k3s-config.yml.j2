@@ -1,0 +1,37 @@
+{{ ansible_managed | comment }}
+token: {{ k3s_token }}
+node-name: {{ inventory_hostname }}
+node-ip: {{ private_ipv4 }}
+{% if k3s_node_role == 'server' %}
+{% if inventory_hostname == k3s_first_server %}
+cluster-init: true
+{% else %}
+server: "https://{{ hostvars[k3s_first_server]['private_ipv4'] }}:6443"
+{% endif %}
+disable-cloud-controller: true
+disable-kube-proxy: true
+disable-network-policy: true
+flannel-backend: "none"
+secrets-encryption: true
+disable:
+  - local-storage
+  - traefik
+  - servicelb
+{% else %}
+server: "https://{{ hostvars[k3s_first_server]['private_ipv4'] }}:6443"
+flannel-iface: enp7s0
+{% endif %}
+kubelet-arg:
+  - "cloud-provider=external"
+{% if k3s_effective_node_taints %}
+node-taint:
+{% for taint in k3s_effective_node_taints %}
+  - "{{ taint }}"
+{% endfor %}
+{% endif %}
+{% if k3s_node_labels %}
+node-label:
+{% for label_key, label_value in k3s_node_labels.items() %}
+  - "{{ label_key }}={{ label_value }}"
+{% endfor %}
+{% endif %}

@@ -59,12 +59,6 @@ timeout 120 bash -c '
 
 export KUBECONFIG="/etc/rancher/k3s/k3s.yaml"
 
-# Setup kubeconfig for engineer user
-mkdir -p /home/engineer/.kube
-cp /etc/rancher/k3s/k3s.yaml /home/engineer/.kube/config
-chown -R engineer:engineer /home/engineer/.kube
-chmod 600 /home/engineer/.kube/config
-
 # Install cilium from repo chart
 install_chart_repos "${CHARTS_DIR}/cilium"
 helm dependency build "${CHARTS_DIR}/cilium"

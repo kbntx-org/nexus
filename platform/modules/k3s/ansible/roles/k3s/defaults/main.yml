@@ -1,0 +1,28 @@
+---
+# Required: k3s version to install, e.g. "v1.34.3+k3s1".
+k3s_version: ''
+
+# Required: shared token used by nodes to join the cluster.
+k3s_token: ''
+
+k3s_docker_hub_username: ''
+k3s_docker_hub_password: ''
+
+k3s_server_node_taints:
+  - 'node-role.kubernetes.io/control-plane=true:NoSchedule'
+
+# Node labels are derived from the Hetzner Cloud labels Terraform sets on
+# each server, minus the labels that only carry inventory-grouping meaning
+# and the "taint-*" labels, which are node taints in disguise (see
+# platform/modules/k3s/node-pools.tf) and are decoded separately below.
+k3s_node_label_exclusions:
+  - type
+  - cluster-name
+  - pool
+
+k3s_node_labels: "{{ (hcloud_labels | default({})) | dict2items | rejectattr('key', 'in', k3s_node_label_exclusions) | rejectattr('key', 'match', '^taint-') | items2dict }}"
+
+# Node taints are recovered from "taint-<key>": "<value>.<effect>" Hetzner
+# Cloud labels, the same tags node_pools.taints in Terraform produces —
+# see platform/modules/k3s/node-pools.tf. Populated per-host in tasks/main.yml.
+k3s_worker_node_taints: []

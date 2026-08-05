@@ -120,6 +120,16 @@ The result: bringing the cluster up from scratch is one Terraform
 workspace away. There is no manual `kubectl apply` step, no SSH ritual,
 no out-of-band install of a CI tool to hand-hold the bootstrap.
 
+A config-file-driven Ansible `k3s` role also exists under
+[`platform/modules/k3s/ansible/`](https://github.com/kbntx-org/nexus/tree/main/platform/modules/k3s/ansible){ target="\_blank" rel="noopener" },
+invoked from
+[`platform/core/kubernetes/configuration/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/kubernetes/configuration){ target="\_blank" rel="noopener" }
+against a dynamic Hetzner Cloud inventory. It installs k3s the same way
+cloud-init does, but from `/etc/rancher/k3s/config.yaml` instead of CLI
+flags, and is idempotent — safe to re-run against an already-bootstrapped
+cluster (e.g. after rotating the k3s version). It is not yet the
+provisioning path; cloud-init above still owns first boot.
+
 ## Hetzner Cloud Controller Manager
 
 k3s is started with `--disable-cloud-controller` and
@@ -179,3 +189,5 @@ the change up on its next reconcile.
 - [`platform/core/hetzner-cloud-controller/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/hetzner-cloud-controller){ target="\_blank" rel="noopener" } — Hetzner CCM + CSI Helm chart
 - [`platform/core/kubernetes/upgrades/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/kubernetes/upgrades){ target="\_blank" rel="noopener" } — system-upgrade-controller and the k3s upgrade plans
 - [`platform/core/network/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/network){ target="\_blank" rel="noopener" } — the private VPC the cluster joins
+- [`platform/modules/k3s/ansible/`](https://github.com/kbntx-org/nexus/tree/main/platform/modules/k3s/ansible){ target="\_blank" rel="noopener" } — reusable Ansible `k3s` role (config-file-driven install/upgrade)
+- [`platform/core/kubernetes/configuration/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/kubernetes/configuration){ target="\_blank" rel="noopener" } — dynamic Hetzner inventory and playbook that runs the `k3s` role

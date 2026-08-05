@@ -56,10 +56,7 @@ data "cloudinit_config" "control_plane" {
     content_type = "text/cloud-config"
     filename     = "cloud-config.yml"
     content = templatefile("${path.module}/config/cloud-init.yml", merge(local.cloud_init_base, {
-      server_address = ""
-      type           = "control-plane"
-      taints         = []
-      labels         = {}
+      type = "control-plane"
     }))
   }
 }

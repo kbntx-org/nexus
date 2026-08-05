@@ -97,6 +97,11 @@ terraform.rc
 *.conf
 *.plan
 
+# Ansible
+vars.yaml
+vars.*.yaml
+
+
 
 .claude/worktrees
 .nx/polygraph

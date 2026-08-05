@@ -3,14 +3,10 @@ data "hcloud_network" "main_network" {
 }
 
 module "nexus_cluster" {
-  source = "../../../modules/k3s"
+  source = "../../../modules/k3s/terraform"
 
-  cluster_name            = "nexus"
-  vpc_name                = "main-vpc"
-  hcloud_token            = var.hcloud_token
-  cloudflare_tunnel_token = var.cloudflare_tunnel_token
-  docker_hub_username     = var.docker_hub_username
-  docker_hub_password     = var.docker_hub_password
+  cluster_name = "nexus"
+  vpc_name     = "main-vpc"
 
   control_plane = {
     server_type = "cx33"
