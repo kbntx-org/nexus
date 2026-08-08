@@ -1,0 +1,14 @@
+---
+- name: Install or upgrade k3s on control-plane nodes
+  hosts: k3s_server
+  serial: 1
+  become: true
+  roles:
+    - k3s
+
+- name: Install or upgrade k3s on worker nodes
+  hosts: k3s_worker
+  serial: 1
+  become: true
+  roles:
+    - k3s

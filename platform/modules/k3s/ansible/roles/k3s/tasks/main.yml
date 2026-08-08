@@ -1,0 +1,130 @@
+---
+- name: Assert required variables are set
+  ansible.builtin.assert:
+    that:
+      - k3s_version | length > 0
+      - k3s_token | length > 0
+    fail_msg: 'k3s_version and k3s_token must both be provided'
+  run_once: true
+
+- name: Assert inventory groups are correctly populated
+  ansible.builtin.assert:
+    that:
+      - "'k3s_server' in groups"
+      - "'k3s_worker' in groups"
+      - groups['k3s_server'] | length > 0
+      - groups['k3s_server'] | length is odd
+    fail_msg: >
+      Inventory must define non-empty k3s_server and k3s_worker groups.
+      k3s_server must have an odd count for etcd quorum (found: {{ groups['k3s_server'] | default([]) | length }}).
+  run_once: true
+
+- name: Set k3s node role facts
+  ansible.builtin.set_fact:
+    k3s_node_role: "{{ 'server' if inventory_hostname in groups['k3s_server'] else 'agent' }}"
+    k3s_service_name: "{{ 'k3s' if inventory_hostname in groups['k3s_server'] else 'k3s-agent' }}"
+    k3s_first_server: "{{ (groups['k3s_server'] | sort) | first }}"
+
+- name: Decode worker node taints from Hetzner Cloud tags
+  ansible.builtin.set_fact:
+    k3s_worker_node_taints: "{{ k3s_worker_node_taints + [(item.key | regex_replace('^taint-', '')) ~ '=' ~ ((item.value.rsplit('.', 1))[0]) ~ ':' ~ ((item.value.rsplit('.', 1))[1])] }}"
+  loop: "{{ (hcloud_labels | default({})) | dict2items | selectattr('key', 'match', '^taint-') | list }}"
+  loop_control:
+    label: '{{ item.key }}'
+  when: k3s_node_role == 'agent'
+
+- name: Set effective node taints
+  ansible.builtin.set_fact:
+    k3s_effective_node_taints: "{{ (k3s_node_role == 'server') | ternary(k3s_server_node_taints, k3s_worker_node_taints) }}"
+
+- name: Ensure the k3s config directory exists
+  ansible.builtin.file:
+    path: /etc/rancher/k3s
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Configure Docker Hub registry credentials
+  ansible.builtin.template:
+    src: registries.yml.j2
+    dest: /etc/rancher/k3s/registries.yaml
+    owner: root
+    group: root
+    mode: '0600'
+  when: k3s_docker_hub_username != '' and k3s_docker_hub_password != ''
+  notify: Restart k3s
+
+- name: Template the k3s config file
+  ansible.builtin.template:
+    src: k3s-config.yml.j2
+    dest: /etc/rancher/k3s/config.yaml
+    owner: root
+    group: root
+    mode: '0600'
+  notify: Restart k3s
+
+- name: Allow unprivileged user namespaces for rootless workloads
+  ansible.posix.sysctl:
+    name: kernel.apparmor_restrict_unprivileged_userns
+    value: '0'
+    sysctl_file: /etc/sysctl.d/99-rootless-docker.conf
+    state: present
+    reload: true
+  when: k3s_node_role == 'agent'
+
+- name: Check whether the k3s binary is already installed
+  ansible.builtin.stat:
+    path: /usr/local/bin/k3s
+  register: k3s_binary
+
+- name: Download and run the k3s install script
+  ansible.builtin.shell: curl -sfL https://get.k3s.io | sh -s - {{ k3s_node_role }}
+  environment:
+    INSTALL_K3S_VERSION: '{{ k3s_version }}'
+    INSTALL_K3S_SKIP_START: 'true'
+  when: not k3s_binary.stat.exists
+  changed_when: true
+
+- name: Strip legacy CLI flags from the k3s systemd unit
+  ansible.builtin.replace:
+    path: /etc/systemd/system/{{ k3s_service_name }}.service
+    regexp: "^\t'.*' \\\\\n"
+    replace: ''
+  notify: Restart k3s
+
+- name: Ensure the k3s service is enabled and started
+  ansible.builtin.systemd:
+    name: '{{ k3s_service_name }}'
+    enabled: true
+    state: started
+
+- name: "Ensure the {{ ansible_user }} user's kube config directory exists"
+  ansible.builtin.file:
+    path: '/home/{{ ansible_user }}/.kube'
+    state: directory
+    owner: '{{ ansible_user }}'
+    group: '{{ ansible_user }}'
+    mode: '0700'
+  when: k3s_node_role == 'server'
+
+- name: 'Install the k3s kubeconfig for the {{ ansible_user }} user'
+  ansible.builtin.copy:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: '/home/{{ ansible_user }}/.kube/config'
+    remote_src: true
+    owner: '{{ ansible_user }}'
+    group: '{{ ansible_user }}'
+    mode: '0600'
+  when: k3s_node_role == 'server'
+
+- name: 'Set KUBECONFIG for the {{ ansible_user }} user'
+  ansible.builtin.lineinfile:
+    path: '/home/{{ ansible_user }}/.bashrc'
+    regexp: '^export KUBECONFIG='
+    line: 'export KUBECONFIG="/home/{{ ansible_user }}/.kube/config"'
+    create: true
+    owner: '{{ ansible_user }}'
+    group: '{{ ansible_user }}'
+    mode: '0644'
+  when: k3s_node_role == 'server'
