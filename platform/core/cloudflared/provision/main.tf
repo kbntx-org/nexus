@@ -11,15 +11,8 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "k3s_tunnel_config" {
   config = {
     ingress = [
       {
-        hostname = "kbntx.com"
+        hostname = "*"
         service  = "http://traefik-ingress.traefik-ingress.svc.cluster.local"
-      },
-      {
-        hostname = "*.kbntx.com"
-        service  = "http://traefik-ingress.traefik-ingress.svc.cluster.local"
-      },
-      {
-        service = "http_status:404"
       }
     ]
   }
@@ -48,17 +41,11 @@ data "cloudflare_zero_trust_tunnel_cloudflared_token" "k3s_tunnel_token" {
   tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.k3s_tunnel.id
 }
 
-resource "vault_mount" "cloudflared" {
-  path        = "cloudflared"
-  type        = "kv-v2"
-  description = "cloudflared tunnel credentials"
-}
-
 resource "vault_policy" "cloudflared_read" {
   name = "cloudflared-tunnel-read"
 
   policy = <<-EOT
-    path "platform/data/tunnel-token" {
+    path "platform/data/cloudflared" {
       capabilities = ["read"]
     }
   EOT
