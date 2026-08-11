@@ -24,7 +24,7 @@ jobs:
       deploy_targets: ${{ steps.affected.outputs.deploy_targets }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
