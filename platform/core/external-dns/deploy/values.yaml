@@ -1,0 +1,21 @@
+external-dns:
+  policy: sync
+  provider:
+    name: cloudflare
+  env:
+    - name: CF_API_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: external-dns-secret
+          key: cloudflareToken
+  labelFilter: 'external-dns/enabled=true'
+  annotationPrefix: external-dns.kubernetes.io/
+  source:
+    - service
+    - ingress
+  extraArgs:
+    - --zone-id-filter=d989ee0321d203608502ea911a3ccc90
+    - --cloudflare-record-comment="provisioned by external-dns"
+    - --service-type-filter=ClusterIP
+    - --managed-record-types=A
+    - --managed-record-types=CNAME
