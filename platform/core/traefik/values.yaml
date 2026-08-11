@@ -18,15 +18,6 @@ traefik:
         trustedIPs: ['10.42.0.0/16']
       expose:
         default: true
-      http:
-        encodedCharacters:
-          allowEncodedSlash: true
-          allowEncodedBackSlash: true
-          allowEncodedNullCharacter: true
-          allowEncodedSemicolon: true
-          allowEncodedPercent: true
-          allowEncodedQuestionMark: true
-          allowEncodedHash: true
     websecure:
       expose:
         default: false
