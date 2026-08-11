@@ -47,7 +47,7 @@
     "@nx/eslint": "22.7.7",
     "@nx/eslint-plugin": "22.7.7",
     "@schematics/angular": "21.2.19",
-    "@types/node": "24.12.4",
+    "@types/node": "24.13.3",
     "@typescript-eslint/eslint-plugin": "^8.38.0",
     "@typescript-eslint/parser": "^8.38.0",
     "autoprefixer": "^10.4.21",
