@@ -67,25 +67,19 @@ spec:
     - port: {{ .Values.containerPort | default 80 }}
       targetPort: {{ .Values.containerPort | default 80 }}
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
 metadata:
   name: documentation-ingress
 spec:
-  ingressClassName: traefik
-  rules:
+  routes:
     {{- $ingressHosts := .Values.ingressHosts }}
     {{- range $host := $ingressHosts }}
     {{- if $host }}
-    - host: {{ $host }}
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: documentation-service
-                port:
-                  number: {{ $.Values.containerPort | default 80 }}
+    - match: Host(`{{ $host }}`)
+      kind: Rule
+      services:
+        - name: documentation-service
+          port: {{ $.Values.containerPort | default 80 }}
     {{- end }}
     {{- end }}

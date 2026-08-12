@@ -6,17 +6,18 @@ title: Overview
 is the **in-cluster ingress controller** in Nexus. It receives plain HTTP
 from the [`cloudflared`](https://github.com/cloudflare/cloudflared){ target="\_blank" rel="noopener" }
 tunnel pod, matches the request against the
-[`Ingress`](https://kubernetes.io/docs/concepts/services-networking/ingress/){ target="\_blank" rel="noopener" }
+[`IngressRoute`](https://doc.traefik.io/traefik/providers/kubernetes-crd/){ target="\_blank" rel="noopener" }
 resources in the cluster, and forwards it to the right `Service`.
 
 ## Why Traefik
 
 A few things made Traefik the path of least resistance here:
 
-- **Native `Ingress` provider.** Traefik watches the standard
-  Kubernetes `Ingress` API directly — no custom resource is required to
-  expose an app. Apps stay portable: their charts only know about stock
-  Kubernetes objects.
+- **Native CRD provider.** Traefik ships its own `IngressRoute` custom
+  resource, giving routes access to Traefik's full matcher syntax
+  (`Host`, `PathPrefix`, header matching, and so on) and a direct path
+  to attach `Middleware` and other Traefik CRDs later without bolting
+  on provider-specific annotations.
 - **Sane defaults.** The Helm chart ships with reasonable production
   defaults (deployment, service, RBAC, metrics) so the configuration in
   this repo is small and focused on the few things that actually need
@@ -61,19 +62,20 @@ with a small set of opinionated overrides in
 [`values.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/traefik/values.yaml){ target="\_blank" rel="noopener" }.
 The decisions worth calling out:
 
-- **Default `IngressClass`.** The chart registers a `traefik`
-  `IngressClass` and marks it as the cluster default. App charts can
-  set `ingressClassName: traefik` explicitly (the portfolio chart
-  does), but anything that omits the field still ends up on Traefik —
-  there is only one ingress controller in this cluster, and the
-  default class makes that the obvious choice.
-- **Stock `Ingress`, no CRDs.** The `kubernetesIngress` provider is
-  enabled and the `kubernetesCRD` provider is **off**. Apps express
-  their routing in the standard Kubernetes `Ingress` API; they never
-  reach for `IngressRoute` or any of the other Traefik CRDs. The
-  trade-off is deliberate: standard `Ingress` covers every routing
-  need so far, and keeping CRDs out means app manifests stay portable
-  and review-friendly.
+- **CRD routing, no stock `Ingress`.** The `kubernetesCRD` provider is
+  enabled and the `kubernetesIngress` provider is **off**. Apps express
+  their routing with `IngressRoute` rather than the standard Kubernetes
+  `Ingress` API. There is only one ingress controller in this cluster,
+  so the portability a stock `Ingress` buys (swapping controllers
+  without touching app manifests) is not a real need here, and
+  `IngressRoute`'s matcher syntax is what unlocks the encoded-URL
+  entrypoint handling and any future per-route `Middleware` chaining
+  below.
+- **No `IngressClass` selection needed.** With a single Traefik
+  instance in the cluster, `IngressRoute` resources don't need an
+  `ingressClassName` to disambiguate which controller should pick them
+  up — Traefik's CRD provider watches every `IngressRoute` in the
+  cluster by default.
 - **Tolerant URL handling on the `web` entrypoint.** A handful of
   encoded-character allowances are turned on (encoded slashes,
   semicolons, percent signs, and so on). Some of the apps behind
@@ -99,44 +101,39 @@ and there is no other source of HTTPS traffic inside the cluster.
 
 ## Exposing a service
 
-Apps use a standard Kubernetes `Ingress`. The portfolio chart's
+Apps use Traefik's `IngressRoute` CRD. The portfolio chart's
 [`template.yaml`](https://github.com/kbntx-org/nexus/blob/main/apps/portfolio/chart/templates/template.yaml){ target="\_blank" rel="noopener" }
 is a representative example:
 
 ```yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
 metadata:
   name: portfolio-ingress
 spec:
-  ingressClassName: traefik
-  rules:
-    - host: my-app.example.com
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: portfolio-service
-                port:
-                  number: 80
+  routes:
+    - match: Host(`my-app.example.com`)
+      kind: Rule
+      services:
+        - name: portfolio-service
+          port: 80
 ```
 
 Two things to keep in mind:
 
-- The manifest is plain Kubernetes — no Traefik-specific annotations,
-  no custom resources. If Traefik were ever swapped for another
-  ingress controller, this resource would not need to change.
-- An `Ingress` only handles in-cluster routing. To make the hostname
-  publicly reachable, it also has to be wired up in the Cloudflare
-  Tunnel ingress config so Cloudflare knows to forward it. That side
-  lives in [Networking](../networking/01-overview.md).
+- `entryPoints` is left unset, so the route binds to every entrypoint
+  Traefik has (`web` and `websecure`). That is fine here: `websecure`
+  is not exposed at the `Service` level (see below), so it is not
+  actually reachable regardless of which entrypoints a route lists.
+- An `IngressRoute` only handles in-cluster routing. To make the
+  hostname publicly reachable, it also has to be wired up in the
+  Cloudflare Tunnel ingress config so Cloudflare knows to forward it.
+  That side lives in [Networking](../networking/01-overview.md).
 
 ## Dashboard
 
 The Traefik dashboard is exposed via a small
-[`Service` + `Ingress` template](https://github.com/kbntx-org/nexus/blob/main/platform/core/traefik/templates/dashboard.yaml){ target="\_blank" rel="noopener" }
+[`Service` + `IngressRoute` template](https://github.com/kbntx-org/nexus/blob/main/platform/core/traefik/templates/dashboard.yaml){ target="\_blank" rel="noopener" }
 that targets the Traefik API port. The chart also passes
 `--api.insecure=true` so the dashboard does not require its own auth
 layer.
@@ -174,9 +171,9 @@ graph LR
 ```
 
 The pay-off is that `*.localhost` URLs hit the local Traefik directly,
-go through the same `Ingress` resources the production cluster uses,
-and exercise the same routing rules — without `kubectl port-forward`
-gymnastics. The full public-traffic path can be validated end-to-end
+go through the same `IngressRoute` resources the production cluster
+uses, and exercise the same routing rules — without `kubectl
+port-forward` gymnastics. The full public-traffic path can be validated end-to-end
 before anything ships.
 
 What is missing locally is the Cloudflare side of the path: in
@@ -190,6 +187,6 @@ only if a bug is ever traced specifically to that hop.
 - [`platform/core/traefik/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/traefik){ target="\_blank" rel="noopener" } — Traefik Helm chart wrapper
 - [`platform/core/traefik/values.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/traefik/values.yaml){ target="\_blank" rel="noopener" } — production overrides (ingress class, providers, entrypoint, logs, replicas)
 - [`platform/core/traefik/values.local.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/traefik/values.local.yaml){ target="\_blank" rel="noopener" } — local-cluster overrides (NodePort + dashboard host)
-- [`platform/core/traefik/templates/dashboard.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/traefik/templates/dashboard.yaml){ target="\_blank" rel="noopener" } — `Service` + `Ingress` exposing the Traefik dashboard
-- [`apps/portfolio/chart/templates/template.yaml`](https://github.com/kbntx-org/nexus/blob/main/apps/portfolio/chart/templates/template.yaml){ target="\_blank" rel="noopener" } — example app `Ingress` consuming the `traefik` class
+- [`platform/core/traefik/templates/dashboard.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/traefik/templates/dashboard.yaml){ target="\_blank" rel="noopener" } — `Service` + `IngressRoute` exposing the Traefik dashboard
+- [`apps/portfolio/chart/templates/template.yaml`](https://github.com/kbntx-org/nexus/blob/main/apps/portfolio/chart/templates/template.yaml){ target="\_blank" rel="noopener" } — example app `IngressRoute`
 - [`tools/bash/cluster.sh`](https://github.com/kbntx-org/nexus/blob/main/tools/bash/cluster.sh){ target="\_blank" rel="noopener" } — local `kind` cluster bootstrap with NodePort-to-host mapping

@@ -90,19 +90,14 @@ spec:
   selector:
     app: n8n
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
 metadata:
   name: n8n-ingress
 spec:
-  rules:
-    - host: n8n.kbntx.com
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: n8n
-                port:
-                  number: 5678
+  routes:
+    - match: Host(`n8n.kbntx.com`)
+      kind: Rule
+      services:
+        - name: n8n
+          port: 5678

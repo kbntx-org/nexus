@@ -2,7 +2,8 @@ dashboardHost: traefik.localhost
 
 traefik:
   service:
-    type: NodePort
+    spec:
+      type: NodePort
 
   ports:
     web:
