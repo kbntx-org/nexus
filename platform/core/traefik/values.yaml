@@ -7,9 +7,9 @@ traefik:
     name: traefik
   providers:
     kubernetesCRD:
-      enabled: false
-    kubernetesIngress:
       enabled: true
+    kubernetesIngress:
+      enabled: false
 
   ports:
     web:
@@ -26,7 +26,8 @@ traefik:
     - '--api.insecure=true'
 
   service:
-    type: ClusterIP
+    spec:
+      type: ClusterIP
 
   deployment:
     replicas: 2

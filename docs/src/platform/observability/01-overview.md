@@ -91,7 +91,7 @@ graph LR
 
 ## Grafana behind Cloudflare Zero Trust
 
-Grafana is published through the in-cluster Ingress
+Grafana is published through an in-cluster `IngressRoute`
 ([`ingress.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/monitoring/templates/ingress.yaml){ target="\_blank" rel="noopener" }),
 which means the same Cloudflare Tunnel + Zero Trust front door
 described in [Networking](../networking/01-overview.md) gates access.
@@ -160,6 +160,6 @@ explicitly out of scope for this stack.
 - [`platform/services/monitoring/`](https://github.com/kbntx-org/nexus/tree/main/platform/services/monitoring){ target="\_blank" rel="noopener" } — full monitoring Helm chart
 - [`platform/services/monitoring/Chart.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/monitoring/Chart.yaml){ target="\_blank" rel="noopener" } — subchart dependencies (VictoriaMetrics, Grafana, Loki, Promtail, kube-state-metrics, node-exporter)
 - [`platform/services/monitoring/values.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/monitoring/values.yaml){ target="\_blank" rel="noopener" } — scrape configs, Loki S3 backend, Grafana database + auth
-- [`platform/services/monitoring/templates/ingress.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/monitoring/templates/ingress.yaml){ target="\_blank" rel="noopener" } — Grafana Ingress
+- [`platform/services/monitoring/templates/ingress.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/monitoring/templates/ingress.yaml){ target="\_blank" rel="noopener" } — Grafana `IngressRoute`
 - [`platform/services/monitoring/templates/postgres.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/monitoring/templates/postgres.yaml){ target="\_blank" rel="noopener" } — dedicated Postgres for Grafana state
 - [`platform/services/monitoring/templates/secrets.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/monitoring/templates/secrets.yaml){ target="\_blank" rel="noopener" } — Vault-backed `ExternalSecret` for credentials

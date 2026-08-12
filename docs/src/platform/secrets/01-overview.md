@@ -24,17 +24,17 @@ Vault runs in-cluster as a Helm chart at
 [`platform/core/vault/server/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/vault/server){ target="\_blank" rel="noopener" }.
 The chart owns three things: the Vault Deployment itself, a
 [CloudNativePG](https://cloudnative-pg.io/){ target="\_blank" rel="noopener" }
-`Cluster` for storage, and the in-cluster `Ingress` that fronts the API.
+`Cluster` for storage, and the in-cluster `IngressRoute` that fronts the API.
 
 ```mermaid
 %%{init: {'theme':'dark'}}%%
 graph LR
-    Ingress[Traefik<br/>Ingress]
+    IngressRoute[Traefik<br/>IngressRoute]
     Vault[Vault<br/>Deployment]
     CNPG[(vault-postgres-cnpg<br/>CNPG cluster)]
     R2[(R2 bucket<br/>barman backups)]
 
-    Ingress --> Vault
+    IngressRoute --> Vault
     Vault -->|kv reads/writes| CNPG
     CNPG -->|WAL + base| R2
 ```
@@ -208,7 +208,7 @@ volume.
 
 ## References
 
-- [`platform/core/vault/server/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/vault/server){ target="\_blank" rel="noopener" } — Vault Helm chart (Deployment, CNPG cluster, Ingress, dev seed)
+- [`platform/core/vault/server/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/vault/server){ target="\_blank" rel="noopener" } — Vault Helm chart (Deployment, CNPG cluster, IngressRoute, dev seed)
 - [`platform/core/vault/server/templates/postgres-cnpg.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/vault/server/templates/postgres-cnpg.yaml){ target="\_blank" rel="noopener" } — CNPG `Cluster` and `ScheduledBackup` for Vault's storage
 - [`platform/core/vault/server/templates/vault-config.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/vault/server/templates/vault-config.yaml){ target="\_blank" rel="noopener" } — Vault listener, storage backend, telemetry
 - [`platform/core/vault/server/files/vault.sql`](https://github.com/kbntx-org/nexus/blob/main/platform/core/vault/server/files/vault.sql){ target="\_blank" rel="noopener" } — Postgres schema for Vault's storage backend
