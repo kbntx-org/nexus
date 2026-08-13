@@ -27,7 +27,7 @@ jobs:
           file: platform/core/github-arc-runners/base-image/Dockerfile
           push: true
           tags: |
-            kbntx/nexus-ci-toolkit:1.3
+            kbntx/nexus-ci-toolkit:1.4
           platforms: linux/amd64
 
       - name: sysbox-deploy-k8s - build and push
