@@ -1,0 +1,185 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.21.0
+  name: accesspolicies.cloudflare.kbntx.com
+spec:
+  group: cloudflare.kbntx.com
+  names:
+    kind: AccessPolicy
+    listKind: AccessPolicyList
+    plural: accesspolicies
+    singular: accesspolicy
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.policyID
+      name: Policy ID
+      type: string
+    - jsonPath: .status.ready
+      name: Ready
+      type: boolean
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: AccessPolicy is a namespaced, reusable Cloudflare Zero Trust
+          Access policy.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: AccessPolicySpec defines the desired state of a Cloudflare
+              Access reusable policy.
+            properties:
+              decision:
+                description: Decision is the action Cloudflare takes when this policy
+                  matches a request.
+                enum:
+                - allow
+                - deny
+                - non_identity
+                - bypass
+                type: string
+              exclude:
+                description: Exclude rules override a matching Include rule.
+                items:
+                  description: |-
+                    AccessRuleSet selects who an include/exclude/require rule matches. Multiple fields
+                    set on the same rule set are OR'd together into separate Cloudflare selectors.
+                  properties:
+                    emailDomains:
+                      description: EmailDomains lists email domains (e.g. "example.com")
+                        to match.
+                      items:
+                        type: string
+                      type: array
+                    emails:
+                      description: Emails lists individual email addresses to match.
+                      items:
+                        type: string
+                      type: array
+                    everyone:
+                      description: Everyone matches any authenticated or unauthenticated
+                        user.
+                      type: boolean
+                    ipRanges:
+                      description: IPRanges lists CIDR ranges to match.
+                      items:
+                        type: string
+                      type: array
+                  type: object
+                type: array
+              include:
+                description: Include rules are OR'd together; at least one must match
+                  for the policy to apply.
+                items:
+                  description: |-
+                    AccessRuleSet selects who an include/exclude/require rule matches. Multiple fields
+                    set on the same rule set are OR'd together into separate Cloudflare selectors.
+                  properties:
+                    emailDomains:
+                      description: EmailDomains lists email domains (e.g. "example.com")
+                        to match.
+                      items:
+                        type: string
+                      type: array
+                    emails:
+                      description: Emails lists individual email addresses to match.
+                      items:
+                        type: string
+                      type: array
+                    everyone:
+                      description: Everyone matches any authenticated or unauthenticated
+                        user.
+                      type: boolean
+                    ipRanges:
+                      description: IPRanges lists CIDR ranges to match.
+                      items:
+                        type: string
+                      type: array
+                  type: object
+                minItems: 1
+                type: array
+              name:
+                description: Name is the policy name shown in the Cloudflare dashboard.
+                  Defaults to the resource name.
+                type: string
+              require:
+                description: Require rules must all match in addition to Include.
+                items:
+                  description: |-
+                    AccessRuleSet selects who an include/exclude/require rule matches. Multiple fields
+                    set on the same rule set are OR'd together into separate Cloudflare selectors.
+                  properties:
+                    emailDomains:
+                      description: EmailDomains lists email domains (e.g. "example.com")
+                        to match.
+                      items:
+                        type: string
+                      type: array
+                    emails:
+                      description: Emails lists individual email addresses to match.
+                      items:
+                        type: string
+                      type: array
+                    everyone:
+                      description: Everyone matches any authenticated or unauthenticated
+                        user.
+                      type: boolean
+                    ipRanges:
+                      description: IPRanges lists CIDR ranges to match.
+                      items:
+                        type: string
+                      type: array
+                  type: object
+                type: array
+            required:
+            - decision
+            - include
+            type: object
+          status:
+            description: AccessPolicyStatus reflects the observed state of a Cloudflare
+              Access reusable policy.
+            properties:
+              message:
+                description: Message describes the last reconciliation result, useful
+                  when Ready is false.
+                type: string
+              observedGeneration:
+                description: ObservedGeneration is the generation last reconciled
+                  by the controller.
+                format: int64
+                type: integer
+              policyID:
+                description: PolicyID is the Cloudflare-assigned ID of the reusable
+                  Access policy.
+                type: string
+              ready:
+                description: Ready is true once the policy has been reconciled with
+                  Cloudflare.
+                type: boolean
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
