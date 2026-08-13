@@ -16,7 +16,7 @@ metadata:
   labels:
     external-dns/enabled: 'true'
   annotations:
-    external-dns.kubernetes.io/target: {{ .Values.internalIngressTarget }}
+    external-dns.kubernetes.io/target: {{ .Values.internalServiceClusterIP }}
 spec:
   routes:
     - match: Host(`{{ .Values.dashboardHost }}`)
