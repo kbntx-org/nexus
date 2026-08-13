@@ -18,12 +18,15 @@ metadata:
   annotations:
     external-dns.kubernetes.io/target: {{ .Values.internalServiceClusterIP }}
 spec:
+  entryPoints:
+    - internal-web
+    - internal-secure
   routes:
     - match: Host(`{{ .Values.dashboardHost }}`)
       kind: Rule
       services:
-        - name: traefik-api-service
-          port: traefik
+        - name: api@internal
+          kind: TraefikService
   tls:
     secretName: traefik-dashboard-tls
 ---

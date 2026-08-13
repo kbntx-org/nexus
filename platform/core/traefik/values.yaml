@@ -16,13 +16,11 @@ traefik:
       enabled: false
 
   ports:
-    web:
+    web: null
+    websecure:
       forwardedHeaders:
         insecure: false
         trustedIPs: ['10.42.0.0/16']
-      expose:
-        default: true
-    websecure:
       expose:
         default: true
     internal-web:
@@ -41,6 +39,7 @@ traefik:
       port: 8011
       expose:
         default: false
+      exposedPort: 443
 
   additionalArguments:
     - '--api.insecure=true'

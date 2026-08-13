@@ -12,7 +12,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "k3s_tunnel_config" {
     ingress = [
       {
         hostname = "*"
-        service  = "http://traefik-ingress.traefik-ingress.svc.cluster.local"
+        service  = "https://traefik-ingress.traefik-ingress.svc.cluster.local"
       }
     ]
   }

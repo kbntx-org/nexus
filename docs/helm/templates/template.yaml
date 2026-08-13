@@ -73,7 +73,6 @@ metadata:
   name: documentation-ingress
 spec:
   entryPoints:
-    - web
     - websecure
   routes:
     {{- $ingressHosts := .Values.ingressHosts }}

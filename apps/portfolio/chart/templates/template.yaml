@@ -95,7 +95,6 @@ metadata:
   name: portfolio-ingress
 spec:
   entryPoints:
-    - web
     - websecure
   routes:
     {{- $ingressHosts := .Values.ingressHosts }}
