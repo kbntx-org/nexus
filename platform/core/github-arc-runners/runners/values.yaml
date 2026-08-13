@@ -21,7 +21,7 @@ gha-runner-scale-set:
       hostUsers: false
       containers:
         - name: runner
-          image: kbntx/nexus-ci-toolkit:1.3
+          image: kbntx/nexus-ci-toolkit:1.4
           command:
             - sh
             - -c

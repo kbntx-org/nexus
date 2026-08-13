@@ -2,6 +2,7 @@ FROM ghcr.io/actions/actions-runner:2.336.0
 
 ENV NODE_VERSION=24.15.0
 ENV PNPM_VERSION=11.9.0
+ENV GO_VERSION=1.26.1
 ENV KUBECTL_VERSION=1.32.0
 ENV ARGOCD_VERSION=2.14.11
 
@@ -43,6 +44,19 @@ RUN ARCH="$(dpkg --print-architecture)" && \
 
 # Install PNPM
 RUN npm install -g pnpm@${PNPM_VERSION}
+
+# Install Go
+RUN ARCH="$(dpkg --print-architecture)" && \
+    case "$ARCH" in \
+      amd64) GO_ARCH=amd64 ;; \
+      arm64) GO_ARCH=arm64 ;; \
+      *) echo "unsupported architecture: $ARCH" && exit 1 ;; \
+    esac && \
+    curl -fsSLO "https://go.dev/dl/go${GO_VERSION}.linux-${GO_ARCH}.tar.gz" && \
+    tar -xzf "go${GO_VERSION}.linux-${GO_ARCH}.tar.gz" -C /usr/local && \
+    rm "go${GO_VERSION}.linux-${GO_ARCH}.tar.gz" && \
+    /usr/local/go/bin/go version
+ENV PATH="/usr/local/go/bin:${PATH}"
 
 # Install mongodb-tools
 RUN curl "https://fastdl.mongodb.org/tools/db/mongodb-database-tools-debian12-x86_64-100.12.0.deb" -o "mongo.deb" && \
