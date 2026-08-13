@@ -114,6 +114,22 @@ argocd-apps:
         syncOptions:
           - CreateNamespace=true
 
+    cert-manager:
+      project: default
+      source:
+        repoURL: https://github.com/kbntx-org/nexus.git
+        path: platform/core/cert-manager/deploy
+        targetRevision: main
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: cert-manager
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+
     cilium:
       project: default
       source:
