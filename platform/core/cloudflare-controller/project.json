@@ -1,0 +1,30 @@
+{
+  "name": "cloudflare-controller",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "platform/core/cloudflare-controller",
+  "tags": [],
+  "metadata": {
+    "deployPaths": [
+      "platform/core/cloudflare-controller/chart/**",
+      "platform/core/cloudflare-controller/Dockerfile"
+    ],
+    "manifestsValuesPath": "cloudflare-controller/values.yaml"
+  },
+  "targets": {
+    "generate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "platform/core/cloudflare-controller",
+        "command": "go tool controller-gen object crd rbac:roleName=cloudflare-controller paths=./... output:crd:artifacts:config=chart/templates output:rbac:artifacts:config=chart/templates"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "platform/core/cloudflare-controller",
+        "command": "go build ./..."
+      }
+    }
+  }
+}

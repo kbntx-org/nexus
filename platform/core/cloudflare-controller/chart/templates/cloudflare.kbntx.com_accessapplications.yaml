@@ -1,0 +1,107 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.21.0
+  name: accessapplications.cloudflare.kbntx.com
+spec:
+  group: cloudflare.kbntx.com
+  names:
+    kind: AccessApplication
+    listKind: AccessApplicationList
+    plural: accessapplications
+    singular: accessapplication
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.domain
+      name: Domain
+      type: string
+    - jsonPath: .status.applicationID
+      name: Application ID
+      type: string
+    - jsonPath: .status.ready
+      name: Ready
+      type: boolean
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: AccessApplication is a namespaced Cloudflare Zero Trust Access
+          application.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: AccessApplicationSpec defines the desired state of a Cloudflare
+              Access application.
+            properties:
+              domain:
+                description: Domain is the public hostname protected by this application,
+                  e.g. "app.example.com".
+                type: string
+              name:
+                description: Name is the application name shown in the Cloudflare
+                  dashboard. Defaults to the resource name.
+                type: string
+              policyRefs:
+                description: |-
+                  PolicyRefs lists the names of AccessPolicy resources, in this same namespace, to attach
+                  to the application. Order matters: policies are evaluated in the order listed here.
+                items:
+                  type: string
+                minItems: 1
+                type: array
+              sessionDuration:
+                default: 24h
+                description: SessionDuration controls how long a successful Access
+                  authorization lasts.
+                type: string
+            required:
+            - domain
+            - policyRefs
+            type: object
+          status:
+            description: AccessApplicationStatus reflects the observed state of a
+              Cloudflare Access application.
+            properties:
+              applicationID:
+                description: ApplicationID is the Cloudflare-assigned ID of the Access
+                  application.
+                type: string
+              message:
+                description: Message describes the last reconciliation result, useful
+                  when Ready is false.
+                type: string
+              observedGeneration:
+                description: ObservedGeneration is the generation last reconciled
+                  by the controller.
+                format: int64
+                type: integer
+              ready:
+                description: Ready is true once the application, and all referenced
+                  policies, have been reconciled.
+                type: boolean
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

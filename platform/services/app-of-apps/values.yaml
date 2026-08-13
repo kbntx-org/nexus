@@ -282,6 +282,29 @@ argocd-apps:
         syncOptions:
           - CreateNamespace=true
 
+    cloudflare-controller:
+      project: default
+      sources:
+        - repoURL: https://github.com/kbntx-org/nexus.git
+          path: platform/core/cloudflare-controller/chart
+          targetRevision: main
+          helm:
+            valueFiles:
+              - values.yaml
+              - $values/cloudflare-controller/values.yaml
+        - repoURL: https://github.com/kbntx-org/nexus-manifests.git
+          targetRevision: main
+          ref: values
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: cloudflare-controller
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+
     n8n:
       project: default
       source:

@@ -69,3 +69,12 @@ jobs:
               file: docs/Dockerfile
               tag: kbntx/documentation:${{ inputs.image_tag }}
               push: ${{ github.event_name != 'pull_request' }}
+
+          - name: Build (and push) cloudflare-controller image
+            if: contains(fromJSON(steps.affected.outputs.deploy_targets), 'cloudflare-controller')
+            uses: ./.github/actions/docker-build-and-push
+            with:
+              context: platform/core/cloudflare-controller
+              file: platform/core/cloudflare-controller/Dockerfile
+              tag: kbntx/cloudflare-controller:${{ inputs.image_tag }}
+              push: ${{ github.event_name != 'pull_request' }}
