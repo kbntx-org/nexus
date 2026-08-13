@@ -1,4 +1,4 @@
-FROM node:24.18.0-alpine AS local
+FROM node:24.18.1-alpine AS local
 
 RUN npm install -g pnpm@11.2.2
 
