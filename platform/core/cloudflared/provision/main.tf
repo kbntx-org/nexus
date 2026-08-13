@@ -13,6 +13,9 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "k3s_tunnel_config" {
       {
         hostname = "*"
         service  = "https://traefik-ingress.traefik-ingress.svc.cluster.local"
+        origin_request = {
+          match_sn_ito_host = true
+        }
       }
     ]
   }
