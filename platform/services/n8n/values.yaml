@@ -1,3 +1,5 @@
+internalIngressTarget: traefik-ingress-internal.traefik-ingress.svc.cluster.local
+
 postgresCluster:
   storageClass: hcloud-volumes
 

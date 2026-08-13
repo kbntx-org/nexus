@@ -94,6 +94,9 @@ kind: IngressRoute
 metadata:
   name: portfolio-ingress
 spec:
+  entryPoints:
+    - web
+    - websecure
   routes:
     {{- $ingressHosts := .Values.ingressHosts }}
     {{- range $host := $ingressHosts }}
@@ -103,5 +106,23 @@ spec:
       services:
         - name: portfolio-service
           port: {{ $.Values.containerPort | default 80 }}
+    {{- end }}
+    {{- end }}
+  tls:
+    secretName: portfolio-tls
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: portfolio-tls
+spec:
+  secretName: portfolio-tls
+  issuerRef:
+    name: letsencrypt-dns01
+    kind: ClusterIssuer
+  dnsNames:
+    {{- range $host := $ingressHosts }}
+    {{- if $host }}
+    - {{ $host }}
     {{- end }}
     {{- end }}

@@ -1,5 +1,7 @@
 global:
   domain: argocd.kbntx.com
+
+internalIngressTarget: traefik-ingress-internal.traefik-ingress.svc.cluster.local
 argo-cd:
   controller:
     resources:
