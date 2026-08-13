@@ -14,6 +14,7 @@ externalSecrets:
 ingress:
   grafanaHost: grafana.kbntx.com
   prometheusHost: prometheus.kbntx.com
+  internalIngressTarget: traefik-ingress-internal.traefik-ingress.svc.cluster.local
 
 victoria-metrics-single:
   server:

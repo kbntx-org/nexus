@@ -10,9 +10,10 @@ external-dns:
           key: cloudflareToken
   labelFilter: 'external-dns/enabled=true'
   annotationPrefix: external-dns.kubernetes.io/
-  source:
+  sources:
     - service
     - ingress
+    - traefik-proxy
   extraArgs:
     - --zone-id-filter=d989ee0321d203608502ea911a3ccc90
     - --cloudflare-record-comment="provisioned by external-dns"

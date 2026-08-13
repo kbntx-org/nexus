@@ -1,5 +1,9 @@
 dashboardHost: traefik.kbntx.com
 
+internalIngressTarget: traefik-ingress-internal.traefik-ingress.svc.cluster.local
+internalWebPort: 8010
+internalSecurePort: 8011
+
 traefik:
   ingressClass:
     isDefaultClass: true
@@ -20,7 +24,25 @@ traefik:
         default: true
     websecure:
       expose:
+        default: true
+    internal-web:
+      asDefault: true
+      port: 8010
+      expose:
         default: false
+      exposedPort: 80
+      http:
+        redirections:
+          entryPoint:
+            to: internal-secure
+            scheme: https
+            permanent: true
+    internal-secure:
+      asDefault: true
+      port: 8011
+      expose:
+        default: false
+      exposedPort: 443
 
   additionalArguments:
     - '--api.insecure=true'

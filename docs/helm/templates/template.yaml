@@ -72,6 +72,9 @@ kind: IngressRoute
 metadata:
   name: documentation-ingress
 spec:
+  entryPoints:
+    - web
+    - websecure
   routes:
     {{- $ingressHosts := .Values.ingressHosts }}
     {{- range $host := $ingressHosts }}
@@ -81,5 +84,23 @@ spec:
       services:
         - name: documentation-service
           port: {{ $.Values.containerPort | default 80 }}
+    {{- end }}
+    {{- end }}
+  tls:
+    secretName: documentation-tls
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: documentation-tls
+spec:
+  secretName: documentation-tls
+  issuerRef:
+    name: letsencrypt-dns01
+    kind: ClusterIssuer
+  dnsNames:
+    {{- range $host := $ingressHosts }}
+    {{- if $host }}
+    - {{ $host }}
     {{- end }}
     {{- end }}
