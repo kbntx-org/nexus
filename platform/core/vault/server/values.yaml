@@ -1,6 +1,6 @@
 image: hashicorp/vault:1.21.2
 ingressHost: vault.kbntx.com
-internalIngressTarget: traefik-ingress-internal.traefik-ingress.svc.cluster.local
+internalIngressTarget: 10.43.216.131
 args: ['server']
 
 dev: false

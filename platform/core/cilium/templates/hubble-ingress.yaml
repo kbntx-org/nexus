@@ -1,0 +1,29 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: hubble-ui-ingress
+  labels:
+    external-dns/enabled: 'true'
+  annotations:
+    external-dns.kubernetes.io/target: {{ .Values.internalIngressTarget }}
+spec:
+  routes:
+    - match: Host(`{{ .Values.hubbleHost }}`)
+      kind: Rule
+      services:
+        - name: hubble-ui
+          port: http
+  tls:
+    secretName: hubble-ui-tls
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: hubble-ui-tls
+spec:
+  secretName: hubble-ui-tls
+  issuerRef:
+    name: letsencrypt-dns01
+    kind: ClusterIssuer
+  dnsNames:
+    - {{ .Values.hubbleHost }}

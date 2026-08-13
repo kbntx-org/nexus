@@ -3,6 +3,7 @@ kind: Service
 metadata:
   name: traefik-ingress-internal
 spec:
+  clusterIP: {{ .Values.internalServiceClusterIP }}
   selector:
     app.kubernetes.io/name: traefik
   ports:
