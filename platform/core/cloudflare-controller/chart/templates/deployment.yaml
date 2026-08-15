@@ -29,7 +29,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: cloudflare-controller-secret
-                  key: accountID
+                  key: accountId
           ports:
             - name: metrics
               containerPort: 8080

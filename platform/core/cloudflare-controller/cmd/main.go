@@ -65,15 +65,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := (&controller.TunnelReconciler{
-		Client:           mgr.GetClient(),
-		Scheme:           mgr.GetScheme(),
-		CloudflareClient: cloudflareClient,
-	}).SetupWithManager(mgr); err != nil {
-		logger.Error("unable to create controller", "controller", "Tunnel", "error", err)
-		os.Exit(1)
-	}
-
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
 		logger.Error("unable to set up health check", "error", err)
 		os.Exit(1)

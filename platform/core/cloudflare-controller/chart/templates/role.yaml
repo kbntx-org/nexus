@@ -5,33 +5,10 @@ metadata:
   name: cloudflare-controller
 rules:
 - apiGroups:
-  - ""
-  resources:
-  - secrets
-  verbs:
-  - create
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - apps
-  resources:
-  - deployments
-  verbs:
-  - create
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
   - cloudflare.kbntx.com
   resources:
   - accessapplications
   - accesspolicies
-  - tunnels
   verbs:
   - get
   - list
@@ -43,7 +20,6 @@ rules:
   resources:
   - accessapplications/finalizers
   - accesspolicies/finalizers
-  - tunnels/finalizers
   verbs:
   - update
 - apiGroups:
@@ -51,7 +27,6 @@ rules:
   resources:
   - accessapplications/status
   - accesspolicies/status
-  - tunnels/status
   verbs:
   - get
   - patch
