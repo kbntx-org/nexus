@@ -36,7 +36,7 @@ argocd-apps:
       project: default
       source:
         repoURL: https://github.com/kbntx-org/nexus.git
-        path: platform/core/external-secrets
+        path: platform/core/external-secrets/deploy
         targetRevision: main
       destination:
         server: https://kubernetes.default.svc
