@@ -27,4 +27,5 @@ resource "vault_kubernetes_auth_backend_role" "eso" {
   bound_service_account_names      = ["*"]
   bound_service_account_namespaces = ["*"]
   token_policies                   = [vault_policy.eso_templated.name]
+  audience                         = "vault"
 }

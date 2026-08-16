@@ -9,7 +9,7 @@ backup:
 externalSecrets:
   vaultServer: https://vault.kbntx.com
   vaultPath: platform
-  vaultRole: monitoring
+  vaultRole: eso
 
 ingress:
   grafanaHost: grafana.kbntx.com
