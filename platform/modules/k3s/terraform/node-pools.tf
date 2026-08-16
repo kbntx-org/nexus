@@ -33,6 +33,11 @@ resource "hcloud_server" "node_pool" {
     alias_ips  = []
   }
 
+  public_net {
+    ipv4_enabled = var.nat_gateway_ip == ""
+    ipv6_enabled = var.nat_gateway_ip == ""
+  }
+
   labels = merge({
     "type" : "worker"
     "pool" : each.value.pool_key

@@ -21,6 +21,11 @@ resource "hcloud_server" "control_plane" {
     alias_ips  = []
   }
 
+  public_net {
+    ipv4_enabled = var.nat_gateway_ip == ""
+    ipv6_enabled = var.nat_gateway_ip == ""
+  }
+
   labels = merge({
     "type" : "control-plane"
     "cluster-name" : var.cluster_name

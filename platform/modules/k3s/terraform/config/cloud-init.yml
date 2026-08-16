@@ -29,8 +29,33 @@ write_files:
     content: |
       TrustedUserCAKeys /etc/ssh/cloudflare-access-ca.pub
 
+%{ if nat_ip != "" ~}
+  - path: /etc/systemd/resolved.conf
+    owner: root:root
+    permissions: '0644'
+    content: |
+      [Resolve]
+      DNS=185.12.64.2 185.12.64.1
+      FallbackDNS=8.8.8.8
+%{ endif ~}
+
 runcmd:
   - ufw disable
   - passwd -l root
   - chage -E -1 -M -1 -I -1 -m 0 root
   - systemctl restart ssh
+%{ if nat_ip != "" ~}
+  - |
+    # Custom network configuration added by cloud-init
+    private_interface=$(ip route get ${nat_ip} | grep -oP '(?<=dev )\S+' | head -n1)
+    cat > /etc/systemd/network/10-$private_interface.network <<EOT
+    [Match]
+    Name=$private_interface
+
+    [Network]
+    DHCP=yes
+    Gateway=${network_gateway_ip}
+    EOT
+  - apt remove -y hc-utils
+  - reboot
+%{ endif ~}

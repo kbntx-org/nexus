@@ -2,6 +2,14 @@ data "hcloud_network" "main_vpc" {
   name = "main-vpc"
 }
 
+resource "hcloud_floating_ip" "bastion" {
+  type          = "ipv4"
+  home_location = "nbg1"
+  labels = {
+    "app" = "bastion"
+  }
+}
+
 module "bastion" {
   source = "../../../modules/vps"
 
@@ -10,9 +18,17 @@ module "bastion" {
   image       = "ubuntu-24.04"
   location    = "nbg1"
   vpc_id      = data.hcloud_network.main_vpc.id
+  private_ip  = "10.0.0.5"
+  use_as_nat  = true
+  floating_ip = hcloud_floating_ip.bastion.ip_address
   labels = {
     "app" = "bastion"
   }
+}
+
+resource "hcloud_floating_ip_assignment" "bastion" {
+  floating_ip_id = hcloud_floating_ip.bastion.id
+  server_id      = module.bastion.server_id
 }
 
 module "bastion_firewall" {
@@ -20,10 +36,16 @@ module "bastion_firewall" {
   name   = "bastion-firewall"
 
   ingress_rules = [
-    { protocol = "tcp", port = "22", source_ips = [data.hcloud_network.main_vpc.ip_range] },
+    { protocol = "tcp", port = "any", source_ips = [data.hcloud_network.main_vpc.ip_range] },
+    { protocol = "udp", port = "any", source_ips = [data.hcloud_network.main_vpc.ip_range] },
+    { protocol = "icmp", port = "", source_ips = [data.hcloud_network.main_vpc.ip_range] },
   ]
 
   label_selector = "app=bastion"
+}
+
+output "bastion_floating_ip" {
+  value = hcloud_floating_ip.bastion.ip_address
 }
 
 resource "cloudflare_zero_trust_tunnel_cloudflared" "bastion_tunnel" {
