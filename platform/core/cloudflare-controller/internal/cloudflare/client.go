@@ -138,3 +138,59 @@ func (c *Client) DeleteApplication(ctx context.Context, id string) error {
 	path := fmt.Sprintf("/accounts/%s/access/apps/%s", c.accountID, id)
 	return c.do(ctx, http.MethodDelete, path, nil, nil)
 }
+
+// Route is a private network CIDR routed through a tunnel.
+type Route struct {
+	ID       string `json:"id,omitempty"`
+	Network  string `json:"network"`
+	TunnelID string `json:"tunnel_id,omitempty"`
+	Comment  string `json:"comment,omitempty"`
+}
+
+func (c *Client) CreateTunnel(ctx context.Context, name string) (string, error) {
+	var result struct {
+		ID string `json:"id"`
+	}
+	payload := map[string]any{"name": name, "config_src": "cloudflare"}
+	path := fmt.Sprintf("/accounts/%s/cfd_tunnel", c.accountID)
+	if err := c.do(ctx, http.MethodPost, path, payload, &result); err != nil {
+		return "", err
+	}
+	return result.ID, nil
+}
+
+func (c *Client) DeleteTunnel(ctx context.Context, id string) error {
+	path := fmt.Sprintf("/accounts/%s/cfd_tunnel/%s", c.accountID, id)
+	return c.do(ctx, http.MethodDelete, path, nil, nil)
+}
+
+// TunnelToken returns the connector token cloudflared needs to run this tunnel. Cloudflare
+// derives it deterministically from the tunnel's stored secret, so it's stable across calls.
+func (c *Client) TunnelToken(ctx context.Context, id string) (string, error) {
+	var token string
+	path := fmt.Sprintf("/accounts/%s/cfd_tunnel/%s/token", c.accountID, id)
+	if err := c.do(ctx, http.MethodGet, path, nil, &token); err != nil {
+		return "", err
+	}
+	return token, nil
+}
+
+func (c *Client) ListRoutes(ctx context.Context, tunnelID string) ([]Route, error) {
+	var routes []Route
+	path := fmt.Sprintf("/accounts/%s/teamnet/routes?tunnel_id=%s", c.accountID, tunnelID)
+	if err := c.do(ctx, http.MethodGet, path, nil, &routes); err != nil {
+		return nil, err
+	}
+	return routes, nil
+}
+
+func (c *Client) CreateRoute(ctx context.Context, tunnelID, network string) error {
+	payload := map[string]any{"tunnel_id": tunnelID, "network": network}
+	path := fmt.Sprintf("/accounts/%s/teamnet/routes", c.accountID)
+	return c.do(ctx, http.MethodPost, path, payload, nil)
+}
+
+func (c *Client) DeleteRoute(ctx context.Context, routeID string) error {
+	path := fmt.Sprintf("/accounts/%s/teamnet/routes/%s", c.accountID, routeID)
+	return c.do(ctx, http.MethodDelete, path, nil, nil)
+}

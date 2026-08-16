@@ -1,0 +1,100 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.21.0
+  name: tunnels.cloudflare.kbntx.com
+spec:
+  group: cloudflare.kbntx.com
+  names:
+    kind: Tunnel
+    listKind: TunnelList
+    plural: tunnels
+    singular: tunnel
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.tunnelID
+      name: Tunnel ID
+      type: string
+    - jsonPath: .status.ready
+      name: Ready
+      type: boolean
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: |-
+          Tunnel is a namespaced Cloudflare Tunnel, backed by a cloudflared Deployment this
+          controller creates and keeps in sync.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: |-
+              TunnelSpec defines the desired state of a Cloudflare Tunnel and the cloudflared
+              deployment that runs it.
+            properties:
+              image:
+                default: cloudflare/cloudflared:2026.7.3
+                description: Image is the cloudflared image run by the tunnel pods.
+                type: string
+              name:
+                description: Name is the tunnel name shown in the Cloudflare dashboard.
+                  Defaults to the resource name.
+                type: string
+              replicas:
+                default: 2
+                description: Replicas is the number of cloudflared pod replicas.
+                format: int32
+                type: integer
+              routes:
+                description: Routes lists private network CIDRs, e.g. "10.42.0.0/16",
+                  to route through this tunnel.
+                items:
+                  type: string
+                type: array
+            type: object
+          status:
+            description: TunnelStatus reflects the observed state of a Cloudflare
+              Tunnel.
+            properties:
+              message:
+                description: Message describes the last reconciliation result, useful
+                  when Ready is false.
+                type: string
+              observedGeneration:
+                description: ObservedGeneration is the generation last reconciled
+                  by the controller.
+                format: int64
+                type: integer
+              ready:
+                description: Ready is true once the tunnel, its routes, and its cloudflared
+                  deployment are reconciled.
+                type: boolean
+              tunnelID:
+                description: TunnelID is the Cloudflare-assigned ID of the tunnel.
+                type: string
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
