@@ -22,6 +22,7 @@ spec:
         {{- include "vault.seedContainer" . | nindent 8 }}
         {{- else }}
         {{- include "vault.configInitContainer" . | nindent 8 }}
+        {{- include "vault.authConfigContainer" . | nindent 8 }}
         {{- end }}
       containers:
         - name: vault
@@ -57,6 +58,10 @@ spec:
         {{- else }}
         - name: vault-config
           emptyDir: {}
+        - name: vault-auth-config-script
+          configMap:
+            name: vault-auth-config-script
+            defaultMode: 0755
         {{- end }}
 ---
 apiVersion: v1
