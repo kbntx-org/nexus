@@ -1,44 +1,27 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: cloudflare.kbntx.com/v1alpha1
+kind: Tunnel
 metadata:
-  name: cloudflared-deployment
+  name: k3s
 spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: cloudflared
-  template:
-    metadata:
-      labels:
-        app: cloudflared
-    spec:
-      securityContext:
-        sysctls:
-        # Allows ICMP traffic (ping, traceroute) to resources behind cloudflared.
-          - name: net.ipv4.ping_group_range
-            value: "65532 65532"
-      containers:
-        - image: cloudflare/cloudflared:2026.7.3
-          name: cloudflared
-          env:
-            - name: TUNNEL_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: cloudflared-secret
-                  key: tunnelToken
-          command:
-            - cloudflared
-            - tunnel
-            - --no-autoupdate
-            - run
+  routes:
+    - 10.43.0.0/16
+    - 10.42.0.0/16
+  ingress:
+    - hostname: kbntx.com
+      service: https://traefik-ingress.traefik-ingress.svc.cluster.local
+      originRequest:
+        matchSNItoHost: true
+    - hostname: "*.kbntx.com"
+      service: https://traefik-ingress.traefik-ingress.svc.cluster.local
+      originRequest:
+        matchSNItoHost: true
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: cloudflared-pdb
+  name: k3s-tunnel-pdb
 spec:
   minAvailable: 1
   selector:
     matchLabels:
-      app: cloudflared
-
+      app: k3s-tunnel
