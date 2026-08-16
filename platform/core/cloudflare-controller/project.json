@@ -16,7 +16,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "platform/core/cloudflare-controller",
-        "command": "go tool controller-gen object crd rbac:roleName=cloudflare-controller paths=./... output:crd:artifacts:config=chart/templates output:rbac:artifacts:config=chart/templates"
+        "command": "go tool controller-gen object crd rbac:roleName=cloudflare-controller paths=./api/v1alpha1/... paths=./cmd/... paths=./internal/... output:crd:artifacts:config=chart/templates output:rbac:artifacts:config=chart/templates"
       }
     },
     "build": {

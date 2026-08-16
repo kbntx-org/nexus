@@ -22,6 +22,38 @@ type TunnelSpec struct {
 	// Routes lists private network CIDRs, e.g. "10.42.0.0/16", to route through this tunnel.
 	// +optional
 	Routes []string `json:"routes,omitempty"`
+
+	// Ingress lists public hostname routing rules for this tunnel, evaluated in order. If the
+	// last rule has a Hostname, the controller appends a catch-all rule after it, since
+	// Cloudflare requires the ingress list to end with one.
+	// +optional
+	Ingress []IngressRule `json:"ingress,omitempty"`
+}
+
+// IngressRule maps a public hostname to the local service cloudflared proxies matching
+// requests to.
+type IngressRule struct {
+	// Hostname is the public hostname to match, e.g. "app.kbntx.com" or "*.kbntx.com". Omit
+	// only on a trailing catch-all rule.
+	// +optional
+	Hostname string `json:"hostname,omitempty"`
+
+	// Service is the address cloudflared proxies matching requests to, e.g.
+	// "https://traefik-ingress.traefik-ingress.svc.cluster.local", or "http_status:404" for a
+	// catch-all rule that returns 404.
+	Service string `json:"service"`
+
+	// OriginRequest customizes how cloudflared connects to Service.
+	// +optional
+	OriginRequest *OriginRequestConfig `json:"originRequest,omitempty"`
+}
+
+// OriginRequestConfig customizes how cloudflared connects to an ingress rule's Service.
+type OriginRequestConfig struct {
+	// MatchSNIToHost makes cloudflared send the same hostname as the request's Host header for
+	// the TLS SNI when connecting to Service, instead of Service's own hostname.
+	// +optional
+	MatchSNIToHost bool `json:"matchSNItoHost,omitempty"`
 }
 
 // TunnelStatus reflects the observed state of a Cloudflare Tunnel.

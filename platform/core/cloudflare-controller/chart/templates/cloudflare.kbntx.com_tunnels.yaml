@@ -54,6 +54,41 @@ spec:
                 default: cloudflare/cloudflared:2026.7.3
                 description: Image is the cloudflared image run by the tunnel pods.
                 type: string
+              ingress:
+                description: |-
+                  Ingress lists public hostname routing rules for this tunnel, evaluated in order. If the
+                  last rule has a Hostname, the controller appends a catch-all rule after it, since
+                  Cloudflare requires the ingress list to end with one.
+                items:
+                  description: |-
+                    IngressRule maps a public hostname to the local service cloudflared proxies matching
+                    requests to.
+                  properties:
+                    hostname:
+                      description: |-
+                        Hostname is the public hostname to match, e.g. "app.kbntx.com" or "*.kbntx.com". Omit
+                        only on a trailing catch-all rule.
+                      type: string
+                    originRequest:
+                      description: OriginRequest customizes how cloudflared connects
+                        to Service.
+                      properties:
+                        matchSNItoHost:
+                          description: |-
+                            MatchSNIToHost makes cloudflared send the same hostname as the request's Host header for
+                            the TLS SNI when connecting to Service, instead of Service's own hostname.
+                          type: boolean
+                      type: object
+                    service:
+                      description: |-
+                        Service is the address cloudflared proxies matching requests to, e.g.
+                        "https://traefik-ingress.traefik-ingress.svc.cluster.local", or "http_status:404" for a
+                        catch-all rule that returns 404.
+                      type: string
+                  required:
+                  - service
+                  type: object
+                type: array
               name:
                 description: Name is the tunnel name shown in the Cloudflare dashboard.
                   Defaults to the resource name.

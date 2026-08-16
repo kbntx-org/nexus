@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"time"
 
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -26,12 +28,14 @@ type AccessApplicationReconciler struct {
 	client.Client
 	Scheme           *runtime.Scheme
 	CloudflareClient *cloudflare.Client
+	Recorder         record.EventRecorder
 }
 
 // +kubebuilder:rbac:groups=cloudflare.kbntx.com,resources=accessapplications,verbs=get;list;watch;update;patch
 // +kubebuilder:rbac:groups=cloudflare.kbntx.com,resources=accessapplications/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=cloudflare.kbntx.com,resources=accessapplications/finalizers,verbs=update
 // +kubebuilder:rbac:groups=cloudflare.kbntx.com,resources=accesspolicies,verbs=get;list;watch
+// +kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 
 func (r *AccessApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger := ctrl.LoggerFrom(ctx)
@@ -60,6 +64,7 @@ func (r *AccessApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Re
 		if statusErr := r.Status().Update(ctx, &application); statusErr != nil {
 			logger.Error(statusErr, "failed to update AccessApplication status")
 		}
+		r.Recorder.Event(&application, corev1.EventTypeWarning, eventReasonReconcileFailed, err.Error())
 		return ctrl.Result{RequeueAfter: policyNotReadyRequeueDelay}, nil
 	}
 
@@ -86,7 +91,9 @@ func (r *AccessApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Re
 		logger.Error(statusErr, "failed to update AccessApplication status")
 	}
 	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("reconcile Cloudflare access application: %w", err)
+		err = fmt.Errorf("reconcile Cloudflare access application: %w", err)
+		r.Recorder.Event(&application, corev1.EventTypeWarning, eventReasonReconcileFailed, err.Error())
+		return ctrl.Result{}, err
 	}
 
 	return ctrl.Result{}, nil
