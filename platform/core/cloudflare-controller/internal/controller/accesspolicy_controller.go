@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -19,11 +21,13 @@ type AccessPolicyReconciler struct {
 	client.Client
 	Scheme           *runtime.Scheme
 	CloudflareClient *cloudflare.Client
+	Recorder         record.EventRecorder
 }
 
 // +kubebuilder:rbac:groups=cloudflare.kbntx.com,resources=accesspolicies,verbs=get;list;watch;update;patch
 // +kubebuilder:rbac:groups=cloudflare.kbntx.com,resources=accesspolicies/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=cloudflare.kbntx.com,resources=accesspolicies/finalizers,verbs=update
+// +kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 
 func (r *AccessPolicyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger := ctrl.LoggerFrom(ctx)
@@ -68,7 +72,9 @@ func (r *AccessPolicyReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		logger.Error(statusErr, "failed to update AccessPolicy status")
 	}
 	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("reconcile Cloudflare access policy: %w", err)
+		err = fmt.Errorf("reconcile Cloudflare access policy: %w", err)
+		r.Recorder.Event(&policy, corev1.EventTypeWarning, eventReasonReconcileFailed, err.Error())
+		return ctrl.Result{}, err
 	}
 
 	return ctrl.Result{}, nil
@@ -103,21 +109,20 @@ func toPolicyPayload(policy *cloudflarev1alpha1.AccessPolicy) cloudflare.PolicyP
 	}
 }
 
-// toRules expands each AccessRuleSet into the individual selector objects Cloudflare expects.
 func toRules(sets []cloudflarev1alpha1.AccessRuleSet) []cloudflare.Rule {
 	var rules []cloudflare.Rule
 	for _, set := range sets {
 		if set.Everyone {
-			rules = append(rules, cloudflare.Rule{"everyone": map[string]any{}})
+			rules = append(rules, cloudflare.Rule{Everyone: true})
 		}
 		for _, email := range set.Emails {
-			rules = append(rules, cloudflare.Rule{"email": map[string]any{"email": email}})
+			rules = append(rules, cloudflare.Rule{Email: email})
 		}
 		for _, domain := range set.EmailDomains {
-			rules = append(rules, cloudflare.Rule{"email_domain": map[string]any{"domain": domain}})
+			rules = append(rules, cloudflare.Rule{EmailDomain: domain})
 		}
 		for _, ipRange := range set.IPRanges {
-			rules = append(rules, cloudflare.Rule{"ip": map[string]any{"ip": ipRange}})
+			rules = append(rules, cloudflare.Rule{IPRange: ipRange})
 		}
 	}
 	return rules

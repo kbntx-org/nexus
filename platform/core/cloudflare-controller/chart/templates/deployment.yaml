@@ -30,6 +30,8 @@ spec:
                 secretKeyRef:
                   name: cloudflare-controller-secret
                   key: accountID
+            - name: EXTERNAL_DNS_ENABLED
+              value: {{ .Values.externalDNS.enabled | quote }}
           ports:
             - name: metrics
               containerPort: 8080

@@ -12,6 +12,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
+	extdnsv1alpha1 "github.com/kbntx-org/nexus/platform/core/cloudflare-controller/api/externaldns/v1alpha1"
 	cloudflarev1alpha1 "github.com/kbntx-org/nexus/platform/core/cloudflare-controller/api/v1alpha1"
 	"github.com/kbntx-org/nexus/platform/core/cloudflare-controller/internal/cloudflare"
 	"github.com/kbntx-org/nexus/platform/core/cloudflare-controller/internal/config"
@@ -23,6 +24,7 @@ var scheme = runtime.NewScheme()
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 	utilruntime.Must(cloudflarev1alpha1.AddToScheme(scheme))
+	utilruntime.Must(extdnsv1alpha1.AddToScheme(scheme))
 }
 
 func main() {
@@ -47,10 +49,13 @@ func main() {
 		os.Exit(1)
 	}
 
+	eventRecorder := mgr.GetEventRecorderFor("cloudflare-controller")
+
 	if err := (&controller.AccessPolicyReconciler{
 		Client:           mgr.GetClient(),
 		Scheme:           mgr.GetScheme(),
 		CloudflareClient: cloudflareClient,
+		Recorder:         eventRecorder,
 	}).SetupWithManager(mgr); err != nil {
 		logger.Error("unable to create controller", "controller", "AccessPolicy", "error", err)
 		os.Exit(1)
@@ -60,15 +65,18 @@ func main() {
 		Client:           mgr.GetClient(),
 		Scheme:           mgr.GetScheme(),
 		CloudflareClient: cloudflareClient,
+		Recorder:         eventRecorder,
 	}).SetupWithManager(mgr); err != nil {
 		logger.Error("unable to create controller", "controller", "AccessApplication", "error", err)
 		os.Exit(1)
 	}
 
 	if err := (&controller.TunnelReconciler{
-		Client:           mgr.GetClient(),
-		Scheme:           mgr.GetScheme(),
-		CloudflareClient: cloudflareClient,
+		Client:             mgr.GetClient(),
+		Scheme:             mgr.GetScheme(),
+		CloudflareClient:   cloudflareClient,
+		Recorder:           eventRecorder,
+		ExternalDNSEnabled: cfg.ExternalDNSEnabled,
 	}).SetupWithManager(mgr); err != nil {
 		logger.Error("unable to create controller", "controller", "Tunnel", "error", err)
 		os.Exit(1)

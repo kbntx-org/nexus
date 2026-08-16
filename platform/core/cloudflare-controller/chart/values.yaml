@@ -3,3 +3,6 @@ image:
   tag: latest
 
 replicas: 1
+
+externalDNS:
+  enabled: true
