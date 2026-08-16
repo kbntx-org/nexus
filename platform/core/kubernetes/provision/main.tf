@@ -2,11 +2,22 @@ data "hcloud_network" "main_network" {
   name = "main-vpc"
 }
 
+data "hcloud_server" "bastion" {
+  with_selector = "app=bastion"
+}
+
+locals {
+  # Hetzner gateway in vpc is on X.X.X.1
+  network_gateway_ip = cidrhost(data.hcloud_network.main_network.ip_range, 1)
+}
+
 module "nexus_cluster" {
   source = "../../../modules/k3s/terraform"
 
-  cluster_name = "nexus"
-  vpc_name     = "main-vpc"
+  cluster_name       = "nexus"
+  vpc_name           = "main-vpc"
+  nat_gateway_ip     = one(data.hcloud_server.bastion.network).ip
+  network_gateway_ip = local.network_gateway_ip
 
   control_plane = {
     server_type = "cx33"

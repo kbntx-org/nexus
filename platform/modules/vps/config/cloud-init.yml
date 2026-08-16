@@ -52,6 +52,43 @@ write_files:
       #!/bin/bash
       docker system prune -af
 
+%{ if use_as_nat ~}
+  - path: /etc/networkd-dispatcher/routable.d/10-eth0-post-up
+    owner: root:root
+    permissions: '0755'
+    content: |
+      #!/bin/bash
+
+      echo 1 > /proc/sys/net/ipv4/ip_forward
+%{ if floating_ip != "" ~}
+      iptables -t nat -A POSTROUTING -o eth0 -j SNAT --to ${floating_ip}
+%{ else ~}
+      iptables -t nat -A POSTROUTING -s '${vpc_cidr}' -o eth0 -j MASQUERADE
+%{ endif ~}
+
+      # Docker sets the FORWARD chain default policy to DROP and only allows
+      # forwarding for its own bridge networks, which would otherwise block
+      # traffic being routed through this NAT gateway before it reaches the
+      # rule above. DOCKER-USER is evaluated first and Docker never rewrites
+      # it, so rules added here survive Docker restarts and reboots.
+      iptables -I DOCKER-USER -s '${vpc_cidr}' -j ACCEPT
+      iptables -I DOCKER-USER -d '${vpc_cidr}' -j ACCEPT
+%{ endif ~}
+
+%{ if floating_ip != "" ~}
+  - path: /etc/netplan/60-floating-ip.yaml
+    owner: root:root
+    permissions: '0600'
+    content: |
+      network:
+        version: 2
+        renderer: networkd
+        ethernets:
+          eth0:
+            addresses:
+              - ${floating_ip}/32
+%{ endif ~}
+
 runcmd:
   - ufw disable
   - |
@@ -74,3 +111,9 @@ runcmd:
   - passwd -l root
   - chage -E -1 -M -1 -I -1 -m 0 root
   - systemctl restart ssh
+%{ if floating_ip != "" ~}
+  - netplan apply
+%{ endif ~}
+%{ if use_as_nat ~}
+  - reboot
+%{ endif ~}

@@ -8,6 +8,18 @@ variable "vpc_name" {
   type        = string
 }
 
+variable "nat_gateway_ip" {
+  description = "Private IP of the NAT gateway server nodes should route outbound traffic through. Leave empty to skip NAT routing."
+  type        = string
+  default     = ""
+}
+
+variable "network_gateway_ip" {
+  description = "Reserved gateway IP of the private network's subnet, used as the next hop for the default route. Hetzner forwards traffic sent here on to the NAT gateway server via the network-level route."
+  type        = string
+  default     = ""
+}
+
 variable "control_plane" {
   description = "Control plane node configuration"
   type = object({
