@@ -6,9 +6,11 @@ import (
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	policyv1 "k8s.io/api/policy/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -27,6 +29,7 @@ const (
 	catchAllRule                   = "http_status:404"
 	cfargotunnelDomainSuffix       = ".cfargotunnel.com"
 	dnsEndpointRecordType          = "CNAME"
+	defaultPDBMinAvailable   int32 = 1
 )
 
 type TunnelReconciler struct {
@@ -43,6 +46,7 @@ type TunnelReconciler struct {
 // +kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update;patch
 // +kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 // +kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch
+// +kubebuilder:rbac:groups=policy,resources=poddisruptionbudgets,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=externaldns.k8s.io,resources=dnsendpoints,verbs=get;list;watch;create;update;patch;delete
 
 func (r *TunnelReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -84,6 +88,10 @@ func (r *TunnelReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 
 	if err := r.reconcileDeployment(ctx, &tunnel, secretName); err != nil {
 		return r.failStatus(ctx, &tunnel, fmt.Errorf("reconcile tunnel deployment: %w", err))
+	}
+
+	if err := r.reconcilePodDisruptionBudget(ctx, &tunnel); err != nil {
+		return r.failStatus(ctx, &tunnel, fmt.Errorf("reconcile tunnel pod disruption budget: %w", err))
 	}
 
 	tunnel.Status.Ready = true
@@ -332,11 +340,37 @@ func (r *TunnelReconciler) reconcileDeployment(ctx context.Context, tunnel *clou
 	return r.Update(ctx, &existing)
 }
 
+func (r *TunnelReconciler) reconcilePodDisruptionBudget(ctx context.Context, tunnel *cloudflarev1alpha1.Tunnel) error {
+	name := tunnel.Name + "-tunnel"
+	pdb := &policyv1.PodDisruptionBudget{ObjectMeta: metav1.ObjectMeta{
+		Name:      name + "-pdb",
+		Namespace: tunnel.Namespace,
+	}}
+
+	if tunnel.Spec.PodDisruptionBudget == nil {
+		return client.IgnoreNotFound(r.Delete(ctx, pdb))
+	}
+
+	minAvailable := tunnel.Spec.PodDisruptionBudget.MinAvailable
+	if minAvailable == 0 {
+		minAvailable = defaultPDBMinAvailable
+	}
+	minAvailableIntStr := intstr.FromInt32(minAvailable)
+
+	_, err := controllerutil.CreateOrUpdate(ctx, r.Client, pdb, func() error {
+		pdb.Spec.MinAvailable = &minAvailableIntStr
+		pdb.Spec.Selector = &metav1.LabelSelector{MatchLabels: map[string]string{"app": name}}
+		return controllerutil.SetControllerReference(tunnel, pdb, r.Scheme)
+	})
+	return err
+}
+
 func (r *TunnelReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	builder := ctrl.NewControllerManagedBy(mgr).
 		For(&cloudflarev1alpha1.Tunnel{}).
 		Owns(&corev1.Secret{}).
-		Owns(&appsv1.Deployment{})
+		Owns(&appsv1.Deployment{}).
+		Owns(&policyv1.PodDisruptionBudget{})
 	// Owns() resolves the GVK at startup, which would crash if the CRD isn't installed.
 	if r.ExternalDNSEnabled {
 		builder = builder.Owns(&extdnsv1alpha1.DNSEndpoint{})

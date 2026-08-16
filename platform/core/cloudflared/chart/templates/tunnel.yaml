@@ -15,13 +15,5 @@ spec:
       service: https://traefik-ingress.traefik-ingress.svc.cluster.local
       originRequest:
         matchSNItoHost: true
----
-apiVersion: policy/v1
-kind: PodDisruptionBudget
-metadata:
-  name: k3s-tunnel-pdb
-spec:
-  minAvailable: 1
-  selector:
-    matchLabels:
-      app: k3s-tunnel
+  podDisruptionBudget:
+    minAvailable: 1
