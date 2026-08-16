@@ -36,25 +36,3 @@
     - name: vault-config
       mountPath: /vault/config
 {{- end }}
-
-{{- define "vault.authConfigContainer" -}}
-- name: vault-auth-config
-  image: {{ .Values.image }}
-  restartPolicy: Always
-  env:
-    - name: VAULT_ADDR
-      value: "http://127.0.0.1:8200"
-    - name: VAULT_TOKEN
-      valueFrom:
-        secretKeyRef:
-          name: vault-secret
-          key: rootToken
-  command:
-    - /bin/sh
-    - -c
-    - /scripts/configure-auth.sh
-  volumeMounts:
-    - name: vault-auth-config-script
-      mountPath: /scripts/configure-auth.sh
-      subPath: configure-auth.sh
-{{- end }}

@@ -13,7 +13,8 @@
       "Read(vars.yaml)",
       "Read(**/vars.yaml)",
       "Read(vars.*.yaml)",
-      "Read(**/vars.*.yaml)"
+      "Read(**/vars.*.yaml)",
+      "Bash(kubectl *)"
     ]
   }
 }
