@@ -93,6 +93,19 @@ spec:
                 description: Name is the tunnel name shown in the Cloudflare dashboard.
                   Defaults to the resource name.
                 type: string
+              podDisruptionBudget:
+                description: |-
+                  PodDisruptionBudget, if set, creates a PodDisruptionBudget for the tunnel's cloudflared
+                  pods.
+                properties:
+                  minAvailable:
+                    default: 1
+                    description: |-
+                      MinAvailable is the minimum number of cloudflared pods that must remain available during
+                      a voluntary disruption.
+                    format: int32
+                    type: integer
+                type: object
               replicas:
                 default: 2
                 description: Replicas is the number of cloudflared pod replicas.

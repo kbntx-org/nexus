@@ -28,6 +28,20 @@ type TunnelSpec struct {
 	// Cloudflare requires the ingress list to end with one.
 	// +optional
 	Ingress []IngressRule `json:"ingress,omitempty"`
+
+	// PodDisruptionBudget, if set, creates a PodDisruptionBudget for the tunnel's cloudflared
+	// pods.
+	// +optional
+	PodDisruptionBudget *PodDisruptionBudgetSpec `json:"podDisruptionBudget,omitempty"`
+}
+
+// PodDisruptionBudgetSpec configures the PodDisruptionBudget for a Tunnel's cloudflared pods.
+type PodDisruptionBudgetSpec struct {
+	// MinAvailable is the minimum number of cloudflared pods that must remain available during
+	// a voluntary disruption.
+	// +kubebuilder:default=1
+	// +optional
+	MinAvailable int32 `json:"minAvailable,omitempty"`
 }
 
 // IngressRule maps a public hostname to the local service cloudflared proxies matching
