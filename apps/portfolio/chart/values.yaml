@@ -8,3 +8,6 @@ ingressHosts:
   - portfolio.kbntx.com
   - kbntx.com
 deploymentStrategy: RollingUpdate
+
+certificate:
+  enabled: true

@@ -1,5 +1,8 @@
 dashboardHost: traefik.kbntx.com
 
+certificate:
+  enabled: true
+
 internalWebPort: 8010
 internalSecurePort: 8011
 internalServiceClusterIP: 10.43.216.131
@@ -40,9 +43,6 @@ traefik:
       expose:
         default: false
       exposedPort: 443
-
-  additionalArguments:
-    - '--api.insecure=true'
 
   service:
     spec:

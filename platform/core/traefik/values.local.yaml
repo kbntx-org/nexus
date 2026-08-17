@@ -1,10 +1,31 @@
 dashboardHost: traefik.localhost
 
+certificate:
+  enabled: false
+
 traefik:
   service:
     spec:
       type: NodePort
 
+  deployment:
+    replicas: 1
+
   ports:
     web:
       nodePort: 30080
+      http:
+        redirections:
+          entryPoint:
+            to: websecure
+            scheme: https
+            permanent: true
+    websecure:
+      nodePort: 30443
+    internal-web: null
+    internal-secure: null
+
+  tlsStore:
+    default:
+      defaultCertificate:
+        secretName: default-tls

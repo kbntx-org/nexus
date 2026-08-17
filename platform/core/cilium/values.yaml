@@ -1,6 +1,9 @@
 hubbleHost: hubble.kbntx.com
 internalIngressTarget: 10.43.216.131
 
+certificate:
+  enabled: true
+
 cilium:
   kubeProxyReplacement: true
   k8sServiceHost: 10.0.0.2

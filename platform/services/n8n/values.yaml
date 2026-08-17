@@ -1,5 +1,8 @@
 internalIngressTarget: 10.43.216.131
 
+certificate:
+  enabled: true
+
 postgresCluster:
   storageClass: hcloud-volumes
 

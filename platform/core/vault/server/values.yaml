@@ -5,6 +5,9 @@ args: ['server']
 
 dev: false
 
+certificate:
+  enabled: true
+
 postgresCluster:
   storageClass: hcloud-volumes
 

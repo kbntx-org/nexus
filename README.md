@@ -31,9 +31,10 @@ k3s cluster on Hetzner, and hosts the apps published under
     ([core/github-arc-runners/](platform/core/github-arc-runners/)).
   - **Observability** — [services/monitoring/](platform/services/monitoring/): VictoriaMetrics,
     Grafana, Loki, Promtail, kube-state-metrics, node-exporter.
-- [tools/](tools/) — bash helpers (KinD cluster bootstrap, SSH setup).
-- [Tiltfile](Tiltfile) — local dev orchestration (Traefik + apps with live
-  reload).
+- [tools/](tools/) — bash helpers (SSH setup).
+- [platform/core/local/](platform/core/local/) — local dev orchestration: KinD
+  cluster bootstrap ([cluster.sh](platform/core/local/cluster.sh)) and the
+  reusable [Tiltfile](Tiltfile) building blocks.
 
 ## Stack
 
@@ -56,15 +57,16 @@ You can spin up a local cluster and run the apps with live reload.
 
 **Bootstrap a local cluster** — creates a KinD cluster with a local registry
 and a port mapping that lets `*.localhost` routes hit Traefik directly. See
-[tools/bash/cluster.sh](tools/bash/cluster.sh).
+[platform/core/local/cluster.sh](platform/core/local/cluster.sh).
 
 ```sh
 pnpm install
 pnpm cluster:create
 ```
 
-**Run an app** — Tilt deploys Traefik, metrics-server, and the selected
-profile, with source hot-reload through Docker sync.
+**Run an app** — Tilt deploys core infra (Traefik, metrics-server, etc.) plus
+the app(s) named on the command line, with source hot-reload through Docker
+sync.
 
 ```sh
 pnpm dev:portfolio   # → http://portfolio.localhost
@@ -78,8 +80,8 @@ pnpm dev:reset       # tilt down — keeps the cluster
 pnpm cluster:delete  # remove the KinD cluster + local registry
 ```
 
-Available Tilt profiles (`docs`, `portfolio`, `all`) are defined in the
-[Tiltfile](Tiltfile).
+See the [Tiltfile](Tiltfile) and [platform/core/local/](platform/core/local/)
+for the full set of resources and how enablement works.
 
 ## Documentation
 

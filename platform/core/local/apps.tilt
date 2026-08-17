@@ -1,0 +1,70 @@
+load('ext://helm_resource', 'helm_resource')
+load('./lib.tilt', 'root_path')
+
+PRODUCT_RESOURCES = ['docs', 'portfolio']
+
+# ── Docs ──────────────────────────────────────────────────────────────────────
+docker_build(
+  'documentation',
+  root_path('docs'),
+  dockerfile=root_path('docs/Dockerfile'),
+  target='local',
+  live_update=[
+    sync(root_path('docs/src'), '/workspace/src'),
+    sync(root_path('docs/mkdocs.yml'), '/workspace/mkdocs.yml'),
+  ],
+)
+
+helm_resource(
+  'docs',
+  root_path('docs/helm'),
+  deps=[root_path('docs/helm')],
+  image_deps=['documentation'],
+  image_keys=[('image.repository', 'image.tag')],
+  namespace='default',
+  flags=[
+    '--values', root_path('docs/helm/values.local.yaml'),
+    '--create-namespace',
+  ],
+  links=[link('http://docs.localhost', 'docs.localhost')],
+  labels=['1-Product'],
+)
+
+# ── Portfolio ─────────────────────────────────────────────────────────────────
+docker_build(
+  'portfolio',
+  root_path('.'),
+  dockerfile=root_path('apps/portfolio/Dockerfile'),
+  target='local',
+  only=[
+    root_path('apps/portfolio'),
+    root_path('tsconfig.base.json'),
+    root_path('nx.json'),
+    root_path('tools'),
+    root_path('pnpm-lock.yaml'),
+    root_path('package.json'),
+    root_path('.npmrc'),
+    root_path('pnpm-workspace.yaml'),
+  ],
+  live_update=[
+    sync(root_path('apps/portfolio/package.json'), '/usr/src/app/apps/portfolio/package.json'),
+    sync(root_path('apps/portfolio/src'), '/usr/src/app/apps/portfolio/src'),
+    sync(root_path('tsconfig.base.json'), '/usr/src/app/tsconfig.base.json'),
+    run('cd /usr/src/app && pnpm install --no-frozen-lockfile', trigger=[root_path('apps/portfolio/package.json')]),
+  ],
+)
+
+helm_resource(
+  'portfolio',
+  root_path('apps/portfolio/chart'),
+  deps=[root_path('apps/portfolio/chart')],
+  image_deps=['portfolio'],
+  image_keys=[('image.repository', 'image.tag')],
+  namespace='default',
+  flags=[
+    '--values', root_path('apps/portfolio/chart/values.local.yaml'),
+    '--create-namespace',
+  ],
+  links=[link('http://portfolio.localhost', 'portfolio.localhost')],
+  labels=['1-Product'],
+)

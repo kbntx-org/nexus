@@ -87,6 +87,7 @@ spec:
     {{- end }}
   tls:
     secretName: documentation-tls
+{{- if .Values.certificate.enabled }}
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
@@ -103,3 +104,4 @@ spec:
     - {{ $host }}
     {{- end }}
     {{- end }}
+{{- end }}

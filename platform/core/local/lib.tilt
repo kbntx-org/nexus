@@ -1,0 +1,44 @@
+def root_path(path):
+  return config.main_dir + '/' + path
+
+def helm_chart_deps(chartPath):
+  if config.tilt_subcommand == 'down':
+    return
+  chartYaml = read_yaml(chartPath + '/Chart.yaml')
+  dependencies = chartYaml.get('dependencies') or []
+
+  missingDependencies = [
+    dependency
+    for dependency in dependencies
+    if not os.path.exists('%s/charts/%s-%s.tgz' % (chartPath, dependency['name'], dependency['version']))
+  ]
+  if not missingDependencies:
+    return
+
+  for dependency in missingDependencies:
+    repository = dependency.get('repository', '')
+    if repository.startswith('http://') or repository.startswith('https://'):
+      local('helm repo add %s %s --force-update' % (dependency['name'], repository), quiet=True)
+  local('helm dependency build ' + chartPath, quiet=True)
+
+def bootstrap_kubernetes(kubernetesContext):
+  availableContexts = [
+    contextName
+    for contextName in str(local("kubectl config get-contexts -o name", quiet=True)).split("\n")
+    if contextName
+  ]
+
+  if kubernetesContext not in availableContexts:
+    fail("Kubernetes context '%s' does not exist." % kubernetesContext)
+
+  local("kubectl config use-context %s" % kubernetesContext, quiet=True)
+
+  clusterHealth = str(local(
+    "kubectl get --raw=/healthz 2>&1 || echo 'unhealthy'",
+    quiet=True,
+  )).strip()
+
+  if clusterHealth != "ok":
+    fail("Kubernetes is not running or API server is not reachable.")
+
+  print("✅ Kubernetes cluster running, starting local dev")

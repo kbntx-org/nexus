@@ -1,3 +1,6 @@
+certificate:
+  enabled: true
+
 postgresCluster:
   storageClass: hcloud-volumes
 

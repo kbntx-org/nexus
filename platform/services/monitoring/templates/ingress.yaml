@@ -20,6 +20,7 @@ spec:
           port: 9090
   tls:
     secretName: monitoring-tls
+{{- if .Values.certificate.enabled }}
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
@@ -33,3 +34,4 @@ spec:
   dnsNames:
     - {{ .Values.ingress.grafanaHost }}
     - {{ .Values.ingress.prometheusHost }}
+{{- end }}

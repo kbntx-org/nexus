@@ -1,0 +1,131 @@
+load('ext://helm_resource', 'helm_resource', 'helm_repo')
+load('./lib.tilt', 'helm_chart_deps', 'bootstrap_kubernetes', 'root_path')
+
+DOCKER_CONTEXT = "kind-kind"
+update_settings(max_parallel_updates=6)
+
+default_registry(
+  "localhost:5005",
+  host_from_cluster="kind-registry:5000",
+)
+
+CORE_RESOURCES = ['cilium', 'vault', 'external-secrets', 'traefik', 'metrics-server-repo', 'metrics-server', 'cloudnative-pg', 'watch-ingresses']
+OPTIONAL_RESOURCES = ['monitoring']
+PERSISTED_ON_DOWN = ['cloudnative-pg', 'cilium']
+
+bootstrap_kubernetes(DOCKER_CONTEXT)
+
+# ── Cilium (CNI + kube-proxy replacement; kind's own CNI/kube-proxy are off, ──
+# ── see cluster.sh, so nothing else can schedule until this is installed) ────
+if config.tilt_subcommand != 'down':
+  KUBE_APISERVER_HOST = str(local(
+    "docker inspect --format='{{ .NetworkSettings.Networks.kind.IPAddress }}' kind-control-plane",
+    quiet=True,
+  )).strip()
+else:
+  KUBE_APISERVER_HOST = ''
+
+helm_chart_deps(root_path('platform/core/cilium'))
+helm_resource(
+  'cilium',
+  root_path('platform/core/cilium'),
+  namespace='kube-system',
+  flags=[
+    '--values', root_path('platform/core/cilium/values.local.yaml'),
+    '--set-string', 'cilium.k8sServiceHost=' + KUBE_APISERVER_HOST,
+    '--set-string', 'cilium.k8sServicePort=6443',
+  ],
+  deps=[root_path('platform/core/cilium')],
+  labels=['2-Infra'],
+  links=[link('http://hubble.localhost', 'hubble.localhost')],
+)
+
+helm_chart_deps(root_path('platform/core/external-secrets/deploy'))
+helm_resource(
+  'external-secrets',
+  root_path('platform/core/external-secrets/deploy'),
+  namespace='external-secrets',
+  flags=['--create-namespace'],
+  deps=[root_path('platform/core/external-secrets')],
+  labels=['2-Infra'],
+)
+
+helm_repo(
+  'metrics-server-repo',
+  'https://kubernetes-sigs.github.io/metrics-server/',
+  labels=['2-Infra'],
+)
+
+helm_resource(
+  'metrics-server',
+  'metrics-server-repo/metrics-server',
+  namespace='kube-system',
+  flags=[
+    '--version=3.13.0',
+    '--set-json=args=["--kubelet-insecure-tls", "--kubelet-preferred-address-types=InternalIP"]',
+  ],
+  resource_deps=['metrics-server-repo'],
+  labels=['2-Infra'],
+)
+
+helm_resource(
+  'vault',
+  root_path('platform/core/vault/server'),
+  namespace='default',
+  flags=[
+    '--values', root_path('platform/core/vault/server/values.local.yaml'),
+    '--create-namespace',
+  ],
+  deps=[root_path('platform/core/vault/server')],
+  labels=['2-Infra'],
+  links=[link('http://vault.localhost', 'vault.localhost')],
+)
+
+# ── Traefik (auto-started as a dependency of all product services) ─────────────
+helm_resource(
+  'traefik',
+  root_path('platform/core/traefik'),
+  deps=[root_path('platform/core/traefik')],
+  namespace='traefik',
+  flags=[
+    '--create-namespace',
+    '--values', root_path('platform/core/traefik/values.local.yaml'),
+  ],
+  labels=['2-Infra'],
+)
+
+# ── Ingress TLS watcher (reissues the local mkcert cert whenever a new IngressRoute host appears) ──
+local_resource(
+  'watch-ingresses',
+  serve_cmd=[root_path('platform/core/local/cluster.sh'), 'watch-ingresses'],
+  deps=[root_path('platform/core/local/cluster.sh')],
+  resource_deps=['traefik'],
+  labels=['2-Infra'],
+)
+
+# ── CloudNative-PG (Postgres operator, required by monitoring) ────────────────
+helm_chart_deps(root_path('platform/core/cloudnative-pg'))
+helm_resource(
+  'cloudnative-pg',
+  root_path('platform/core/cloudnative-pg'),
+  namespace='cloudnative-pg',
+  flags=['--create-namespace'],
+  deps=[root_path('platform/core/cloudnative-pg')],
+  labels=['2-Infra'],
+)
+
+# ── Monitoring (VictoriaMetrics + Grafana + Loki + node/kube-state metrics) ───
+helm_chart_deps(root_path('platform/services/monitoring'))
+helm_resource(
+  'monitoring',
+  root_path('platform/services/monitoring'),
+  namespace='monitoring',
+  flags=[
+    '--values', root_path('platform/services/monitoring/values.local.yaml'),
+    '--create-namespace',
+  ],
+  deps=[root_path('platform/services/monitoring')],
+  resource_deps=['vault', 'external-secrets', 'cloudnative-pg', 'traefik'],
+  labels=['2-Infra'],
+  links=[link('http://grafana.localhost', 'grafana.localhost')],
+)

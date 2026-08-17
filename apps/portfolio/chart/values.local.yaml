@@ -4,3 +4,6 @@ ingressHosts:
   - portfolio.localhost
   - portfolio-local.kbntx.com
 deploymentStrategy: Recreate
+
+certificate:
+  enabled: false
