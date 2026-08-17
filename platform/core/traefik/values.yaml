@@ -51,17 +51,17 @@ traefik:
   deployment:
     replicas: 2
 
-  logs:
-    general:
-      format: json
-    access:
-      enabled: true
-      format: json
-      fields:
-        headers:
-          defaultMode: drop
-          names:
-            Referer: keep
-            User-Agent: keep
-            X-Forwarded-For: keep
-            CF-IPCountry: keep
+  log:
+    format: json
+
+  accessLog:
+    enabled: true
+    format: json
+    fields:
+      headers:
+        defaultMode: drop
+        names:
+          Referer: keep
+          User-Agent: keep
+          X-Forwarded-For: keep
+          CF-IPCountry: keep
