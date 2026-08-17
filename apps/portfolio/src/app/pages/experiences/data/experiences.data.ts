@@ -24,16 +24,19 @@ export const EXPERIENCES: Experience[] = [
       'PowerUs helps workers find the best jobs, discover new companies & industries, connect with other workers and get further education. On the other side, PowerUs helps attractive employers find these workers to fulfill their projects and grow.',
     roles: [
       {
-        title: 'Staff Platform Engineer',
-        duration: 'March 2026 - Present',
+        title: 'Senior Platform Engineer',
+        duration: 'November 2024 - Present',
         description:
-          "As a Staff Platform Engineer, I'm defining the platform strategy and technical direction across the engineering organization, driving cross-team alignment on infrastructure, distributed systems, developer experience, and delivery standards.",
+          'As a Senior Platform Engineer at PowerUs, I focused on improving developer experience, reliability, and delivery speed by evolving our cloud and Kubernetes platform. I worked across teams to build a fast, safe, and self-service path from idea to production.',
         highlights: [
-          'Replaced 5 static staging environments with unlimited on-demand preview environments provisioned in minutes from a GitHub label via a custom Kubernetes controller, used across engineering, design, and product',
+          'Replaced 5 static staging environments with unlimited on-demand preview environments with a custom Kubernetes controller, provisioned in minutes from a GitHub label, used across engineering, design, and product',
           'Migrated self-hosted RabbitMQ to an HA Amazon MQ cluster with zero downtime, reducing operational burden and enabling future use as an event bus',
-          'Implemented Tilt to make the local environment a real platform product, developing directly on Kubernetes with built-in tooling and the same charts used from local to production; available in under 2 minutes and shareable across peers and stakeholders via Cloudflare tunnels',
-          'Introduced leader election in the monolithic backend, removing the need for two standalone microservices (cron scheduler, Salesforce streaming) previously split out due to high availability incompatibility, simplifying the deployment model',
-          'Decoupled transpilation from typechecking and adopted TSGO, removing 5GB of RAM usage and reducing the process from 30s to 1-2s in the local environment, previously a daily bottleneck'
+          'Drove the zero-downtime migration from DigitalOcean to AWS, resolving service reliability issues, introducing granular access control, and unlocking a broader cloud services catalog',
+          'Migrated from Docker Compose to Kubernetes on EKS, replacing fragmented per-service operations with a unified platform for deployments, recovery, configuration management, and engineer self-service via ArgoCD',
+          'Revamped CI/CD pipelines with GitHub Actions, ArgoCD, and self-hosted ARC runners, cutting P95 from 20 to 10 minutes, reducing CI costs by 40%, and increasing deployment frequency from 1-2/day to 20-25/day',
+          'Built a self-service local dev environment with full production parity, cutting onboarding to under 5 minutes, and extended into self-hosted Coder workspaces for AI agents and non-engineers to experiment independently',
+          'Hardened the security posture with Cloudflare, zero-trust access (Cloudflare Access, WARP), private-only infrastructure, and VPC-based access for critical systems, enabling faster response to scraping attacks through improved rate limiting and bot detection',
+          'Launched a platform guild, hands-on workshops (AWS, Terraform, Kubernetes), and regular office hours to spread platform knowledge and build team autonomy across product squads and the on-call rotation'
         ],
         technologies: [
           'Kubernetes',
@@ -63,54 +66,14 @@ export const EXPERIENCES: Experience[] = [
           'RabbitMQ',
           'Amazon MQ',
           'Tilt',
+          'Coder Workspaces',
+          'Sysbox',
           'REST APIs',
           'Node.js',
-          'Amazon S3'
-        ]
-      },
-      {
-        title: 'Senior Platform Engineer',
-        duration: 'November 2024 - March 2026',
-        description:
-          'As a Senior Platform Engineer at PowerUs, I focused on improving developer experience, reliability, and delivery speed by evolving our cloud and Kubernetes platform. I worked across teams to build a fast, safe, and self-service path from idea to production.',
-        highlights: [
-          'Drove the zero-downtime migration from DigitalOcean to AWS, resolving service reliability issues, introducing granular access control, and unlocking a broader cloud services catalog',
-          'Migrated from Docker Compose to Kubernetes on EKS, replacing fragmented per-service operations with a unified platform for deployments, recovery, configuration management, and engineer self-service via ArgoCD',
-          'Revamped CI/CD pipelines with GitHub Actions and self-hosted ARC runners, cutting P95 from 20 to 10 minutes and reducing CI costs by 40%',
-          'Rolled out continuous deployment with Argo Rollouts blue/green, increasing deployment frequency from 1-2/day to 20-25/day and reducing release risk',
-          'Hardened the security posture implementing zero-trust access with Cloudflare (Access, WARP), private-only infrastructure, and VPC-based operational access for critical systems',
-          'Built internal platform packages: service worker update mechanism, NestJS decorators for queue and log ownership, and a webhook fan-out dispatcher for preview environments',
-          'Launched a platform guild, hands-on workshops (AWS, Terraform, Kubernetes), and regular office hours to spread platform knowledge and build team autonomy across product squads'
-        ],
-        technologies: [
-          'Sentry',
-          'Terraform',
-          'RabbitMQ',
-          'REST APIs',
-          'MongoDB',
-          'Node.js',
-          'Nginx',
-          'Angular',
-          'Cypress',
-          'TypeScript',
-          'GitHub Actions',
-          'Bash',
-          'NestJS',
-          'Datadog',
-          'Jsonnet',
-          'NX',
-          'Docker',
-          'GitHub',
-          'Linux',
-          'Drone CI',
-          'HashiCorp Vault',
           'Amazon S3',
-          'Kubernetes',
-          'AWS',
-          'ArgoCD',
-          'Helm',
-          'Karpenter',
-          'Cloudflare'
+          'Cypress',
+          'GitHub',
+          'Drone CI'
         ]
       },
       {
@@ -121,8 +84,8 @@ export const EXPERIENCES: Experience[] = [
         highlights: [
           'Led improvements to the job matching system, reducing average execution time by 68% and enhancing content delivery and personalization',
           'Migrated DigitalOcean infrastructure from ClickOps to Terraform IaC, consolidating into the monorepo for full visibility, reducing environment provisioning to a single config change',
-          'Migrated frontends to Angular 17 with esbuild, set up Storybook with visual testing, cutting CI build times by 50% and reducing visual regression feedback loops',
-          'Set up Datadog across the stack: agent deployment on all VMs, CI/CD observability, dashboards and monitors to support on-call rotation',
+          'Upgraded outdated frameworks (Angular, NestJS, NX) and modernized build tooling (esbuild, SWC) across frontend and backend, cutting CI time from 50 to 20 minutes and reducing test flakiness',
+          'Rolled out Datadog observability across the organization, giving teams real-time telemetry that surfaced previously undetected issues, driving targeted refactoring and improving incident detection and response',
           'Supported the data chapter with BigQuery permissions and tooling integration across their pipeline (DBT, Fivetran, BigQuery, CI/CD)',
           'Mentored and onboarded junior engineers on best practices, architecture, and product domain knowledge, enabling them to ship features independently and confidently'
         ],
@@ -154,15 +117,14 @@ export const EXPERIENCES: Experience[] = [
       },
       {
         title: 'Full Stack & DevOps Engineer',
-        duration: 'October 2022 - May 2023',
+        duration: 'July 2022 - May 2023',
         description:
           'As a Full-Stack & DevOps Engineer in the Network squad, I contributed to user engagement and retention features while taking ownership of mobile development and improving delivery workflows.',
         highlights: [
-          'Improved CI/CD pipelines from 50 mins to 20 mins, reduced E2E test flakiness, and automated mobile builds with GitHub Actions and Fastlane',
-          'Shipped the iOS mobile app using CapacitorJS with live update support. Mobile users showed 30% higher activity than web users',
-          'Migrated configuration management from build time to runtime reducing the numbers of build in CI from N (number of environments) to 1 and enabling more testing environments without impacting delivery performance',
-          'Upgraded core frameworks (NX, NestJS, Angular) to improve developer experience, runtime and build performance',
-          'Built community features (video uploads, reporting system) and integrated education modules to improve user retention'
+          'Promoted from Junior Full-Stack Engineer after 3 months, following contributions to sign-up funnels, landing pages, and public job search features that drove user acquisition',
+          'Shipped the iOS mobile app using CapacitorJS with live update and full continuous delivery support. Mobile users showed 30% higher activity than web users',
+          'Deployed a long-lived product environment reflecting the latest stable state of the app, giving PMs and designers a stable space to explore features outside the standard test environments',
+          'Introduced HashiCorp Vault for remote configuration management, decreasing incident response time related to configuration and reducing the number of builds in the CI'
         ],
         technologies: [
           'RabbitMQ',
@@ -185,29 +147,9 @@ export const EXPERIENCES: Experience[] = [
           'HashiCorp Vault',
           'Fastlane',
           'GitHub Actions',
-          'Mobile Application Development'
-        ]
-      },
-      {
-        title: 'Junior Full Stack Engineer',
-        duration: 'July 2022 - October 2022',
-        description:
-          'As a Junior Full-Stack Engineer in the Acquisition squad, I contributed to user acquisition features and frontend improvements supporting growth initiatives.',
-
-        technologies: [
-          'RabbitMQ',
+          'Mobile Application Development',
           'Mixpanel',
-          'REST APIs',
-          'MongoDB',
-          'Node.js',
-          'Angular',
-          'Cypress',
           'Google Tag Manager',
-          'TypeScript',
-          'NestJS',
-          'Docker',
-          'GitHub',
-          'Drone CI',
           'Google Ads'
         ]
       }
