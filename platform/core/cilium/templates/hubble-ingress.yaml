@@ -15,6 +15,7 @@ spec:
           port: http
   tls:
     secretName: hubble-ui-tls
+{{- if .Values.certificate.enabled }}
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
@@ -27,3 +28,4 @@ spec:
     kind: ClusterIssuer
   dnsNames:
     - {{ .Values.hubbleHost }}
+{{- end }}

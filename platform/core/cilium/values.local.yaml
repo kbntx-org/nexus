@@ -1,5 +1,4 @@
-backup:
-  enabled: false
+hubbleHost: hubble.localhost
 
 certificate:
   enabled: false

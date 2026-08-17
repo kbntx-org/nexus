@@ -1,6 +1,9 @@
 backup:
   enabled: false
 
+certificate:
+  enabled: false
+
 postgresCluster:
   storageClass: standard
 

@@ -21,5 +21,13 @@
   "yaml.format.enable": false,
   "go.alternateTools": {
     "go": "/Users/kenny/.goenv/shims/go"
+  },
+  "files.associations": {
+    "Tiltfile": "tiltfile",
+    "*.tilt": "tiltfile"
+  },
+  "material-icon-theme.files.associations": {
+    "Tiltfile": "Tilt",
+    "*.tilt": "Tilt"
   }
 }

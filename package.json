@@ -8,10 +8,11 @@
     "pnpm": ">=11.0.0"
   },
   "scripts": {
-    "cluster:create": "bash tools/bash/cluster.sh create",
-    "cluster:delete": "bash tools/bash/cluster.sh delete",
-    "dev:docs": "tilt up -- --profile=docs",
-    "dev:portfolio": "tilt up -- --profile=portfolio",
+    "cluster:create": "bash platform/core/local/cluster.sh create",
+    "cluster:delete": "bash platform/core/local/cluster.sh delete",
+    "cluster:recreate": "bash platform/core/local/cluster.sh recreate",
+    "dev:docs": "tilt up -- docs",
+    "dev:portfolio": "tilt up -- portfolio",
     "dev:reset": "tilt down"
   },
   "dependencies": {

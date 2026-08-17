@@ -1,6 +1,9 @@
 global:
   domain: argocd.kbntx.com
 
+certificate:
+  enabled: true
+
 internalIngressTarget: 10.43.216.131
 argo-cd:
   controller:

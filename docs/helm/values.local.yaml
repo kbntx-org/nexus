@@ -2,3 +2,6 @@ replicas: 1
 ingressHosts:
   - docs.localhost
   - docs-local.kbntx.com
+
+certificate:
+  enabled: false

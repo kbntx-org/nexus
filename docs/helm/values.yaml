@@ -5,3 +5,6 @@ containerPort: 80
 replicas: 2
 ingressHosts:
   - docs.kbntx.com
+
+certificate:
+  enabled: true

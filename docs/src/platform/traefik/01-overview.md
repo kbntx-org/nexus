@@ -149,19 +149,21 @@ trusts that anything reaching it has already been vetted.
 
 The same chart is reused for the [Tilt](https://tilt.dev/){ target="\_blank" rel="noopener" }-driven
 local [`kind`](https://kind.sigs.k8s.io/){ target="\_blank" rel="noopener" }
-cluster, with two overrides in
+cluster, with overrides in
 [`values.local.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/traefik/values.local.yaml){ target="\_blank" rel="noopener" }:
-the Traefik `Service` is switched to `NodePort`, and the `web`
-entrypoint is pinned to a known NodePort. The cluster bootstrap script
-[`tools/bash/cluster.sh`](https://github.com/kbntx-org/nexus/blob/main/tools/bash/cluster.sh){ target="\_blank" rel="noopener" }
-maps that NodePort to `localhost:80` on the host via `kind`'s
-`extraPortMappings`.
+the Traefik `Service` is switched to `NodePort`, the `internal-web` /
+`internal-secure` entrypoints (production-only, fronted by
+`cloudflared`) are disabled, and `web` / `websecure` are each pinned to
+a known NodePort instead. The cluster bootstrap script
+[`platform/core/local/cluster.sh`](https://github.com/kbntx-org/nexus/blob/main/platform/core/local/cluster.sh){ target="\_blank" rel="noopener" }
+maps those NodePorts to `localhost:80` and `localhost:443` on the host
+via `kind`'s `extraPortMappings`.
 
 ```mermaid
 %%{init: {'theme':'dark'}}%%
 graph LR
     Browser[Browser<br/>*.localhost]
-    Host[localhost:80]
+    Host[localhost:80/443]
     NodePort[kind node<br/>NodePort]
     Traefik
 
@@ -176,7 +178,28 @@ uses, and exercise the same routing rules — without `kubectl
 port-forward` gymnastics. The full public-traffic path can be validated end-to-end
 before anything ships.
 
-What is missing locally is the Cloudflare side of the path: in
+### Local TLS
+
+Unlike production, where TLS terminates at the Cloudflare edge, the
+local cluster terminates TLS itself so `https://*.localhost` works out
+of the box. `cluster.sh` installs
+[mkcert](https://github.com/FiloSottile/mkcert){ target="\_blank" rel="noopener" },
+trusts its local certificate authority in the host's trust store, and
+generates a certificate for `localhost` and `*.localhost`. That
+certificate is loaded into the `traefik` namespace as the `default-tls`
+`Secret` and wired up as the entrypoint's default certificate via
+`tlsStore.default.defaultCertificate` in `values.local.yaml` — see the
+upstream chart's [TLS store example](https://github.com/traefik/traefik-helm-chart/blob/master/EXAMPLES.md){ target="\_blank" rel="noopener" }
+for the shape of that value. The `web` entrypoint permanently redirects
+to `websecure`, mirroring the `internal-web` → `internal-secure`
+redirect used in production.
+
+Because mkcert's certificate authority is only trusted on the machine
+that ran `cluster.sh`, this only makes the browser trust the
+certificate locally — it is not a substitute for the Cloudflare-issued
+certificate used in production.
+
+What is still missing locally is the Cloudflare side of the path: in
 production, requests reach Traefik via the `cloudflared` tunnel; locally
 they arrive directly from the host. Adding a local `cloudflared` stack
 on top of this for full parity is a future option, but worth the cost
@@ -186,7 +209,7 @@ only if a bug is ever traced specifically to that hop.
 
 - [`platform/core/traefik/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/traefik){ target="\_blank" rel="noopener" } — Traefik Helm chart wrapper
 - [`platform/core/traefik/values.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/traefik/values.yaml){ target="\_blank" rel="noopener" } — production overrides (ingress class, providers, entrypoint, logs, replicas)
-- [`platform/core/traefik/values.local.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/traefik/values.local.yaml){ target="\_blank" rel="noopener" } — local-cluster overrides (NodePort + dashboard host)
+- [`platform/core/traefik/values.local.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/traefik/values.local.yaml){ target="\_blank" rel="noopener" } — local-cluster overrides (NodePorts, dashboard host, disabled internal entrypoints, TLS store)
 - [`platform/core/traefik/templates/dashboard.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/traefik/templates/dashboard.yaml){ target="\_blank" rel="noopener" } — `Service` + `IngressRoute` exposing the Traefik dashboard
 - [`apps/portfolio/chart/templates/template.yaml`](https://github.com/kbntx-org/nexus/blob/main/apps/portfolio/chart/templates/template.yaml){ target="\_blank" rel="noopener" } — example app `IngressRoute`
-- [`tools/bash/cluster.sh`](https://github.com/kbntx-org/nexus/blob/main/tools/bash/cluster.sh){ target="\_blank" rel="noopener" } — local `kind` cluster bootstrap with NodePort-to-host mapping
+- [`platform/core/local/cluster.sh`](https://github.com/kbntx-org/nexus/blob/main/platform/core/local/cluster.sh){ target="\_blank" rel="noopener" } — local `kind` cluster bootstrap with NodePort-to-host mapping and mkcert-issued local TLS certificate
