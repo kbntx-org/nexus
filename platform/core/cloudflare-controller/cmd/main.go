@@ -77,6 +77,7 @@ func main() {
 		CloudflareClient:   cloudflareClient,
 		Recorder:           eventRecorder,
 		ExternalDNSEnabled: cfg.ExternalDNSEnabled,
+		ExternalDNSPrefix:  cfg.ExternalDNSPrefix,
 	}).SetupWithManager(mgr); err != nil {
 		logger.Error("unable to create controller", "controller", "Tunnel", "error", err)
 		os.Exit(1)

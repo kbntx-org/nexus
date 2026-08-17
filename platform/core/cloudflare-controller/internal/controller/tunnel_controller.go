@@ -38,6 +38,7 @@ type TunnelReconciler struct {
 	CloudflareClient   *cloudflare.Client
 	Recorder           record.EventRecorder
 	ExternalDNSEnabled bool
+	ExternalDNSPrefix  string
 }
 
 // +kubebuilder:rbac:groups=cloudflare.kbntx.com,resources=tunnels,verbs=get;list;watch;update;patch
@@ -196,6 +197,9 @@ func (r *TunnelReconciler) reconcileDNSEndpoint(ctx context.Context, tunnel *clo
 			DNSName:    hostname,
 			Targets:    []string{target},
 			RecordType: dnsEndpointRecordType,
+			ProviderSpecific: extdnsv1alpha1.ProviderSpecific{
+				{Name: fmt.Sprintf("%scloudflare-proxied", r.ExternalDNSPrefix), Value: "true"},
+			},
 		}
 	}
 

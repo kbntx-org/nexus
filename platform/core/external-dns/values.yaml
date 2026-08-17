@@ -14,6 +14,7 @@ external-dns:
     - service
     - ingress
     - traefik-proxy
+    - crd
   extraArgs:
     - --zone-id-filter=d989ee0321d203608502ea911a3ccc90
     - --cloudflare-record-comment="provisioned by external-dns"
