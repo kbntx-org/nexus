@@ -25,11 +25,18 @@ type DNSEndpointSpec struct {
 }
 
 type Endpoint struct {
-	DNSName    string   `json:"dnsName,omitempty"`
-	Targets    []string `json:"targets,omitempty"`
-	RecordType string   `json:"recordType,omitempty"`
-	RecordTTL  int64    `json:"recordTTL,omitempty"`
+	DNSName          string           `json:"dnsName,omitempty"`
+	Targets          []string         `json:"targets,omitempty"`
+	RecordType       string           `json:"recordType,omitempty"`
+	RecordTTL        int64            `json:"recordTTL,omitempty"`
+	ProviderSpecific ProviderSpecific `json:"providerSpecific,omitempty"`
 }
+
+type ProviderSpecificProperty struct {
+	Name  string `json:"name,omitempty"`
+	Value string `json:"value,omitempty"`
+}
+type ProviderSpecific []ProviderSpecificProperty
 
 func (in *DNSEndpoint) DeepCopyInto(out *DNSEndpoint) {
 	*out = *in
