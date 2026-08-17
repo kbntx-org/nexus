@@ -32,6 +32,8 @@ spec:
                   key: accountId
             - name: EXTERNAL_DNS_ENABLED
               value: {{ .Values.externalDNS.enabled | quote }}
+            - name: EXTERNAL_DNS_LABEL_FILTER
+              value: {{ .Values.externalDNS.labelFilter | quote }}
           ports:
             - name: metrics
               containerPort: 8080

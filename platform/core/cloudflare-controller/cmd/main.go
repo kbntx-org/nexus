@@ -72,12 +72,13 @@ func main() {
 	}
 
 	if err := (&controller.TunnelReconciler{
-		Client:             mgr.GetClient(),
-		Scheme:             mgr.GetScheme(),
-		CloudflareClient:   cloudflareClient,
-		Recorder:           eventRecorder,
-		ExternalDNSEnabled: cfg.ExternalDNSEnabled,
-		ExternalDNSPrefix:  cfg.ExternalDNSPrefix,
+		Client:                 mgr.GetClient(),
+		Scheme:                 mgr.GetScheme(),
+		CloudflareClient:       cloudflareClient,
+		Recorder:               eventRecorder,
+		ExternalDNSEnabled:     cfg.ExternalDNSEnabled,
+		ExternalDNSPrefix:      cfg.ExternalDNSPrefix,
+		ExternalDNSLabelFilter: cfg.ExternalDNSLabelFilter,
 	}).SetupWithManager(mgr); err != nil {
 		logger.Error("unable to create controller", "controller", "Tunnel", "error", err)
 		os.Exit(1)
