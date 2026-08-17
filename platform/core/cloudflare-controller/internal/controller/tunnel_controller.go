@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -30,15 +31,17 @@ const (
 	cfargotunnelDomainSuffix       = ".cfargotunnel.com"
 	dnsEndpointRecordType          = "CNAME"
 	defaultPDBMinAvailable   int32 = 1
+	labelFilterSeparator           = "="
 )
 
 type TunnelReconciler struct {
 	client.Client
-	Scheme             *runtime.Scheme
-	CloudflareClient   *cloudflare.Client
-	Recorder           record.EventRecorder
-	ExternalDNSEnabled bool
-	ExternalDNSPrefix  string
+	Scheme                 *runtime.Scheme
+	CloudflareClient       *cloudflare.Client
+	Recorder               record.EventRecorder
+	ExternalDNSEnabled     bool
+	ExternalDNSPrefix      string
+	ExternalDNSLabelFilter string
 }
 
 // +kubebuilder:rbac:groups=cloudflare.kbntx.com,resources=tunnels,verbs=get;list;watch;update;patch
@@ -205,9 +208,20 @@ func (r *TunnelReconciler) reconcileDNSEndpoint(ctx context.Context, tunnel *clo
 
 	_, err := controllerutil.CreateOrUpdate(ctx, r.Client, dnsEndpoint, func() error {
 		dnsEndpoint.Spec.Endpoints = endpoints
+		if key, value, ok := parseLabelFilter(r.ExternalDNSLabelFilter); ok {
+			if dnsEndpoint.Labels == nil {
+				dnsEndpoint.Labels = map[string]string{}
+			}
+			dnsEndpoint.Labels[key] = value
+		}
 		return controllerutil.SetControllerReference(tunnel, dnsEndpoint, r.Scheme)
 	})
 	return err
+}
+
+func parseLabelFilter(filter string) (key string, value string, ok bool) {
+	key, value, ok = strings.Cut(filter, labelFilterSeparator)
+	return key, value, ok
 }
 
 func (r *TunnelReconciler) reconcileRoutes(ctx context.Context, tunnel *cloudflarev1alpha1.Tunnel) error {

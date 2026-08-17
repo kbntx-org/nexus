@@ -9,6 +9,7 @@ type Config struct {
 	HealthProbeBindAddress string `env:"HEALTH_PROBE_BIND_ADDRESS" envDefault:":8081"`
 	ExternalDNSEnabled     bool   `env:"EXTERNAL_DNS_ENABLED" envDefault:"true"`
 	ExternalDNSPrefix      string `env:"EXTERNAL_DNS_PREFIX" envDefault:"external-dns.kubernetes.io/"`
+	ExternalDNSLabelFilter string `env:"EXTERNAL_DNS_LABEL_FILTER" envDefault:"external-dns/enabled=true"`
 }
 
 func Load() (Config, error) {

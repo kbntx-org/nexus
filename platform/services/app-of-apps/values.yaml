@@ -102,7 +102,7 @@ argocd-apps:
       project: default
       source:
         repoURL: https://github.com/kbntx-org/nexus.git
-        path: platform/core/external-dns/deploy
+        path: platform/core/external-dns
         targetRevision: main
       destination:
         server: https://kubernetes.default.svc
@@ -118,7 +118,7 @@ argocd-apps:
       project: default
       source:
         repoURL: https://github.com/kbntx-org/nexus.git
-        path: platform/core/cert-manager/deploy
+        path: platform/core/cert-manager
         targetRevision: main
       destination:
         server: https://kubernetes.default.svc
