@@ -23,7 +23,7 @@ WORKDIR /src
 RUN git clone https://github.com/nestybox/sysbox-pkgr.git . \
     && git checkout ${SYSBOX_PKGR_REF}
 
-FROM ubuntu:jammy AS sysbox-bins
+FROM ubuntu:noble AS sysbox-bins
 
 ARG SYSBOX_VERSION
 ARG SYSBOX_VERSION_FULL
