@@ -1,0 +1,6 @@
+dependencies:
+- name: karpenter-provider-hetzner
+  repository: https://kbntx-org.github.io/nexus
+  version: 2.1.0
+digest: sha256:b847a923de861a77462d4f5cb5233330152c6108601bc9281287ca38b948f2b0
+generated: "2026-08-18T21:33:24.161264+01:00"

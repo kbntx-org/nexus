@@ -3,6 +3,11 @@ name: Build and Push Docker Images
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   build-docker-images:
     name: Build and Push Docker Images
@@ -39,3 +44,58 @@ jobs:
           tags: |
             kbntx/sysbox-deploy-k8s:v0.7.1-0
           platforms: linux/amd64
+
+      - name: Checkout karpenter-provider-hetzner
+        uses: actions/checkout@v7
+        with:
+          repository: kbntx-org/karpenter-provider-hetzner
+          ref: v2.1.0
+          path: karpenter-provider-hetzner
+
+      - name: Read karpenter-provider-hetzner chart version
+        id: karpenter-provider-hetzner-version
+        run: echo "appVersion=$(yq '.appVersion' karpenter-provider-hetzner/charts/karpenter-provider-hetzner/Chart.yaml)" >> "$GITHUB_OUTPUT"
+
+      - name: karpenter-provider-hetzner - build and push
+        uses: docker/build-push-action@v7
+        with:
+          context: karpenter-provider-hetzner
+          file: karpenter-provider-hetzner/Dockerfile
+          push: true
+          tags: |
+            kbntx/karpenter-provider-hetzner:${{ steps.karpenter-provider-hetzner-version.outputs.appVersion }}
+          platforms: linux/amd64
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+
+      - name: Package karpenter-provider-hetzner chart
+        run: |
+          mkdir -p dist
+          helm package karpenter-provider-hetzner/charts/karpenter-provider-hetzner \
+            --version "${{ steps.karpenter-provider-hetzner-version.outputs.appVersion }}" \
+            --app-version "${{ steps.karpenter-provider-hetzner-version.outputs.appVersion }}" \
+            --destination dist
+
+      - name: Fetch existing chart index (if any) and merge
+        run: |
+          if curl -sf --output dist/index-old.yaml \
+            "https://kbntx-org.github.io/nexus/index.yaml"; then
+            helm repo index dist \
+              --url "https://kbntx-org.github.io/nexus" \
+              --merge dist/index-old.yaml
+            rm dist/index-old.yaml
+          else
+            helm repo index dist \
+              --url "https://kbntx-org.github.io/nexus"
+          fi
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+          retention-days: 1
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

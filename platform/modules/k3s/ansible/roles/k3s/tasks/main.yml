@@ -4,7 +4,8 @@
     that:
       - k3s_version | length > 0
       - k3s_token | length > 0
-    fail_msg: 'k3s_version and k3s_token must both be provided'
+      - k3s_agent_token | length > 0
+    fail_msg: 'k3s_version, k3s_token and k3s_agent_token must all be provided'
   run_once: true
 
 - name: Assert inventory groups are correctly populated

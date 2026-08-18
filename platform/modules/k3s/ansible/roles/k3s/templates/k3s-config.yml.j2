@@ -1,5 +1,10 @@
 {{ ansible_managed | comment }}
+{% if k3s_node_role == 'server' %}
 token: {{ k3s_token }}
+agent-token: {{ k3s_agent_token }}
+{% else %}
+token: {{ k3s_agent_token }}
+{% endif %}
 node-name: {{ inventory_hostname }}
 node-ip: {{ private_ipv4 }}
 {% if k3s_node_role == 'server' %}

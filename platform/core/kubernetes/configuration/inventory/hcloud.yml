@@ -8,7 +8,6 @@ label_selector: 'cluster-name=nexus'
 
 compose:
   private_ipv4: hcloud_private_ipv4
-  public_ipv4: hcloud_ipv4
 
 groups:
   k3s_server: "hcloud_labels.type == 'control-plane'"
