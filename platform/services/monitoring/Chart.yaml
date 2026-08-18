@@ -3,7 +3,7 @@ name: monitoring-stack
 version: 1.0.0
 dependencies:
   - name: grafana
-    version: 12.10.1
+    version: 12.10.2
     repository: https://grafana-community.github.io/helm-charts
   - name: loki
     version: 7.2.0
