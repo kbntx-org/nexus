@@ -163,6 +163,22 @@ argocd-apps:
         syncOptions:
           - CreateNamespace=true
 
+    karpenter:
+      project: default
+      source:
+        repoURL: https://github.com/kbntx-org/nexus.git
+        path: platform/core/karpenter
+        targetRevision: main
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: karpenter
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+
     sysbox:
       project: default
       source:

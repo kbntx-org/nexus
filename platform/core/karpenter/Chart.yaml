@@ -1,0 +1,7 @@
+apiVersion: v2
+name: karpenter
+version: 1.0.0
+dependencies:
+  - name: karpenter-provider-hetzner
+    version: 2.1.0
+    repository: https://kbntx-org.github.io/nexus

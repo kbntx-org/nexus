@@ -2,8 +2,11 @@
 # Required: k3s version to install, e.g. "v1.34.3+k3s1".
 k3s_version: ''
 
-# Required: shared token used by nodes to join the cluster.
+# Required: shared token used by control-plane nodes to join the cluster.
 k3s_token: ''
+
+# Required: shared token used by worker nodes to join the cluster. Unlike
+k3s_agent_token: ''
 
 k3s_docker_hub_username: ''
 k3s_docker_hub_password: ''
