@@ -87,11 +87,14 @@ a `nodeSelector` (`pool: ci-runners`) and tolerates a matching taint, so:
 There is no job-container hook mechanism, and no separate pod is created
 for Docker actions or `docker` commands in a step. Each runner pod is a
 **single pod** with two containers sharing the same ephemeral work
-volume: `runner`, which runs the job, and `dind`, a rootless
+volume and a socket volume: `runner`, which runs the job, and `dind`, a
 [Docker-in-Docker](https://hub.docker.com/_/docker){ target="\_blank" rel="noopener" }
 sidecar. `DOCKER_HOST` on the `runner` container points at the sidecar's
-rootless socket, so `docker build`, Docker actions, and service
-containers all work without the pod itself needing privileged mode.
+socket, so `docker build`, Docker actions, and service containers all
+work without either container needing `privileged: true` — the pod's
+`sysbox-runc`
+[`runtimeClassName`](https://github.com/kbntx-org/nexus/blob/main/platform/core/github-arc-runners/runners/values.yaml){ target="\_blank" rel="noopener" }
+is what makes running a Docker daemon safe without that flag.
 
 Because the pod is single-use and discarded once the job finishes, there
 is no image or container state carried between jobs — every run starts

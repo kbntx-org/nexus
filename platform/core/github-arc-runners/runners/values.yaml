@@ -21,16 +21,12 @@ gha-runner-scale-set:
       hostUsers: false
       containers:
         - name: runner
-          image: kbntx/nexus-ci-toolkit:1.4
+          image: kbntx/nexus-ci-toolkit:1.5
           command:
-            - sh
-            - -c
-            - |
-              sudo dockerd &
-              echo 'Waiting for dockerd to be ready...'
-              until docker info > /dev/null 2>&1; do sleep 1; done
-              echo 'dockerd is ready'
-              exec /home/runner/run.sh
+            - /home/runner/run.sh
+          env:
+            - name: DOCKER_HOST
+              value: unix:///run/docker.sock
           startupProbe:
             exec:
               command: ['docker', 'info']
@@ -40,8 +36,21 @@ gha-runner-scale-set:
           volumeMounts:
             - name: work
               mountPath: /home/runner/_work
+            - name: docker-sock
+              mountPath: /run
+        - name: dind
+          image: docker:29.7.2-dind
+          args:
+            - --group=123
+          volumeMounts:
+            - name: work
+              mountPath: /home/runner/_work
+            - name: docker-sock
+              mountPath: /run
       volumes:
         - name: work
+          emptyDir: {}
+        - name: docker-sock
           emptyDir: {}
       nodeSelector:
         pool: ci-runners
