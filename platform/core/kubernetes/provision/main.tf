@@ -65,6 +65,21 @@ module "control_plane_firewall" {
   label_selector = "type=control-plane,cluster-name=nexus"
 }
 
+data "cloudflare_zone" "kbntx" {
+  filter = {
+    name = "kbntx.com"
+  }
+}
+
+resource "cloudflare_dns_record" "nexus_control_plane" {
+  zone_id = data.cloudflare_zone.kbntx.zone_id
+  name    = "nexus-control-plane"
+  type    = "A"
+  content = module.nexus_cluster.control_plane_ip
+  ttl     = 300
+  proxied = false
+}
+
 module "worker_nodes_firewall" {
   source = "../../../modules/firewall"
   name   = "nexus-worker-nodes-firewall"

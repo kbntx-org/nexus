@@ -7,11 +7,12 @@ token: {{ k3s_agent_token }}
 {% endif %}
 node-name: {{ inventory_hostname }}
 node-ip: {{ private_ipv4 }}
+{% set k3s_control_plane_endpoint = k3s_tls_san if k3s_tls_san else hostvars[k3s_first_server]['private_ipv4'] %}
 {% if k3s_node_role == 'server' %}
 {% if inventory_hostname == k3s_first_server %}
 cluster-init: true
 {% else %}
-server: "https://{{ hostvars[k3s_first_server]['private_ipv4'] }}:6443"
+server: "https://{{ k3s_control_plane_endpoint }}:6443"
 {% endif %}
 disable-cloud-controller: true
 disable-kube-proxy: true
@@ -22,8 +23,13 @@ disable:
   - local-storage
   - traefik
   - servicelb
+{% if k3s_tls_san %}
+tls-san:
+  - {{ k3s_tls_san }}
+  - {{ private_ipv4 }}
+{% endif %}
 {% else %}
-server: "https://{{ hostvars[k3s_first_server]['private_ipv4'] }}:6443"
+server: "https://{{ k3s_control_plane_endpoint }}:6443"
 flannel-iface: enp7s0
 {% endif %}
 kubelet-arg:

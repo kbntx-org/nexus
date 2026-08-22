@@ -10,5 +10,5 @@ compose:
   private_ipv4: hcloud_private_ipv4
 
 groups:
-  k3s_server: "hcloud_labels.type == 'control-plane'"
-  k3s_worker: "hcloud_labels.type == 'worker'"
+  k3s_server: "hcloud_labels.get('type') == 'control-plane' and hcloud_labels.get('karpenter.sh/managed-by') != 'karpenter'"
+  k3s_worker: "hcloud_labels.get('type') == 'worker' and hcloud_labels.get('karpenter.sh/managed-by') != 'karpenter'"

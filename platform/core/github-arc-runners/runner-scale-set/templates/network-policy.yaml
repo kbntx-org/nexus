@@ -1,7 +1,7 @@
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: github-runner-egress-restrict
+  name: github-runner-egress-restrict-{{ .Values.poolName }}
 spec:
   endpointSelector:
     matchLabels:

@@ -1,0 +1,7 @@
+apiVersion: v2
+name: runners-generator
+version: 1.0.0
+dependencies:
+  - name: argocd-apps
+    version: 2.0.5
+    repository: https://argoproj.github.io/argo-helm

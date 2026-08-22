@@ -10,12 +10,8 @@ karpenter-provider-hetzner:
     requests: null
     limits: null
 
-# Cloud-init rendered into the karpenter-user-data Secret (see templates/secrets.yaml),
-# referenced by an HCloudNodeClass's userDataSecretRef to bootstrap the k3s agent on
-# worker nodes Karpenter provisions. The k3s join token itself never lives here or in
-# git — it's pulled from Vault at sync time by the ExternalSecret's template.
 cloudInit:
   k3sVersion: v1.36.2+k3s1
   # Private IP of the first k3s control-plane node on the "main-vpc" network, matching
   # platform/core/external-secrets/provision/main.tf's kubernetes_host.
-  k3sServerURL: 10.0.0.2
+  k3sServerURL: nexus-control-plane.kbntx.com

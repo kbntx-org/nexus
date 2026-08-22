@@ -1,0 +1,33 @@
+{{- if .Values.karpenter.enabled }}
+apiVersion: karpenter.hetzner.cloud/v1
+kind: HCloudNodeClass
+metadata:
+  name: {{ .Values.poolName }}
+spec:
+  locations:
+    {{- range .Values.karpenter.locations }}
+    - {{ . }}
+    {{- end }}
+  networkID: {{ .Values.karpenter.networkID | int64 }}
+  imageSelector:
+    family: {{ .Values.karpenter.imageSelector.family }}
+    version: {{ .Values.karpenter.imageSelector.version | quote }}
+  firewallIDs:
+    {{- range .Values.karpenter.firewallIDs }}
+    - {{ . | int64 }}
+    {{- end }}
+  sshKeyIDs:
+    {{- range .Values.karpenter.sshKeyIDs }}
+    - {{ . | int64 }}
+    {{- end }}
+  placementGroupStrategy: spread
+  enablePublicIPv4: {{ .Values.karpenter.enablePublicIPv4 }}
+  enablePublicIPv6: false
+  labels:
+    managed-by: karpenter
+    pool: {{ .Values.poolName }}
+  userDataSecretRef:
+    namespace: {{ .Release.Namespace }}
+    name: github-arc-runners-{{ .Values.poolName }}-userdata
+    key: userData
+{{- end }}

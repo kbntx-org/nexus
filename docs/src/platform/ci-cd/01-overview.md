@@ -35,9 +35,9 @@ jobs:
     runs-on: nexus-org-runners
 ```
 
-`nexus-org-runners` is the
-[`runnerScaleSetName`](https://github.com/kbntx-org/nexus/blob/main/platform/core/github-arc-runners/runners/values.yaml){ target="\_blank" rel="noopener" }
-exposed by the runner chart. No per-job `container:` override is needed —
+`nexus-org-runners` is a `runnerScaleSetName` defined for one pool in
+[runners-generator's pool list](https://github.com/kbntx-org/nexus/blob/main/platform/core/github-arc-runners/runners-generator/values.yaml){ target="\_blank" rel="noopener" }.
+No per-job `container:` override is needed —
 the runner pod itself runs the [CI toolkit image](#ci-toolkit-image), so
 every tool a workflow needs is already on the pod that executes it.
 
@@ -68,19 +68,33 @@ discarded. There is no shared state between jobs, no warm caches between
 runs, and no opportunity for one job to leave behind something that
 affects the next one.
 
-The pool size scales between `minRunners` and `maxRunners` (configured in
-the [runner values](https://github.com/kbntx-org/nexus/blob/main/platform/core/github-arc-runners/runners/values.yaml){ target="\_blank" rel="noopener" }):
+Each pool's size scales between its own `minRunners` and `maxRunners`
+(set per pool in
+[runners-generator's pool list](https://github.com/kbntx-org/nexus/blob/main/platform/core/github-arc-runners/runners-generator/values.yaml){ target="\_blank" rel="noopener" }):
 the listener creates new ephemeral runners as jobs queue up, the
 controller materializes them as pods, and idle slack is pruned back down.
 
-### Dedicated node pool
+### Runner pools
 
-Runner pods schedule onto a **dedicated node pool**. The runner spec sets
-a `nodeSelector` (`pool: ci-runners`) and tolerates a matching taint, so:
+Runner pods are organized into **pools** — one Helm release of the
+[runner-scale-set](https://github.com/kbntx-org/nexus/tree/main/platform/core/github-arc-runners/runner-scale-set){ target="\_blank" rel="noopener" }
+chart per pool, generated from the pool list in
+[runners-generator's values](https://github.com/kbntx-org/nexus/blob/main/platform/core/github-arc-runners/runners-generator/values.yaml){ target="\_blank" rel="noopener" }
+by an ArgoCD `ApplicationSet`. Adding or removing a pool is a one-line
+change to that list. Each pool's runner spec sets a distinct `nodeSelector`
+and tolerates a matching taint, so:
 
 - CI workloads cannot land on application nodes
 - Application workloads cannot land on runner nodes
 - Resource pressure from a noisy job stays within its blast radius
+- Pools don't contend with each other for capacity
+
+Most pools provision their nodes on demand via
+[Karpenter](https://karpenter.sh/){ target="\_blank" rel="noopener" }
+against Hetzner Cloud, scaling node count with runner demand instead of
+running fixed-size node pools. One pool (`ci-runners`) still runs on a
+statically provisioned Terraform node instead, for workloads that want
+that dedicated compute.
 
 ### Docker-in-Docker sidecar
 
@@ -92,8 +106,8 @@ volume and a socket volume: `runner`, which runs the job, and `dind`, a
 sidecar. `DOCKER_HOST` on the `runner` container points at the sidecar's
 socket, so `docker build`, Docker actions, and service containers all
 work without either container needing `privileged: true` — the pod's
-`sysbox-runc`
-[`runtimeClassName`](https://github.com/kbntx-org/nexus/blob/main/platform/core/github-arc-runners/runners/values.yaml){ target="\_blank" rel="noopener" }
+`sysbox-runc` `runtimeClassName`, set in
+[runners-generator's pool list](https://github.com/kbntx-org/nexus/blob/main/platform/core/github-arc-runners/runners-generator/values.yaml){ target="\_blank" rel="noopener" },
 is what makes running a Docker daemon safe without that flag.
 
 Because the pod is single-use and discarded once the job finishes, there
@@ -102,8 +116,8 @@ from the same clean sidecar.
 
 - **Network isolation.** The runner pod carries a `github-job-pod: 'true'`
   label. A
-  [`CiliumNetworkPolicy`](https://github.com/kbntx-org/nexus/blob/main/platform/core/github-arc-runners/runners/templates/network-policy.yaml){ target="\_blank" rel="noopener" }
-  selects on that label and restricts egress to DNS (`kube-system`) and
+  [`CiliumNetworkPolicy`](https://github.com/kbntx-org/nexus/blob/main/platform/core/github-arc-runners/runner-scale-set/templates/network-policy.yaml){ target="\_blank" rel="noopener" }
+  (one per pool) selects on that label and restricts egress to DNS (`kube-system`) and
   the public internet — the cluster's other namespaces are denied.
   Runners execute arbitrary user-authored code (workflow YAML, pulled
   actions, build scripts), so treating them as untrusted is the safe
@@ -204,7 +218,8 @@ the build/deploy logic is risky enough to warrant a full re-deploy.
 ## References
 
 - [`platform/core/github-arc-runners/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/github-arc-runners){ target="\_blank" rel="noopener" } — ARC controller and runner Helm charts
-- [`platform/core/github-arc-runners/runners/templates/network-policy.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/github-arc-runners/runners/templates/network-policy.yaml){ target="\_blank" rel="noopener" } — runner egress restrictions
+- [`platform/core/github-arc-runners/runners-generator/values.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/core/github-arc-runners/runners-generator/values.yaml){ target="\_blank" rel="noopener" } — the pool list and per-pool `ApplicationSet` template
+- [`platform/core/github-arc-runners/runner-scale-set/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/github-arc-runners/runner-scale-set){ target="\_blank" rel="noopener" } — the chart deployed once per pool (runner spec, node pool, network policy)
 - [`platform/core/github-arc-runners/base-image/`](https://github.com/kbntx-org/nexus/tree/main/platform/core/github-arc-runners/base-image){ target="\_blank" rel="noopener" } — CI toolkit image
 - [`.github/workflows/`](https://github.com/kbntx-org/nexus/tree/main/.github/workflows){ target="\_blank" rel="noopener" } — workflow definitions
 - [`.github/actions/compute-affected/action.yaml`](https://github.com/kbntx-org/nexus/blob/main/.github/actions/compute-affected/action.yaml){ target="\_blank" rel="noopener" } — affected detection (per-app base from `nexus-manifests` on main)

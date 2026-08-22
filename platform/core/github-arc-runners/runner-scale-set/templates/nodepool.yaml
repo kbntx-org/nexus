@@ -1,0 +1,50 @@
+{{- if .Values.karpenter.enabled }}
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: {{ .Values.poolName }}
+spec:
+  template:
+    metadata:
+      labels:
+        pool: arc-{{ .Values.poolName }}-pool
+        sysbox-install: 'yes'
+        k3s.sh/plan-exclude: 'true'
+    spec:
+      nodeClassRef:
+        group: karpenter.hetzner.cloud
+        kind: HCloudNodeClass
+        name: {{ .Values.poolName }}
+      requirements:
+        - key: kubernetes.io/arch
+          operator: In
+          values: [amd64]
+        - key: node.kubernetes.io/instance-type
+          operator: In
+          values:
+            {{- range .Values.karpenter.instanceTypes }}
+            - {{ . | quote }}
+            {{- end }}
+        - key: topology.kubernetes.io/zone
+          operator: In
+          values:
+            {{- range .Values.karpenter.locations }}
+            - {{ . }}
+            {{- end }}
+      taints:
+        - key: {{ .Values.poolName }}-runner
+          value: 'true'
+          effect: NoSchedule
+  {{- with .Values.karpenter.limits }}
+  limits:
+    {{- with .cpu }}
+    cpu: {{ . | quote }}
+    {{- end }}
+    {{- with .memory }}
+    memory: {{ . | quote }}
+    {{- end }}
+  {{- end }}
+  disruption:
+    consolidationPolicy: WhenEmpty
+    consolidateAfter: 30s
+{{- end }}
