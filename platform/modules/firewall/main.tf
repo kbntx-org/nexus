@@ -27,4 +27,8 @@ resource "hcloud_firewall_attachment" "attachment" {
 
   firewall_id     = hcloud_firewall.firewall.id
   label_selectors = [var.label_selector]
+
+  lifecycle {
+    ignore_changes = [server_ids]
+  }
 }

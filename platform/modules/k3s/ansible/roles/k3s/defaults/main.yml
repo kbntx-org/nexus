@@ -14,6 +14,11 @@ k3s_docker_hub_password: ''
 k3s_server_node_taints:
   - 'node-role.kubernetes.io/control-plane=true:NoSchedule'
 
+# Extra hostname/IP to include in the k3s server's TLS certificate, e.g. a
+# DNS record pointing at the control-plane node so kubeconfigs and other
+# consumers can use a stable hostname instead of a raw IP.
+k3s_tls_san: ''
+
 # Node labels are derived from the Hetzner Cloud labels Terraform sets on
 # each server, minus the labels that only carry inventory-grouping meaning
 # and the "taint-*" labels, which are node taints in disguise (see

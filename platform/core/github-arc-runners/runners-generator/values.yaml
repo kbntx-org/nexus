@@ -1,0 +1,167 @@
+argocd-apps:
+  applicationsets:
+    ci-runners:
+      goTemplate: true
+      goTemplateOptions: ['missingkey=error']
+      generators:
+        - list:
+            elements:
+              - name: runners-4cpu-8gb
+                instanceTypes: ['cx33', 'cpx32']
+              - name: runners-static
+                # Runs on the existing Terraform-provisioned "ci-runners"
+                # node (platform/core/kubernetes/provision/main.tf) instead
+                # of one Karpenter provisions, so it keeps that compute.
+                # nodeSelectorPool/tolerationKey must match that node's
+                # actual label/taint, and sharingHosts is true since it's
+                # one physical node hosting every runner in the pool.
+                karpenterEnabled: false
+                nodeSelectorPool: ci-runners
+                tolerationKey: ci-runners
+                sharingHosts: true
+                minRunners: 4
+                maxRunners: 4
+      template:
+        metadata:
+          name: 'runner-{{ .name }}'
+          labels:
+            runner: '{{ .name }}'
+        spec:
+          project: default
+          source:
+            repoURL: https://github.com/kbntx-org/nexus.git
+            targetRevision: main
+          destination:
+            server: https://kubernetes.default.svc
+            namespace: arc-runners
+          syncPolicy:
+            automated:
+              prune: true
+              selfHeal: true
+            syncOptions:
+              - CreateNamespace=true
+      syncPolicy:
+        # Removing a pool from the list above deletes its Application (and
+        # everything it created) instead of orphaning it.
+        preserveResourcesOnDeletion: false
+      templatePatch: |
+        spec:
+          source:
+            path: platform/core/github-arc-runners/runner-scale-set
+            helm:
+              values: |
+                poolName: '{{ .name }}'
+                vaultKey: arc-runners
+
+                {{- if (dig "karpenterEnabled" true .) }}
+                karpenter:
+                  enabled: true
+                  networkID: 11317690
+                  firewallIDs:
+                    - 10483672
+                  sshKeyIDs:
+                    # dummy-karpenter ssh key — Hetzner emails the root otherwise
+                    - 117687226
+                  locations:
+                    - nbg1
+                    - fsn1
+                    - hel1
+                  enablePublicIPv4: true
+                  imageSelector:
+                    family: ubuntu
+                    version: '24.04'
+                  instanceTypes:
+                  {{- range .instanceTypes }}
+                    - {{ . | quote }}
+                  {{- end }}
+                  limits:
+                    cpu: '40'
+                    memory: 80Gi
+                  userData:
+                    k3sVersion: v1.36.2+k3s1
+                    k3sServerURL: nexus-control-plane.kbntx.com
+                {{- else }}
+                karpenter:
+                  enabled: false
+                {{- end }}
+
+                gha-runner-scale-set:
+                  # Needs to be specified because live discovery doesn't work when applying this chart with Argo instead of Helm
+                  # See https://github.com/actions/actions-runner-controller/issues/3043#issuecomment-2502263842
+                  controllerServiceAccount:
+                    namespace: arc-systems
+                    name: github-arc-runners-controller-gha-rs-controller
+                  githubConfigUrl: https://github.com/kbntx-org
+                  githubConfigSecret: 'github-arc-runners-{{ .name }}-secret'
+                  maxRunners: {{ dig "maxRunners" 10 . }}
+                  minRunners: {{ dig "minRunners" 0 . }}
+                  runnerGroup: 'default'
+                  runnerScaleSetName: '{{ .name }}'
+                  listenerTemplate:
+                    spec:
+                      containers:
+                        - name: listener
+                  template:
+                    metadata:
+                      labels:
+                        github-job-pod: 'true'
+                    spec:
+                      runtimeClassName: sysbox-runc
+                      hostUsers: false
+                      automountServiceAccountToken: false
+                      containers:
+                        - name: runner
+                          image: kbntx/nexus-ci-toolkit:1.5
+                          command:
+                            - /home/runner/run.sh
+                          env:
+                            - name: DOCKER_HOST
+                              value: unix:///run/docker.sock
+                          startupProbe:
+                            exec:
+                              command: ['docker', 'info']
+                            initialDelaySeconds: 0
+                            failureThreshold: 24
+                            periodSeconds: 5
+                          volumeMounts:
+                            - name: work
+                              mountPath: /home/runner/_work
+                            - name: docker-sock
+                              mountPath: /run
+                        - name: dind
+                          image: docker:29.7.2-dind
+                          args:
+                            - --group=123
+                          volumeMounts:
+                            - name: work
+                              mountPath: /home/runner/_work
+                            - name: docker-sock
+                              mountPath: /run
+                      volumes:
+                        - name: work
+                          emptyDir: {}
+                        - name: docker-sock
+                          emptyDir: {}
+                      nodeSelector:
+                        pool: '{{ dig "nodeSelectorPool" (printf "arc-%s-pool" .name) . }}'
+                      tolerations:
+                        - key: '{{ dig "tolerationKey" (printf "%s-runner" .name) . }}'
+                          operator: 'Equal'
+                          value: 'true'
+                          effect: 'NoSchedule'
+                      {{- if (dig "sharingHosts" false .) }}
+                      affinity:
+                        podAntiAffinity:
+                          requiredDuringSchedulingIgnoredDuringExecution: []
+                      {{- else }}
+                      affinity:
+                        podAntiAffinity:
+                          requiredDuringSchedulingIgnoredDuringExecution:
+                            - labelSelector:
+                                matchExpressions:
+                                  - key: actions-ephemeral-runner
+                                    operator: In
+                                    values:
+                                      - 'True'
+                              topologyKey: 'kubernetes.io/hostname'
+                      {{- end }}

@@ -53,6 +53,11 @@ output "cluster_token" {
   sensitive   = true
 }
 
+output "control_plane_ip" {
+  description = "Private IP of the control-plane node on the cluster's network"
+  value       = hcloud_server_network.control_plane_network.ip
+}
+
 data "cloudinit_config" "control_plane" {
   gzip          = false
   base64_encode = false

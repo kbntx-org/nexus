@@ -227,15 +227,15 @@ argocd-apps:
         syncOptions:
           - CreateNamespace=true
 
-    github-arc-runners:
+    github-arc-runners-generator:
       project: default
       source:
         repoURL: https://github.com/kbntx-org/nexus.git
-        path: platform/core/github-arc-runners/runners
+        path: platform/core/github-arc-runners/runners-generator
         targetRevision: main
       destination:
         server: https://kubernetes.default.svc
-        namespace: arc-runners
+        namespace: argocd
       syncPolicy:
         automated:
           prune: true

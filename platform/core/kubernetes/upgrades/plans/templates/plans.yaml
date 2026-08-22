@@ -31,6 +31,10 @@ spec:
     matchExpressions:
     - key: node-role.kubernetes.io/control-plane
       operator: DoesNotExist
+    - key: k3s.sh/plan-exclude
+      operator: NotIn
+      values:
+      - "true"
   tolerations:
     - operator: Exists
   prepare:
