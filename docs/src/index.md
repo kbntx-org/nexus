@@ -292,9 +292,8 @@ hide:
     Welcome to <span class="nexus-hero__brand">Nexus</span>
   </h1>
   <p class="nexus-hero__subtitle">
-    A space to experiment with cloud-native infrastructure and build a solid,
-    reusable foundation for every side project — so I can stop reinventing
-    CI/CD, secrets, and deployment for each new idea.
+    A space to experiment with latest technologies, cloud-native infrastructure while building a solid,
+    reusable production infrastructure my projects.
   </p>
   <div class="nexus-hero__actions">
     <a class="nexus-cta nexus-cta--primary" href="getting-started/01-overview/">
@@ -302,40 +301,6 @@ hide:
     </a>
     <a class="nexus-cta nexus-cta--ghost" href="https://github.com/kbntx-org/nexus" target="_blank" rel="noopener noreferrer">
       View on GitHub
-    </a>
-  </div>
-</section>
-
-<section class="nexus-pillars">
-  <div class="nexus-grid">
-    <article class="nexus-card">
-      <h2>Why this exists</h2>
-      <p>
-        Platform engineering is what I do for a living, and I wanted somewhere
-        to practice the craft without production constraints. Nexus is that
-        space — opinionated, fully declarative, and built end-to-end from
-        infrastructure provisioning to application delivery.
-      </p>
-    </article>
-    <article class="nexus-card">
-      <h2>A learning environment</h2>
-      <p>
-        Every component is chosen because I want to understand it deeply, not
-        just use it. If something feels like a black box, it does not belong
-        in Nexus. The docs cover the <em>why</em> behind each choice, not
-        just the how.
-      </p>
-    </article>
-  </div>
-
-  <div class="nexus-grid">
-    <a class="nexus-link-card" href="getting-started/01-overview/">
-      <h3>Getting Started <span class="nexus-link-card__arrow">&rarr;</span></h3>
-      <p>What Nexus is, how it's architected, and how to run it locally.</p>
-    </a>
-    <a class="nexus-link-card" href="platform/ci-cd/01-overview/">
-      <h3>Platform <span class="nexus-link-card__arrow">&rarr;</span></h3>
-      <p>A deep dive into each component: GitOps, networking, secrets, observability, CI/CD, and more.</p>
     </a>
   </div>
 </section>

@@ -3,163 +3,100 @@ title: Overview
 ---
 
 Observability in Nexus is a single Helm chart at
-[`platform/services/monitoring/`](https://github.com/kbntx-org/nexus/tree/main/platform/services/monitoring){ target="\_blank" rel="noopener" }
-that wires up metrics, logs, and a UI for both. The deliberate split is:
-**[VictoriaMetrics](https://docs.victoriametrics.com/){ target="\_blank" rel="noopener" }**
-for metrics,
-**[Loki](https://grafana.com/docs/loki/latest/){ target="\_blank" rel="noopener" }**
-for logs, and
-**[Grafana](https://grafana.com/docs/grafana/latest/){ target="\_blank" rel="noopener" }**
-in front of both.
+<a href="https://github.com/kbntx-org/nexus/tree/main/platform/services/monitoring" target="_blank" rel="noopener"><code>platform/services/monitoring/</code></a>,
+built on the Grafana OSS stack rather than something like Datadog. Two reasons drive that: cost, and
+control over visualization — Grafana lets us mix metrics, logs, and arbitrary external data sources
+(custom APIs included) on the same dashboard, instead of being boxed into one vendor's model of what
+a panel can query.
 
-## Why VictoriaMetrics instead of Prometheus
+The broader strategy is to back every component by S3-compatible object storage where possible —
+it's less to operate than block-storage-backed alternatives, and storage then scales independently
+of the cluster. Loki already works this way; metrics don't yet (see [Metrics](#metrics) below).
 
-Prometheus is the obvious choice and the reference implementation; this
-stack swaps it out for VictoriaMetrics on purpose:
+## Stack
 
-- **Memory footprint.** At equivalent active-series counts,
-  VictoriaMetrics keeps a much smaller resident set than Prometheus.
-  On a single-node-ish home cluster where every gigabyte of RAM is
-  visible on the bill, that gap matters.
-- **Single binary, single process.** No separate scraper, ruler, or
-  remote-write target to operate. The
-  [`victoria-metrics-single`](https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-single){ target="\_blank" rel="noopener" }
-  chart deploys one workload that scrapes, stores, and serves queries.
-- **Drop-in PromQL.** Existing Prometheus dashboards, exporters, scrape
-  configs, and PromQL queries all work unchanged. VictoriaMetrics speaks
-  Prometheus' remote-write and query APIs, so the rest of the ecosystem
-  (`kube-state-metrics`, `node-exporter`, Grafana data sources) does not
-  even know it has been swapped out.
-
-The trade-off is mostly cultural: the Prometheus operator's CRDs
-(`ServiceMonitor`, `PodMonitor`, `PrometheusRule`) are not used here.
-Scrape targets are defined as plain Prometheus scrape configs in
-[`values.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/monitoring/values.yaml){ target="\_blank" rel="noopener" }
-under `victoria-metrics-single.server.scrape.extraScrapeConfigs`.
-
-## Metrics pipeline
-
-Two exporters publish metrics that VictoriaMetrics scrapes on a schedule:
-
-- [`prometheus-node-exporter`](https://github.com/prometheus/node_exporter){ target="\_blank" rel="noopener" }
-  (DaemonSet) for host-level signals — CPU, memory, disk, network.
-- [`kube-state-metrics`](https://github.com/kubernetes/kube-state-metrics){ target="\_blank" rel="noopener" }
-  for the Kubernetes object graph as metrics — pod phases, replica
-  counts, deployment status, and so on.
-
-Both are subcharts of the monitoring chart, discovered via Kubernetes
-SD, and filtered down by `relabel_configs` so VictoriaMetrics only
-keeps the targets it cares about.
-
-## Logs pipeline
-
-[Promtail](https://grafana.com/docs/loki/latest/clients/promtail/){ target="\_blank" rel="noopener" }
-runs as a DaemonSet on every node, tails container log files from the
-node's filesystem, attaches Kubernetes metadata (namespace, pod,
-controller kind, controller name), and pushes batches into Loki's HTTP
-ingest endpoint.
-
-Loki itself runs in
-[**SimpleScalable**](https://grafana.com/docs/loki/latest/get-started/deployment-modes/#simple-scalable){ target="\_blank" rel="noopener" }
-mode — `read`, `write`, and `backend` workloads scaled separately —
-backed by **S3-compatible object storage** for chunks and the index.
-Bucket credentials and endpoint come from Vault via the External
-Secrets Operator (see [Secrets](../secrets/01-overview.md)). Keeping
-chunks off cluster volumes means log retention scales with object
-storage pricing rather than with the cluster's PVC budget, and
-snapshots / lifecycle rules live where they belong: at the bucket.
-
-## How it fits together
+| Signal     | Tool                                                                                           | Backing storage                                              |
+| ---------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Metrics    | <a href="https://docs.victoriametrics.com/" target="_blank" rel="noopener">VictoriaMetrics</a> | Local disk today — see [Metrics](#metrics)                   |
+| Logs       | <a href="https://grafana.com/docs/loki/latest/" target="_blank" rel="noopener">Loki</a>        | S3-compatible (R2)                                           |
+| Traces     | Not deployed yet                                                                               | —                                                            |
+| Dashboards | <a href="https://grafana.com/docs/grafana/latest/" target="_blank" rel="noopener">Grafana</a>  | CloudNativePG — see [Databases](../databases/01-overview.md) |
 
 ```mermaid
 %%{init: {'theme':'dark'}}%%
 graph LR
     NodeExporter[node-exporter<br/>DaemonSet]
-    KubeStateMetrics[kube-state-metrics]
+    KSM[kube-state-metrics]
     Promtail[Promtail<br/>DaemonSet]
-
-    VictoriaMetrics[VictoriaMetrics<br/>scrape + store]
-    Loki[Loki<br/>S3 chunks]
+    Metrics[VictoriaMetrics]
+    Logs[Loki]
+    S3[(S3 / R2)]
+    Disk[(Local disk)]
     Grafana
 
-    NodeExporter -->|scrape| VictoriaMetrics
-    KubeStateMetrics -->|scrape| VictoriaMetrics
-    Promtail -->|push| Loki
-    Grafana -->|PromQL| VictoriaMetrics
-    Grafana -->|LogQL| Loki
+    NodeExporter -->|scrape| Metrics
+    KSM -->|scrape| Metrics
+    Promtail -->|push| Logs
+    Logs --> S3
+    Metrics --> Disk
+    Grafana -->|PromQL| Metrics
+    Grafana -->|LogQL| Logs
 ```
 
-## Grafana behind Cloudflare Zero Trust
+## Metrics
 
-Grafana is published through an in-cluster `IngressRoute`
-([`ingress.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/monitoring/templates/ingress.yaml){ target="\_blank" rel="noopener" }),
-which means the same Cloudflare Tunnel + Zero Trust front door
-described in [Networking](../networking/01-overview.md) gates access.
-Authentication, MFA, and identity-aware policy all live at the edge.
+<a href="https://docs.victoriametrics.com/" target="_blank" rel="noopener">VictoriaMetrics</a> (the
+<a href="https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-single" target="_blank" rel="noopener"><code>victoria-metrics-single</code></a>
+chart) scrapes
+<a href="https://github.com/prometheus/node_exporter" target="_blank" rel="noopener"><code>node-exporter</code></a>
+(host-level signals) and
+<a href="https://github.com/kubernetes/kube-state-metrics" target="_blank" rel="noopener"><code>kube-state-metrics</code></a>
+(the Kubernetes object graph as metrics) on a schedule, speaking Prometheus'
+scrape/remote-write/query APIs so PromQL, dashboards, and exporters all work unchanged.
 
-The Grafana config takes that for granted: the values file flips
-`auth.disable_login: true` and `auth.disable_login_form: true`, so
-the application itself has no login screen at all. If you reached
-Grafana, Cloudflare already decided you should be there. The only
-local credential is the admin password, pulled from Vault via ESO and
-mounted from the
-[`monitoring-secret`](https://github.com/kbntx-org/nexus/blob/main/platform/services/monitoring/templates/secrets.yaml){ target="\_blank" rel="noopener" }.
+It's the one signal not yet S3-backed — storage is a local volume today. The plan is to move onto
+<a href="https://grafana.com/oss/mimir/" target="_blank" rel="noopener">Mimir</a> (same Grafana OSS
+family, natively S3-backed, still speaks PromQL) to close that gap, rather than staying on a
+single-node setup indefinitely. The idea is also to move the different daemonsets to alloy that
+cover all our cases (metrics + logs collection).
 
-## Postgres for Grafana state
+At the moment we cover only core metrics (cpu, I/O, memory, disk) at different levels (nodes, pods,
+containers).
 
-Grafana keeps dashboards, data sources, alert rules, and users in a
-relational store. The chart default is embedded SQLite on a PVC, which
-is fine until it isn't:
+## Logs
 
-- **Single-writer, file-locked.** Crash mid-write and the file can come
-  back corrupted. Recovering from a snapshot of an in-flight SQLite
-  database is its own adventure.
-- **Tied to a pod.** The PVC pins Grafana to a single replica and a
-  single node — fine for one user, awkward for any HA story later.
-- **Snapshot-unfriendly.** Volume snapshots of a live SQLite file are
-  not consistent without quiescing the pod first.
+<a href="https://grafana.com/docs/loki/latest/clients/promtail/" target="_blank" rel="noopener">Promtail</a>
+runs as a DaemonSet, tails container logs, attaches Kubernetes metadata, and pushes to Loki, which
+runs in
+<a href="https://grafana.com/docs/loki/latest/get-started/deployment-modes/#simple-scalable" target="_blank" rel="noopener">SimpleScalable</a>
+mode backed by S3-compatible storage for chunks and the index.
 
-The chart instead deploys a small dedicated
-[Postgres](https://www.postgresql.org/docs/){ target="\_blank" rel="noopener" }
-StatefulSet
-([`postgres.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/monitoring/templates/postgres.yaml){ target="\_blank" rel="noopener" })
-on a Hetzner block volume, and points Grafana at it via
-`grafana.ini.database`. Credentials are injected from the same Vault
-secret as the rest of the stack. Grafana itself runs with
-`persistence.enabled: false` — all state lives in Postgres, the pod is
-disposable, and backups are a single `pg_dump` (or a volume snapshot of
-a quiesced Postgres) away.
+## Traces
+
+Not wired up yet. The natural next piece is
+<a href="https://grafana.com/oss/tempo/" target="_blank" rel="noopener">Tempo</a>, same Grafana OSS
+family and S3-backed like Loki already is. It is work in progress, traces are quite important for
+representing things like CI/CD visibility (global data, tests failures, etc).
 
 ## Adding a dashboard
 
-Two paths, both supported:
-
-- **Imported through the UI.** The Grafana sidecar runs with
-  `allowUiUpdates: true`, so dashboards saved interactively are
-  persisted to Postgres and survive pod restarts. Good for iterating.
-- **Provisioned via the chart.** Anything that should be source-of-truth
-  belongs in the
-  [monitoring values file](https://github.com/kbntx-org/nexus/blob/main/platform/services/monitoring/values.yaml){ target="\_blank" rel="noopener" }
-  (or a sibling ConfigMap rendered by the chart) so it is reapplied on
-  every ArgoCD sync. UI-edited dashboards should eventually be
+- **Imported through the UI.** The Grafana sidecar runs with `allowUiUpdates: true`, so dashboards
+  saved interactively persist and survive pod restarts. Good for iterating.
+- **Provisioned via the chart.** Anything that should be source-of-truth belongs in the
+  <a href="https://github.com/kbntx-org/nexus/blob/main/platform/services/monitoring/values.yaml" target="_blank" rel="noopener">monitoring
+  values file</a> so it's reapplied on every ArgoCD sync. UI-edited dashboards should eventually be
   promoted there.
 
 ## Alerts
 
-Alerting is currently a **known gap**. The Loki subchart has
-`ruler.enabled: false`, no `PrometheusRule`-equivalents are wired into
-VictoriaMetrics, and no Alertmanager (or
-[`vmalert`](https://docs.victoriametrics.com/vmalert/){ target="\_blank" rel="noopener" })
-is deployed. Dashboards exist; pages do not. Wiring `vmalert` against
-VictoriaMetrics for metric alerts and re-enabling the Loki ruler for
-log-based alerts is the natural next step, but until then alerting is
-explicitly out of scope for this stack.
+Alerting goes through
+<a href="https://grafana.com/docs/grafana/latest/alerting/" target="_blank" rel="noopener">Grafana's
+own unified alerting</a> rather than a separate Alertmanager or `vmalert` — one less component to
+run, and rules live next to the dashboards that inform them.
 
 ## References
 
-- [`platform/services/monitoring/`](https://github.com/kbntx-org/nexus/tree/main/platform/services/monitoring){ target="\_blank" rel="noopener" } — full monitoring Helm chart
-- [`platform/services/monitoring/Chart.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/monitoring/Chart.yaml){ target="\_blank" rel="noopener" } — subchart dependencies (VictoriaMetrics, Grafana, Loki, Promtail, kube-state-metrics, node-exporter)
-- [`platform/services/monitoring/values.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/monitoring/values.yaml){ target="\_blank" rel="noopener" } — scrape configs, Loki S3 backend, Grafana database + auth
-- [`platform/services/monitoring/templates/ingress.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/monitoring/templates/ingress.yaml){ target="\_blank" rel="noopener" } — Grafana `IngressRoute`
-- [`platform/services/monitoring/templates/postgres.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/monitoring/templates/postgres.yaml){ target="\_blank" rel="noopener" } — dedicated Postgres for Grafana state
-- [`platform/services/monitoring/templates/secrets.yaml`](https://github.com/kbntx-org/nexus/blob/main/platform/services/monitoring/templates/secrets.yaml){ target="\_blank" rel="noopener" } — Vault-backed `ExternalSecret` for credentials
+- <a href="https://github.com/kbntx-org/nexus/tree/main/platform/services/monitoring" target="_blank" rel="noopener"><code>platform/services/monitoring/</code></a>
+  — full monitoring Helm chart
+- [Databases](../databases/01-overview.md) — CNPG pattern backing Grafana's own state
+- [Secrets](../secrets/01-overview.md) — how Loki's S3 credentials reach the cluster

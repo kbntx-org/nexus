@@ -1,10 +1,9 @@
 title: Platform
 
 nav:
-  - ci-cd
-  - networking
-  - argocd
-  - kubernetes
-  - traefik
-  - observability
+  - cluster
+  - traffic
+  - delivery
+  - databases
   - secrets
+  - observability

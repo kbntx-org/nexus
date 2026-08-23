@@ -12,8 +12,7 @@
     "cluster:delete": "bash platform/core/local/cluster.sh delete",
     "cluster:recreate": "bash platform/core/local/cluster.sh recreate",
     "dev:docs": "tilt up -- docs",
-    "dev:portfolio": "tilt up -- portfolio",
-    "dev:reset": "tilt down"
+    "dev:portfolio": "tilt up -- portfolio"
   },
   "dependencies": {
     "@angular/animations": "21.2.19",
