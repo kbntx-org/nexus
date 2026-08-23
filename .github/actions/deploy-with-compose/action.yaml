@@ -22,7 +22,12 @@ runs:
     - name: Setup SSH and Deploy
       shell: bash
       run: |
-        ./tools/bash/setup-ssh.sh "$SSH_KEY" "$SSH_KNOWN_HOSTS"
+        mkdir -p ~/.ssh
+        echo -n "$SSH_KEY" > ~/.ssh/id_ed25519
+        chmod 600 ~/.ssh/id_ed25519
+        echo -n "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+        chmod 600 ~/.ssh/known_hosts
+
         ssh -fNT -L /tmp/docker.sock:/var/run/docker.sock "${{ inputs.user }}@${{ inputs.server }}"
         docker system prune -af
         COMPOSE_CMD="docker compose"

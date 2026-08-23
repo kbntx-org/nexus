@@ -12,9 +12,6 @@ on:
         description: 'JSON array of projects whose code OR deployPaths changed since their last deploy'
         value: ${{ jobs.build.outputs.deploy_targets }}
 
-concurrency:
-  group: build-${{ inputs.image_tag }}
-
 jobs:
   build:
     name: Build
