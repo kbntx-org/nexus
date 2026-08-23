@@ -1,6 +1,8 @@
 ---
 title: Nexus - Kubernetes & Compute Platform
-description: A production-ready Kubernetes infrastructure built on Hetzner Cloud, featuring K3s cluster, Terraform automation, and comprehensive networking setup.
+description:
+  A production-ready Kubernetes infrastructure built on Hetzner Cloud, featuring K3s cluster,
+  Terraform automation, and comprehensive networking setup.
 tech:
   - Kubernetes (K3S)
   - Terraform
@@ -23,8 +25,15 @@ features:
   - Standardized deployments
 ---
 
-Designed and implemented a scalable Kubernetes platform using K3s on Hetzner Cloud. K3s was chosen because it's a lightweight kubernetes distribution and it comes with some batteries that makes its implementation easier. The foundational infrastructure is fully automated with a terraform module based on a system of node-pools.
+Designed and implemented a scalable Kubernetes platform using K3s on Hetzner Cloud. K3s was chosen
+because it's a lightweight kubernetes distribution and it comes with some batteries that makes its
+implementation easier. The foundational infrastructure is fully automated with a terraform module
+based on a system of node-pools.
 
 <br>
 
-The cluster comes with a few batteries included like ArgoCD, ingress-nginx, the hetzner CSI and finally cloudflared to expose services to the internet. The platform is following GitOps principles as much as possible to have a minimum recovery time in case of disaster. Workloads are mostly stateless and for the stateful ones, an aggresive backup strategy is applied to avoid data loss in case of incident.
+The cluster comes with a few batteries included like ArgoCD, ingress-nginx, the hetzner CSI and
+finally cloudflared to expose services to the internet. The platform is following GitOps principles
+as much as possible to have a minimum recovery time in case of disaster. Workloads are mostly
+stateless and for the stateful ones, an aggresive backup strategy is applied to avoid data loss in
+case of incident.

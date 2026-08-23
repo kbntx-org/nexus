@@ -1,6 +1,7 @@
 ---
 title: Portfolio
-description: A modern, responsive portfolio website built with Angular to showcase my projects and experiences.
+description:
+  A modern, responsive portfolio website built with Angular to showcase my projects and experiences.
 tech:
   - Angular
   - TypeScript
@@ -15,9 +16,11 @@ images:
   - https://nexus-public-assets.kbntx.com/images/portfolio-projects.webp
 githubUrl: https://github.com/kbntx-org/nexus
 features:
-  - Dark/light theme support
+  - Dark/light theme supports
   - Declarative content management to keep a low maintenance cost
   - Pre-rendering for performance optimization
 ---
 
-A modern, responsive portfolio website showcasing my different projects and experiences. Built with Angular, it is featuring smooth animations, dark/light theme switching. It is was also optimized by using pre-rendering.
+A modern, responsive portfolio website showcasing my different projects and experiences. Built with
+Angular, it is featuring smooth animations, dark/light theme switching. It is was also optimized by
+using pre-rendering.

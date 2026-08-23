@@ -6,7 +6,7 @@ certificate:
 
 cilium:
   kubeProxyReplacement: true
-  k8sServiceHost: 10.0.0.2
+  k8sServiceHost: nexus-control-plane.kbntx.com
   k8sServicePort: 6443
   ipam:
     operator:
