@@ -25,7 +25,7 @@ jobs:
       - parallel:
           - name: Check formatting (affected)
             if: github.event_name == 'pull_request'
-            run: pnpm nx format:check --base remotes/origin/${{ github.base_ref }}
+            run: pnpm nx format:check --all
             shell: bash
 
           - name: Check formatting (all)

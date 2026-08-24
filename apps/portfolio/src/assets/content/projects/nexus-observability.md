@@ -1,6 +1,8 @@
 ---
 title: Nexus - Monitoring & Observability
-description: Lightweight Kubernetes-native observability stack with Grafana, VictoriaMetrics, Loki, and automated S3 backups.
+description:
+  Lightweight Kubernetes-native observability stack with Grafana, VictoriaMetrics, Loki, and
+  automated S3 backups.
 tech:
   - Kubernetes
   - VictoriaMetrics
@@ -27,8 +29,13 @@ features:
   - Stateful services with recurrent backup in S3
 ---
 
-Nexus is my homelab project where I experiment with building a production-grade observability platform.
+Nexus is my homelab project where I experiment with building a production-grade observability
+platform.
 
 <br>
 
-The stack provides full monitoring, logging, and alerting for Kubernetes clusters and hosted applications. VictoriaMetrics replaces Prometheus to enable seamless live backups to S3, reducing operational complexity and ensuring resilience. Combined with Grafana dashboards, Loki logs, and GitOps workflows via ArgoCD, the system offers real-time visibility, disaster recovery, and streamlined deployments.
+The stack provides full monitoring, logging, and alerting for Kubernetes clusters and hosted
+applications. VictoriaMetrics replaces Prometheus to enable seamless live backups to S3, reducing
+operational complexity and ensuring resilience. Combined with Grafana dashboards, Loki logs, and
+GitOps workflows via ArgoCD, the system offers real-time visibility, disaster recovery, and
+streamlined deployments.
