@@ -1,19 +1,57 @@
-FROM ghcr.io/actions/actions-runner:2.336.0
+FROM mcr.microsoft.com/dotnet/runtime-deps:8.0-noble AS build
 
-ENV NODE_VERSION=24.15.0
-ENV PNPM_VERSION=11.9.0
-ENV GO_VERSION=1.26.1
-ENV KUBECTL_VERSION=1.32.0
-ENV ARGOCD_VERSION=2.14.11
+ARG TARGETOS
+ARG TARGETARCH
+ARG RUNNER_VERSION
 
-USER root
+RUN apt-get update -y && \
+    apt-get install --no-install-recommends -y curl unzip && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && \
+WORKDIR /actions-runner
+RUN export RUNNER_ARCH=${TARGETARCH} && \
+    if [ "$RUNNER_ARCH" = "amd64" ]; then export RUNNER_ARCH=x64 ; fi && \
+    curl -f -L -o runner.tar.gz "https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-${TARGETOS}-${RUNNER_ARCH}-${RUNNER_VERSION}.tar.gz" && \
+    tar xzf ./runner.tar.gz && \
+    rm runner.tar.gz && \
+    rm -rf ./externals/node20
+
+FROM mcr.microsoft.com/dotnet/runtime-deps:8.0-noble
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV RUNNER_MANUALLY_TRAP_SIG=1
+ENV ACTIONS_RUNNER_PRINT_LOG_TO_STDOUT=1
+ENV ImageOS=ubuntu24
+
+ARG NODE_VERSION
+ARG PNPM_VERSION
+ARG GO_VERSION
+ARG KUBECTL_VERSION
+ARG ARGOCD_VERSION
+
+RUN apt-get update -y && \
     apt-get install --no-install-recommends -y \
+      sudo lsb-release gpg-agent software-properties-common \
       curl unzip netcat-traditional jq gnupg git \
-      gettext-base wget openssh-client \
-      xz-utils ca-certificates && \
-    rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
+      gettext-base wget openssh-client xz-utils ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN add-apt-repository ppa:git-core/ppa && \
+    apt-get update -y && \
+    apt-get install --no-install-recommends -y git && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN adduser --disabled-password --gecos "" --uid 1001 runner && \
+    groupadd docker --gid 123 && \
+    usermod -aG sudo runner && \
+    usermod -aG docker runner && \
+    echo "%sudo   ALL=(ALL:ALL) NOPASSWD:ALL" > /etc/sudoers && \
+    echo "Defaults env_keep += \"DEBIAN_FRONTEND\"" >> /etc/sudoers && \
+    chmod 777 /home/runner
+
+WORKDIR /home/runner
+
+COPY --chown=runner:docker --from=build /actions-runner .
 
 # Install the Docker CLI, Buildx and Compose plugins.
 RUN install -m 0755 -d /etc/apt/keyrings && \
@@ -58,28 +96,11 @@ RUN ARCH="$(dpkg --print-architecture)" && \
     /usr/local/go/bin/go version
 ENV PATH="/usr/local/go/bin:${PATH}"
 
-# Install mongodb-tools
-RUN curl "https://fastdl.mongodb.org/tools/db/mongodb-database-tools-debian12-x86_64-100.12.0.deb" -o "mongo.deb" && \
-    apt-get update && apt-get install --no-install-recommends -y ./mongo.deb && rm mongo.deb && \
-    rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
-
 # Install s5cmd
 COPY --from=peakcom/s5cmd:v2.3.0 /s5cmd /usr/local/bin/s5cmd
 
 # Install yq
 COPY --from=mikefarah/yq:4 /usr/bin/yq /usr/local/bin/yq
-
-# Install ArgoCD CLI (latest stable version)
-RUN curl -sSL -o argocd-linux-amd64 "https://github.com/argoproj/argo-cd/releases/download/v${ARGOCD_VERSION}/argocd-linux-amd64" && \
-    install -m 555 argocd-linux-amd64 /usr/local/bin/argocd && \
-    rm argocd-linux-amd64
-
-# Install kubectl
-RUN curl -LO "https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl" && \
-    curl -LO "https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl.sha256" && \
-    echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check && \
-    install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl && \
-    rm kubectl kubectl.sha256
 
 # Install gh-cli
 RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | tee /usr/share/keyrings/githubcli-archive-keyring.gpg > /dev/null && \
