@@ -1,13 +1,12 @@
 load('ext://helm_resource', 'helm_resource')
-load('./lib.tilt', 'root_path')
+load('./lib.tilt', 'buildkit_build', 'root_path')
 
 PRODUCT_RESOURCES = ['docs', 'portfolio']
 
 # ── Docs ──────────────────────────────────────────────────────────────────────
-docker_build(
+buildkit_build(
   'documentation',
   root_path('docs'),
-  dockerfile=root_path('docs/Dockerfile'),
   target='local',
   live_update=[
     sync(root_path('docs/src'), '/workspace/src'),
@@ -31,7 +30,7 @@ helm_resource(
 )
 
 # ── Portfolio ─────────────────────────────────────────────────────────────────
-docker_build(
+buildkit_build(
   'portfolio',
   root_path('.'),
   dockerfile=root_path('apps/portfolio/Dockerfile'),

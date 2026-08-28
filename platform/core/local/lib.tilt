@@ -1,6 +1,13 @@
 def root_path(path):
   return config.main_dir + '/' + path
 
+CLUSTER_CONFIG = decode_json(str(local(
+  [root_path('platform/core/local/cluster.sh'), 'config'],
+  quiet=True,
+)))
+BUILDX_BUILDER_NAME = CLUSTER_CONFIG['builderName']
+REGISTRY_REF = '%s:%s' % (CLUSTER_CONFIG['registryName'], CLUSTER_CONFIG['registryPort'])
+
 def helm_chart_deps(chartPath):
   if config.tilt_subcommand == 'down':
     return
@@ -20,6 +27,32 @@ def helm_chart_deps(chartPath):
     if repository.startswith('http://') or repository.startswith('https://'):
       local('helm repo add %s %s --force-update' % (dependency['name'], repository), quiet=True)
   local('helm dependency build ' + chartPath, quiet=True)
+
+def buildkit_build(ref, context, dockerfile=None, target=None, only=[], build_args={}, live_update=[]):
+  dockerfilePath = dockerfile or (context + '/Dockerfile')
+  flags = ['--file', dockerfilePath]
+  if target:
+    flags = flags + ['--target', target]
+  for key in build_args:
+    flags = flags + ['--build-arg', '%s=%s' % (key, build_args[key])]
+
+  deps = only if only else [context]
+  if dockerfilePath not in deps:
+    deps = deps + [dockerfilePath]
+
+  custom_build(
+    ref,
+    command=' '.join([
+      'docker buildx build',
+      '--builder', BUILDX_BUILDER_NAME,
+      '--output', 'type=image,name="$EXPECTED_REF",push=true,registry.insecure=true,compression=zstd,force-compression=true,oci-mediatypes=true',
+      '--provenance=false',
+    ] + flags + [context]),
+    deps=deps,
+    live_update=live_update,
+    skips_local_docker=True,
+    disable_push=True,
+  )
 
 def bootstrap_kubernetes(kubernetesContext):
   availableContexts = [
