@@ -22,6 +22,6 @@ runs:
       run: |
         buildArgs=(--file "${{ inputs.file }}" --tag "${{ inputs.tag }}")
         if [ "${{ inputs.push }}" = "true" ]; then
-          buildArgs+=(--push)
+          buildArgs+=(--output type=registry,oci-mediatypes=true,compression=zstd,force-compression=true)
         fi
         docker buildx build "${buildArgs[@]}" "${{ inputs.context }}"
