@@ -1,13 +1,10 @@
 load('ext://helm_resource', 'helm_resource', 'helm_repo')
-load('./lib.tilt', 'helm_chart_deps', 'bootstrap_kubernetes', 'root_path')
+load('./lib.tilt', 'helm_chart_deps', 'bootstrap_kubernetes', 'root_path', 'REGISTRY_REF')
 
 DOCKER_CONTEXT = "kind-kind"
 update_settings(max_parallel_updates=6)
 
-default_registry(
-  "localhost:5005",
-  host_from_cluster="kind-registry:5000",
-)
+default_registry(REGISTRY_REF)
 
 CORE_RESOURCES = ['cilium', 'vault', 'external-secrets', 'traefik', 'metrics-server-repo', 'metrics-server', 'cloudnative-pg', 'watch-ingresses']
 OPTIONAL_RESOURCES = ['monitoring']

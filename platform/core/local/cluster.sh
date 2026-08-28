@@ -3,7 +3,8 @@ set -euo pipefail
 
 CLUSTER_NAME="kind"
 REGISTRY_NAME="kind-registry"
-REGISTRY_PORT="5005"
+REGISTRY_PORT="5000"
+BUILDER_NAME="kind-builder"
 KUBERNETES_VERSION="v1.36.1"
 POD_SUBNET="10.42.0.0/16"
 SERVICE_SUBNET="10.43.0.0/16"
@@ -15,12 +16,39 @@ TLS_SECRET_NAME="default-tls"
 TLS_CERTIFICATE_DOMAINS=("localhost")
 INGRESS_WATCH_INTERVAL_SECONDS="30"
 
+print_config() {
+  cat <<EOF
+{
+  "clusterName": "${CLUSTER_NAME}",
+  "kubeContext": "${KUBE_CONTEXT}",
+  "registryName": "${REGISTRY_NAME}",
+  "registryPort": "${REGISTRY_PORT}",
+  "builderName": "${BUILDER_NAME}"
+}
+EOF
+}
+
 ensure_kube_context() {
   if ! kubectl config get-contexts "${KUBE_CONTEXT}" &> /dev/null; then
     echo "Kubernetes context '${KUBE_CONTEXT}' does not exist. Run '$0 create' first." >&2
     exit 1
   fi
   kubectl config use-context "${KUBE_CONTEXT}" &> /dev/null
+}
+
+create_buildx_builder() {
+  if docker buildx inspect --bootstrap "${BUILDER_NAME}" &> /dev/null; then
+    echo "Buildx builder '${BUILDER_NAME}' already exists."
+  else
+    echo "Creating buildx builder '${BUILDER_NAME}'..."
+    docker buildx create --name "${BUILDER_NAME}" --driver docker-container --bootstrap
+  fi
+
+  local builderContainerName="buildx_buildkit_${BUILDER_NAME}0"
+  echo "Connecting buildx builder to kind network..."
+  if [ "$(docker inspect -f='{{json .NetworkSettings.Networks.kind}}' "${builderContainerName}")" = 'null' ]; then
+    docker network connect "kind" "${builderContainerName}"
+  fi
 }
 
 create() {
@@ -31,10 +59,9 @@ create() {
     docker run \
       --detach \
       --restart=always \
-      --publish "127.0.0.1:${REGISTRY_PORT}:5000" \
       --name "${REGISTRY_NAME}" \
       registry:2
-    echo "Registry '${REGISTRY_NAME}' started on port ${REGISTRY_PORT}."
+    echo "Registry '${REGISTRY_NAME}' started."
   fi
 
   echo "Creating kind cluster '${CLUSTER_NAME}' (Kubernetes ${KUBERNETES_VERSION})..."
@@ -64,26 +91,18 @@ kubeadmConfigPatches:
     serializeImagePulls: false
 containerdConfigPatches:
   - |-
-    [plugins."io.containerd.grpc.v1.cri".registry]
-      config_path = "/etc/containerd/certs.d"
+    [plugins."io.containerd.grpc.v1.cri".registry.mirrors."${REGISTRY_NAME}:${REGISTRY_PORT}"]
+      endpoint = ["http://${REGISTRY_NAME}:${REGISTRY_PORT}"]
 EOF
 
   ensure_kube_context
-
-  # Make localhost:5000 on each node seen as the registry:5005
-  echo "Configuring containerd registry mirror on each node..."
-  REGISTRY_DIR="/etc/containerd/certs.d/localhost:${REGISTRY_PORT}"
-  for node in $(kind get nodes --name "${CLUSTER_NAME}"); do
-    docker exec "${node}" mkdir -p "${REGISTRY_DIR}"
-    cat <<EOF | docker exec --interactive "${node}" cp /dev/stdin "${REGISTRY_DIR}/hosts.toml"
-[host."http://${REGISTRY_NAME}:5000"]
-EOF
-  done
 
   echo "Connecting registry to kind network..."
   if [ "$(docker inspect -f='{{json .NetworkSettings.Networks.kind}}' "${REGISTRY_NAME}")" = 'null' ]; then
     docker network connect "kind" "${REGISTRY_NAME}"
   fi
+
+  create_buildx_builder
 
   kubectl apply --filename - <<EOF
 apiVersion: v1
@@ -93,14 +112,14 @@ metadata:
   namespace: kube-public
 data:
   localRegistryHosting.v1: |
-    host: "localhost:${REGISTRY_PORT}"
+    host: "${REGISTRY_NAME}:${REGISTRY_PORT}"
     help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
 EOF
 
   setup_local_tls_certificate
 
   echo "✅ Cluster '${CLUSTER_NAME}' is ready."
-  echo "   Registry:   localhost:${REGISTRY_PORT}"
+  echo "   Registry:   ${REGISTRY_NAME}:${REGISTRY_PORT}"
   echo "   Kubeconfig: $(kubectl config current-context)"
 }
 
@@ -202,7 +221,10 @@ delete() {
   echo "Removing registry container '${REGISTRY_NAME}'..."
   docker rm --force "${REGISTRY_NAME}" 2>/dev/null || true
 
-  echo "✅ Cluster and registry deleted."
+  echo "Removing buildx builder '${BUILDER_NAME}'..."
+  docker buildx rm "${BUILDER_NAME}" 2>/dev/null || true
+
+  echo "✅ Cluster, registry, and builder deleted."
 }
 
 recreate() {
@@ -215,8 +237,9 @@ case "${1:-}" in
   delete) delete ;;
   recreate) recreate ;;
   watch-ingresses) watch_ingresses ;;
+  config) print_config ;;
   *)
-    echo "Usage: $0 <create|delete|recreate|watch-ingresses>" >&2
+    echo "Usage: $0 <create|delete|recreate|watch-ingresses|config>" >&2
     exit 1
     ;;
 esac
