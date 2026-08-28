@@ -12,9 +12,9 @@ tech:
   - ArgoCD
   - GitOps
   - Helm
-logo: https://nexus-public-assets.kbntx.com/images/kubernetes-logo.svg
+logo: https://portfolio-assets.kbntx.com/images/kubernetes-logo.svg
 images:
-  - https://nexus-public-assets.kbntx.com/images/k3s-cluster-schema.png
+  - https://portfolio-assets.kbntx.com/images/k3s-cluster-schema.png
 githubUrl: https://github.com/kbntx-org/nexus
 features:
   - K3s cluster with multi-node setup

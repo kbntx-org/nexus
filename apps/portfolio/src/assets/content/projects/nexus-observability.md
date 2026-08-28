@@ -11,11 +11,11 @@ tech:
   - Promtail
   - PostgreSQL
   - S3
-logo: https://nexus-public-assets.kbntx.com/images/grafana-logo.svg
+logo: https://portfolio-assets.kbntx.com/images/grafana-logo.svg
 images:
-  - https://nexus-public-assets.kbntx.com/images/ingress-nginx-dashboard.png
-  - https://nexus-public-assets.kbntx.com/images/node-k8s-dashboard.png
-  - https://nexus-public-assets.kbntx.com/images/api-server-dashboard.png
+  - https://portfolio-assets.kbntx.com/images/ingress-nginx-dashboard.png
+  - https://portfolio-assets.kbntx.com/images/node-k8s-dashboard.png
+  - https://portfolio-assets.kbntx.com/images/api-server-dashboard.png
 githubUrl: https://github.com/kbntx-org/nexus
 features:
   - VictoriaMetrics metrics collection with live S3 backups

@@ -52,7 +52,7 @@ export class SkillsComponent implements AfterViewInit, OnDestroy {
 
   public skills: Skill[] = SKILLS;
 
-  private readonly iconsBaseUrl = 'https://nexus-public-assets.kbntx.com/icons';
+  private readonly iconsBaseUrl = 'https://portfolio-assets.kbntx.com/icons';
   private particles: Particle[] = [];
   private animationId: number | null = null;
 
