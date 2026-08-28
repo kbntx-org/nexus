@@ -16,23 +16,3 @@
       mountPath: /scripts/seed-vault.sh
       subPath: seed-vault.sh
 {{- end }}
-
-{{- define "vault.configInitContainer" -}}
-- name: config-init
-  image: kbntx/nexus-ci-toolkit:1.0
-  command: ["/bin/sh", "-c"]
-  args:
-    - envsubst < /vault/config-template/config.hcl > /vault/config/config.hcl
-  env:
-    - name: VAULT_POSTGRES_CONNECTION_URI
-      valueFrom:
-        secretKeyRef:
-          name: vault-secret
-          key: databaseUri
-  volumeMounts:
-    - name: vault-config-map
-      mountPath: /vault/config-template/config.hcl
-      subPath: config.hcl
-    - name: vault-config
-      mountPath: /vault/config
-{{- end }}
