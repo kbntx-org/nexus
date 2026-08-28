@@ -8,12 +8,12 @@ tech:
   - Tailwind CSS
   - S3
   - Markdown
-logo: https://nexus-public-assets.kbntx.com/images/kt-logo.jpg
+logo: https://portfolio-assets.kbntx.com/images/kt-logo.jpg
 images:
-  - https://nexus-public-assets.kbntx.com/images/portfolio-landing-page.webp
-  - https://nexus-public-assets.kbntx.com/images/portfolio-experiences.webp
-  - https://nexus-public-assets.kbntx.com/images/portfolio-skills.webp
-  - https://nexus-public-assets.kbntx.com/images/portfolio-projects.webp
+  - https://portfolio-assets.kbntx.com/images/portfolio-landing-page.webp
+  - https://portfolio-assets.kbntx.com/images/portfolio-experiences.webp
+  - https://portfolio-assets.kbntx.com/images/portfolio-skills.webp
+  - https://portfolio-assets.kbntx.com/images/portfolio-projects.webp
 githubUrl: https://github.com/kbntx-org/nexus
 features:
   - Dark/light theme supports
