@@ -2,6 +2,15 @@ name: Lint & Format
 
 on:
   workflow_call:
+    inputs:
+      lint_projects_csv:
+        description: 'Comma-delimited list of affected projects with a lint target'
+        required: true
+        type: string
+      affected_base:
+        description: 'Git ref/SHA to diff format:check against (Affected job output)'
+        required: true
+        type: string
 
 jobs:
   lint-and-format:
@@ -12,33 +21,26 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
-
-      - name: Fetch base branch
-        if: github.event_name == 'pull_request'
-        run: git fetch origin ${{ github.base_ref }} --depth=1
-        shell: bash
+        with:
+          fetch-depth: 0
+          filter: tree:0
 
       - name: Install dependencies
         run: pnpm install
         shell: bash
 
       - parallel:
-          - name: Check formatting (affected)
-            if: github.event_name == 'pull_request'
-            run: pnpm nx format:check --all
+          - name: Check formatting
+            env:
+              AFFECTED_BASE: ${{ inputs.affected_base }}
+            run: |
+              # --libs-and-apps only checks files nx considers part of a project (per the
+              # project graph); the classic mode only checks files in the git diff. Neither
+              # alone covers everything, so run both.
+              pnpm nx format:check --base "$AFFECTED_BASE" --libs-and-apps
+              pnpm nx format:check --base "$AFFECTED_BASE"
             shell: bash
 
-          - name: Check formatting (all)
-            if: github.event_name != 'pull_request'
-            run: pnpm nx format:check --all
-            shell: bash
-
-          - name: Lint (affected)
-            if: github.event_name == 'pull_request'
-            run: pnpm nx affected:lint --parallel --base remotes/origin/${{ github.base_ref }}
-            shell: bash
-
-          - name: Lint (all)
-            if: github.event_name != 'pull_request'
-            run: pnpm nx run-many --target lint --all --parallel
+          - name: Lint
+            run: pnpm nx run-many --target lint --projects="${{ inputs.lint_projects_csv }}" --parallel --outputStyle=stream
             shell: bash

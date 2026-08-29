@@ -7,38 +7,22 @@ on:
         description: 'Image tag to build (and push on non-PR runs)'
         required: true
         type: string
-    outputs:
-      deploy_targets:
-        description: 'JSON array of projects whose code OR deployPaths changed since their last deploy'
-        value: ${{ jobs.build.outputs.deploy_targets }}
+      deploy_targets_csv:
+        description: 'Comma-delimited list of nx-affected projects with a build-ci target'
+        required: true
+        type: string
 
 jobs:
   build:
     name: Build
     runs-on: nexus-org-runners
     timeout-minutes: 10
-    outputs:
-      deploy_targets: ${{ steps.affected.outputs.deploy_targets }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
 
       - name: Install dependencies
         run: pnpm install
-        shell: bash
-
-      - name: Compute affected
-        id: affected
-        uses: ./.github/actions/compute-affected
-        with:
-          manifests-app-id: ${{ secrets.NEXUS_MANIFESTS_APP_ID }}
-          manifests-app-private-key: ${{ secrets.NEXUS_MANIFESTS_APP_PRIVATE_KEY }}
-
-      - name: Build portfolio frontend
-        if: contains(fromJSON(steps.affected.outputs.deploy_targets), 'portfolio')
-        run: pnpm nx build portfolio --configuration=production
         shell: bash
 
       - name: Login to Docker registry
@@ -48,30 +32,9 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
-      - parallel:
-          - name: Build (and push) portfolio image
-            if: contains(fromJSON(steps.affected.outputs.deploy_targets), 'portfolio')
-            uses: ./.github/actions/docker-build-and-push
-            with:
-              context: .
-              file: apps/portfolio/Dockerfile
-              tag: kbntx/portfolio:${{ inputs.image_tag }}
-              push: ${{ github.event_name != 'pull_request' }}
-
-          - name: Build (and push) documentation image
-            if: contains(fromJSON(steps.affected.outputs.deploy_targets), 'documentation')
-            uses: ./.github/actions/docker-build-and-push
-            with:
-              context: docs
-              file: docs/Dockerfile
-              tag: kbntx/documentation:${{ inputs.image_tag }}
-              push: ${{ github.event_name != 'pull_request' }}
-
-          - name: Build (and push) cloudflare-controller image
-            if: contains(fromJSON(steps.affected.outputs.deploy_targets), 'cloudflare-controller')
-            uses: ./.github/actions/docker-build-and-push
-            with:
-              context: platform/core/cloudflare-controller
-              file: platform/core/cloudflare-controller/Dockerfile
-              tag: kbntx/cloudflare-controller:${{ inputs.image_tag }}
-              push: ${{ github.event_name != 'pull_request' }}
+      - name: Build and push affected images
+        env:
+          IMAGE_TAG: ${{ inputs.image_tag }}
+          PUSH: ${{ github.event_name != 'pull_request' && 'true' || 'false' }}
+        run: pnpm nx run-many --target=build-ci --projects="${{ inputs.deploy_targets_csv }}" --outputStyle=stream
+        shell: bash

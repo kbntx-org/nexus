@@ -14,7 +14,11 @@
       "!{projectRoot}/test-setup.[jt]s",
       "!{projectRoot}/eslint.config.mjs"
     ],
-    "sharedGlobals": []
+    "sharedGlobals": [
+      "{workspaceRoot}/.github/workflows/affected.yml",
+      "{workspaceRoot}/.github/workflows/build.yml",
+      "{workspaceRoot}/.github/workflows/deploy.yml"
+    ]
   },
   "targetDefaults": {
     "build": {
@@ -33,6 +37,9 @@
     "e2e": {
       "inputs": ["default", "^production"],
       "cache": true
+    },
+    "build-ci": {
+      "inputs": ["production", "^production"]
     },
     "@angular-devkit/build-angular:application": {
       "cache": true,

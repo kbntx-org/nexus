@@ -74,6 +74,7 @@ jobs:
           DEPLOY_TARGETS: ${{ inputs.deploy_targets }}
           MANIFESTS_DIR: /tmp/manifests
           COMMIT_BODY_FILE: /tmp/commit-body
+          BRANCH: ${{ inputs.branch }}
         with:
           script: |
             const { spawnSync } = require('child_process');
@@ -92,8 +93,9 @@ jobs:
             const deployTargets = JSON.parse(process.env.DEPLOY_TARGETS);
             const manifestsDir = process.env.MANIFESTS_DIR;
             const commitBodyFile = process.env.COMMIT_BODY_FILE;
+            const branch = process.env.BRANCH;
 
-            const lines = [];
+            const bumped = [];
             for (const project of deployTargets) {
               const manifestsValuesPath = nxProject(project).metadata?.manifestsValuesPath;
               if (!manifestsValuesPath) {
@@ -107,13 +109,32 @@ jobs:
               } else {
                 run('yq', ['-i', '.image.tag = strenv(TAG)', file], { env: process.env });
               }
-              lines.push(`- ${project}: ${tag}`);
+              bumped.push({ project, valuesPath: manifestsValuesPath });
             }
 
+            const lines = bumped.map(({ project }) => `- ${project}: ${tag}`);
             fs.writeFileSync(commitBodyFile, lines.length ? lines.join('\n') + '\n' : '');
             if (lines.length === 0) {
               core.info('No GitOps-managed targets in deploy_targets — nothing to do');
             }
+
+            const rows = bumped.length
+              ? bumped.map(({ project, valuesPath }) => [project, `\`${valuesPath}\``, `\`${tag}\``])
+              : [['_none_', '', '']];
+
+            await core.summary
+              .addHeading('Deploy', 3)
+              .addRaw(`Branch: \`${branch}\`\n\n`)
+              .addTable([
+                [
+                  { data: 'Project', header: true },
+                  { data: 'Values file', header: true },
+                  { data: 'Tag', header: true },
+                ],
+                ...rows,
+              ])
+              .addRaw(`\nBastion: ${deployTargets.includes('bastion') ? 'requested' : 'not requested'}\n`)
+              .write();
 
       - name: Commit and push (rebase retry)
         if: github.event_name != 'workflow_dispatch'

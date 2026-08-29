@@ -83,40 +83,107 @@ PR/main file.
 ```mermaid
 %%{init: {'theme':'dark'}}%%
 graph LR
-    Push[push / PR] --> Lint[Lint & format]
-    Push --> Test
-    Push --> Build[Build<br/>affected + images, parallel]
-    Lint & Test & Build --> Deploy[Deploy<br/>gated on targets != empty]
+    Push[push / PR] --> Affected[Affected]
+    Affected --> Lint[Lint & format]
+    Affected --> Test
+    Affected --> Build[Build<br/>images, parallel]
+    Lint & Test & Build --> Gate[Checks gate]
+    Gate --> Deploy[Deploy<br/>gated on targets != empty]
+    Gate & Deploy --> PGate[Pipeline gate]
 ```
 
-1. **Lint & format** — `nx affected` on a PR, the `--all` equivalent on `main`.
-2. **Test** — same affected/all split.
-3. **Build** — resolve affected + deploy targets (see below), then build — and, outside a PR, push —
-   the portfolio, documentation, and cloudflare-controller images as parallel steps in one job. On a
-   PR the images are built but never pushed, so a broken Dockerfile fails the check without
-   publishing anything.
-4. **Deploy** — only runs if lint and test succeeded and there's at least one deploy target; see
+0. **Affected** — a single job at the front of the pipeline that resolves what changed once (see
+   [Affected detection](#affected-detection) below) and hands the result to every job after it.
+1. **Lint & format** — `nx run-many` scoped to the projects Affected marked as lint-affected.
+   Skipped entirely, runner and all, when that list is empty — both on a PR and on `main`.
+2. **Test** — same scoping/skip behavior against the test-affected list.
+3. **Build** — build — and, outside a PR, push — the portfolio, documentation, and
+   cloudflare-controller images as parallel steps in one job, each individually skipped if not a
+   deploy target. Skipped as a whole job when Affected found no deploy targets at all. On a PR the
+   images are built but never pushed, so a broken Dockerfile fails the check without publishing
+   anything.
+4. **Checks gate** — reads the result of Affected, Lint & format, Test, and Build, and fails unless
+   every one of them is `success` or `skipped`. This is what branch protection should require
+   instead of the individual jobs — a job that's legitimately skipped (nothing affected) shouldn't
+   be able to block a merge.
+5. **Deploy** — only runs if Checks gate passed and there's at least one deploy target; see
    [GitOps deploys](03-gitops-deploys.md) for the full mechanics.
-
-Branch protection blocks merging a PR until lint, test, and build all pass.
+6. **Pipeline gate** — a second, non-required gate after Deploy, folding its result in too. It
+   exists purely so [Affected detection](#diff-base) has one reliable "did this commit's pipeline,
+   deploy included, actually complete" signal — branch protection stays on Checks gate, since a
+   flaky PR-preview push shouldn't be able to block a merge.
 
 ## Affected detection
 
 <a href="https://nx.dev/" target="_blank" rel="noopener">Nx</a> answers "what changed since
-`<base>`", and the pipeline leans on it for two different questions: what to lint/test (plain
-`nx affected` against the base branch), and what to _deploy_ — `nx affected`, plus any project whose
-declared **deploy paths** (`project.json`'s `metadata.deployPaths`) intersect the changed files,
-which catches changes Nx alone can't see, like a Helm chart edit.
+`<base>`", and every question the pipeline asks it — what to lint, what to test, what to build for
+CI — is the exact same call shape:
+`nx show projects --affected --base <base> --with-target <target>`. Each deployable project
+(`portfolio`, `documentation`, `cloudflare-controller`, and `bastion`) declares a real `build-ci`
+<a href="https://nx.dev/reference/project-configuration#targets" target="_blank" rel="noopener">Nx
+target</a> in its `project.json`, deliberately named differently from the plain `build` target some
+of these projects already have for local dev (`portfolio:build` is what `nx serve` depends on;
+folding a Docker push into it would make local dev accidentally publish images). For the three
+Docker-shipping apps, `build-ci` is an `nx:run-commands` target that runs
+<a href="https://github.com/kbntx-org/nexus/blob/main/tools/docker-build-and-push.sh" target="_blank" rel="noopener"><code>tools/docker-build-and-push.sh</code></a>;
+for `bastion`, which is deployed by SSH rather than an image (see
+[What's not GitOps-managed](03-gitops-deploys.md#whats-not-gitops-managed)), it's a plain `nx:noop`
+that exists purely so `bastion` still participates in affected detection. All of this runs as steps
+directly inside the
+<a href="https://github.com/kbntx-org/nexus/blob/main/.github/workflows/affected.yml" target="_blank" rel="noopener"><code>Affected</code></a>
+job — it has no read dependency on `nexus-manifests` at all; every app's deploy-target decision is
+Nx's own affected-graph computation, diffed against the same shared base described below. `build-ci`
+only produces and pushes the image; bumping the tag in `nexus-manifests` is still entirely
+`deploy.yml`'s job, unchanged — see [GitOps deploys](03-gitops-deploys.md).
 
-The
-<a href="https://github.com/kbntx-org/nexus/blob/main/.github/actions/compute-affected/action.yaml" target="_blank" rel="noopener"><code>compute-affected</code></a>
-composite action runs as a step inside the build job (not its own job — it has one caller). On
-`main`, the diff base for an image-shipping app is **that app's own last-deployed SHA**, read from
-`nexus-manifests`, not the previous commit — see
-[GitOps deploys](03-gitops-deploys.md#affected-detection-per-app) for why and for the fallback
-cases. It also has a fail-safe: a change to a pipeline-critical file (the action itself,
-`build.yml`, `deploy.yml`) marks every application as a deploy target, on the assumption that a
-change to build/deploy logic is risky enough to warrant a full re-deploy.
+There's no hand-rolled path-matching or fail-safe script anymore — both are just Nx `inputs`.
+`affected.yml`, `build.yml`, and `deploy.yml` are listed in `nx.json`'s `sharedGlobals` named input,
+which every project's `default` (and therefore `production`, and therefore every target built on top
+of it — `build`, `build-ci`, `test`, `lint`) already includes. So a change to any of those three
+files changes every project's task hash for every target, and Nx's own affected computation marks
+everything affected on its own — deliberately broader than the old fail-safe, which only ever
+touched deploy targets; a pipeline-critical change now also re-lints and re-tests everything, not
+just re-deploys it.
+
+### Diff base
+
+On a PR, the diff base is always trunk (`origin/main`), regardless of the PR's actual base branch —
+this matters for stacked PRs targeting another feature branch.
+
+On `main`, the diff base is **the most recent ancestor commit whose `Pipeline gate` job succeeded**,
+not simply the previous commit. A commit can land on `main` without its pipeline ever going green —
+an infra blip, a flaky job, a force-push, or a deploy that failed to push to `nexus-manifests` after
+Checks gate already passed — and diffing against an unvalidated (or undeployed) commit would
+silently drop whatever never actually shipped. Checking `Pipeline gate` specifically, rather than
+`Checks gate`, is what makes that self-healing: since Pipeline gate also folds in Deploy's result, a
+commit whose deploy failed is ineligible as a future diff base, so the very next run's diff
+naturally widens to pick that change back up. So instead the action walks `Checks` runs on `main`
+newest-first via the GitHub API, skipping any whose commit isn't a real ancestor of `HEAD` (guards
+against two runs finishing out of order), and falls back to the empty tree — treating every project
+as affected — logging a warning if no green ancestor is found at all.
+
+This only catches drift `nexus`'s own pipeline can see, though — a manual `git revert` made directly
+in `nexus-manifests` (see [Rollback and hotfix](03-gitops-deploys.md#rollback-and-hotfix)) has no
+trace anywhere in `nexus`, so there's nothing for this walk to detect; re-syncing after a manual
+rollback is a deliberate follow-up step, not something this makes automatic.
+
+```mermaid
+%%{init: {'theme':'dark'}}%%
+graph TD
+    Start[Walk Checks runs<br/>on main, newest first] --> Ancestor{commit is ancestor<br/>of HEAD?}
+    Ancestor -->|no| Start
+    Ancestor -->|yes| Gate{Pipeline gate<br/>succeeded?}
+    Gate -->|no| Start
+    Gate -->|yes| Base[Diff base = that commit]
+    Start -->|runs exhausted| Empty[Diff base = empty tree<br/>+ warning logged]
+```
+
+Every app uses this same base — there's no separate per-app diff base read from `nexus-manifests`
+anymore. The tradeoff: if two commits land on `main` close enough together that the second one's
+diff base walk doesn't yet see the first as green, both can independently decide the same app is a
+deploy target and each push their own tag. That's harmless, not incorrect — see
+[Deploy target computation](03-gitops-deploys.md#deploy-target-computation) for why the write side
+already makes the newer commit's tag win.
 
 ## References
 
@@ -134,5 +201,8 @@ change to build/deploy logic is risky enough to warrant a full re-deploy.
   — CI toolkit image
 - <a href="https://github.com/kbntx-org/nexus/tree/main/.github/workflows" target="_blank" rel="noopener"><code>.github/workflows/</code></a>
   — workflow definitions
-- <a href="https://github.com/kbntx-org/nexus/blob/main/.github/actions/compute-affected/action.yaml" target="_blank" rel="noopener"><code>.github/actions/compute-affected/action.yaml</code></a>
-  — affected + deploy-target computation
+- <a href="https://github.com/kbntx-org/nexus/blob/main/.github/workflows/checks.yml" target="_blank" rel="noopener"><code>.github/workflows/checks.yml</code></a>
+  — entrypoint wiring Affected, Lint & format, Test, Build, Checks gate, Deploy, and Pipeline gate
+  together
+- <a href="https://github.com/kbntx-org/nexus/blob/main/.github/workflows/affected.yml" target="_blank" rel="noopener"><code>.github/workflows/affected.yml</code></a>
+  — the single upfront job: affected + deploy-target computation, including the trunk diff-base walk
