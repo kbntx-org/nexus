@@ -5,20 +5,14 @@
   "sourceRoot": "docs",
   "tags": [],
   "metadata": {
-    "deployPaths": [
-      "docs/helm/**",
-      "docs/src/**",
-      "docs/Dockerfile",
-      "docs/Caddyfile",
-      "docs/mkdocs.yml",
-      "docs/docker-entrypoint.sh",
-      ".github/workflows/build-documentation.yml"
-    ],
     "manifestsValuesPath": "documentation/values.yaml"
   },
   "targets": {
-    "build": {
-      "executor": "nx:noop"
+    "build-ci": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tools/docker-build-and-push.sh docs/Dockerfile docs kbntx/documentation:$IMAGE_TAG"
+      }
     }
   }
 }

@@ -10,35 +10,134 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  affected:
+    name: Affected (${{ github.event_name == 'pull_request' && 'PR' || 'Trunk' }})
+    permissions:
+      contents: read
+      actions: read
+    uses: ./.github/workflows/affected.yml
+    secrets: inherit
+
   lint-and-format:
-    name: Lint & Format
+    name: Lint & Format (${{ github.event_name == 'pull_request' && 'PR' || 'Trunk' }})
+    needs: affected
+    if: needs.affected.outputs.lintProjects != '[]'
     uses: ./.github/workflows/lint-and-format.yml
     secrets: inherit
+    with:
+      lint_projects_csv: ${{ needs.affected.outputs.lintProjectsCsv }}
+      affected_base: ${{ needs.affected.outputs.affectedBase }}
 
   test:
-    name: Test
+    name: Test (${{ github.event_name == 'pull_request' && 'PR' || 'Trunk' }})
+    needs: affected
+    if: needs.affected.outputs.testProjects != '[]'
     uses: ./.github/workflows/test.yml
     secrets: inherit
+    with:
+      test_projects_csv: ${{ needs.affected.outputs.testProjectsCsv }}
 
   build:
-    name: Build
+    name: Build (${{ github.event_name == 'pull_request' && 'PR' || 'Trunk' }})
+    needs: affected
+    if: needs.affected.outputs.deployTargets != '[]'
     uses: ./.github/workflows/build.yml
     secrets: inherit
     with:
-      image_tag: ${{ github.event_name == 'pull_request' && format('pr-{0}-commit-{1}', github.event.pull_request.number, github.event.pull_request.head.sha) || format('main-{0}', github.sha) }}
+      image_tag: ${{ github.event_name == 'pull_request' && format('pr-{0}-commit-{1}', github.event.pull_request.number, github.event.pull_request.head.sha) || format('trunk-{0}', github.sha) }}
+      deploy_targets_csv: ${{ needs.affected.outputs.deployTargetsCsv }}
+
+  checks-gate:
+    name: Checks gate (${{ github.event_name == 'pull_request' && 'PR' || 'Trunk' }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: always()
+    needs:
+      - affected
+      - lint-and-format
+      - test
+      - build
+
+    steps:
+      - name: Verify all checks passed
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: |
+          {
+            echo "### Checks gate"
+            echo
+            echo "| Check | Result |"
+            echo "| --- | --- |"
+            echo "$NEEDS" | jq -r '
+              to_entries[]
+              | "| \(.key) | " +
+                (if .value.result == "success" then "✅ success"
+                 elif .value.result == "skipped" then "⏭️ skipped"
+                 else "❌ " + .value.result end) +
+                " |"
+            '
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "$NEEDS" | jq -r 'to_entries[] | "\(.key): \(.value.result)"'
+
+          failedChecks="$(echo "$NEEDS" | jq -r 'to_entries[] | select(.value.result != "success" and .value.result != "skipped") | .key' | tr '\n' ' ')"
+
+          if [ -n "$failedChecks" ]; then
+            echo "::error::Checks did not pass: $failedChecks"
+            exit 1
+          fi
+
+          echo "All checks passed."
+        shell: bash
 
   deploy:
-    name: Deploy
-    needs: [lint-and-format, test, build]
+    name: Deploy (${{ github.event_name == 'pull_request' && 'PR' || 'Trunk' }})
+    needs: [affected, checks-gate]
     if: |
-      always() &&
-      needs.lint-and-format.result == 'success' &&
-      needs.test.result == 'success' &&
-      needs.build.result != 'failure' && needs.build.result != 'cancelled' &&
-      needs.build.outputs.deploy_targets != '[]'
+      needs.checks-gate.result == 'success' &&
+      needs.affected.outputs.deployTargets != '[]'
     uses: ./.github/workflows/deploy.yml
     secrets: inherit
     with:
-      image_tag: ${{ github.event_name == 'pull_request' && format('pr-{0}-commit-{1}', github.event.pull_request.number, github.event.pull_request.head.sha) || format('main-{0}', github.sha) }}
-      deploy_targets: ${{ needs.build.outputs.deploy_targets }}
+      image_tag: ${{ github.event_name == 'pull_request' && format('pr-{0}-commit-{1}', github.event.pull_request.number, github.event.pull_request.head.sha) || format('trunk-{0}', github.sha) }}
+      deploy_targets: ${{ needs.affected.outputs.deployTargets }}
       branch: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || 'main' }}
+
+  pipeline-gate:
+    name: Pipeline gate (Trunk)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: always() && github.event_name != 'pull_request'
+    needs:
+      - checks-gate
+      - deploy
+
+    steps:
+      - name: Verify checks-gate and deploy both passed
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: |
+          {
+            echo "### Pipeline gate"
+            echo
+            echo "| Check | Result |"
+            echo "| --- | --- |"
+            echo "$NEEDS" | jq -r '
+              to_entries[]
+              | "| \(.key) | " +
+                (if .value.result == "success" then "✅ success"
+                 elif .value.result == "skipped" then "⏭️ skipped"
+                 else "❌ " + .value.result end) +
+                " |"
+            '
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          failedChecks="$(echo "$NEEDS" | jq -r 'to_entries[] | select(.value.result != "success" and .value.result != "skipped") | .key' | tr '\n' ' ')"
+
+          if [ -n "$failedChecks" ]; then
+            echo "::error::Pipeline did not complete: $failedChecks"
+            exit 1
+          fi
+
+          echo "Pipeline complete."
+        shell: bash

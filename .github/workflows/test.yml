@@ -2,6 +2,11 @@ name: Test
 
 on:
   workflow_call:
+    inputs:
+      test_projects_csv:
+        description: 'Comma-delimited list of affected projects with a test target'
+        required: true
+        type: string
 
 jobs:
   test:
@@ -13,21 +18,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
-      - name: Fetch base branch
-        if: github.event_name == 'pull_request'
-        run: git fetch origin ${{ github.base_ref }} --depth=1
-        shell: bash
-
       - name: Install dependencies
         run: pnpm install
         shell: bash
 
-      - name: Test (affected)
-        if: github.event_name == 'pull_request'
-        run: pnpm nx affected --target=test --parallel --base remotes/origin/${{ github.base_ref }}
-        shell: bash
-
-      - name: Test (all)
-        if: github.event_name != 'pull_request'
-        run: pnpm nx run-many --target=test --all --parallel
+      - name: Test
+        run: pnpm nx run-many --target=test --projects="${{ inputs.test_projects_csv }}" --parallel --outputStyle=stream
         shell: bash

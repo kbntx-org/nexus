@@ -5,10 +5,6 @@
   "sourceRoot": "platform/core/cloudflare-controller",
   "tags": [],
   "metadata": {
-    "deployPaths": [
-      "platform/core/cloudflare-controller/chart/**",
-      "platform/core/cloudflare-controller/Dockerfile"
-    ],
     "manifestsValuesPath": "cloudflare-controller/values.yaml"
   },
   "targets": {
@@ -24,6 +20,12 @@
       "options": {
         "cwd": "platform/core/cloudflare-controller",
         "command": "go build ./..."
+      }
+    },
+    "build-ci": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tools/docker-build-and-push.sh platform/core/cloudflare-controller/Dockerfile platform/core/cloudflare-controller kbntx/cloudflare-controller:$IMAGE_TAG"
       }
     }
   }

@@ -1,0 +1,185 @@
+name: Affected
+
+on:
+  workflow_call:
+    outputs:
+      mode:
+        description: 'pr or main, depending on the triggering event'
+        value: ${{ jobs.affected.outputs.mode }}
+      affectedBase:
+        description: 'Git ref/SHA that affected projects were diffed against'
+        value: ${{ jobs.affected.outputs.affectedBase }}
+      lintProjects:
+        description: 'JSON array of nx-affected projects with a lint target'
+        value: ${{ jobs.affected.outputs.lintProjects }}
+      lintProjectsCsv:
+        description: 'Comma-delimited list of nx-affected projects with a lint target'
+        value: ${{ jobs.affected.outputs.lintProjectsCsv }}
+      testProjects:
+        description: 'JSON array of nx-affected projects with a test target'
+        value: ${{ jobs.affected.outputs.testProjects }}
+      testProjectsCsv:
+        description: 'Comma-delimited list of nx-affected projects with a test target'
+        value: ${{ jobs.affected.outputs.testProjectsCsv }}
+      deployTargets:
+        description: 'JSON array of nx-affected projects with a build-ci target (i.e. need a nexus-manifests deploy)'
+        value: ${{ jobs.affected.outputs.deployTargets }}
+      deployTargetsCsv:
+        description: 'Comma-delimited list of nx-affected projects with a build-ci target'
+        value: ${{ jobs.affected.outputs.deployTargetsCsv }}
+
+jobs:
+  affected:
+    name: Affected
+    runs-on: nexus-org-runners
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      mode: ${{ steps.refs.outputs.mode }}
+      affectedBase: ${{ steps.pr_base.outputs.affected_base || steps.trunk_base.outputs.affected_base }}
+      lintProjects: ${{ steps.affected.outputs.lint_projects }}
+      lintProjectsCsv: ${{ steps.affected.outputs.lint_projects_csv }}
+      testProjects: ${{ steps.affected.outputs.test_projects }}
+      testProjectsCsv: ${{ steps.affected.outputs.test_projects_csv }}
+      deployTargets: ${{ steps.affected.outputs.deploy_targets }}
+      deployTargetsCsv: ${{ steps.affected.outputs.deploy_targets_csv }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          filter: tree:0
+
+      - name: Install dependencies
+        run: pnpm install
+        shell: bash
+
+      - name: Resolve mode
+        id: refs
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "mode=pr" >> "$GITHUB_OUTPUT"
+          else
+            echo "mode=main" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Resolve PR affected base (pr mode only)
+        id: pr_base
+        if: steps.refs.outputs.mode == 'pr'
+        shell: bash
+        run: |
+          echo "affected_base=remotes/origin/main" >> "$GITHUB_OUTPUT"
+
+      - name: Resolve trunk affected base (main mode only)
+        id: trunk_base
+        if: steps.refs.outputs.mode == 'main'
+        uses: actions/github-script@v9
+        env:
+          HEAD_SHA: ${{ github.sha }}
+        with:
+          script: |
+            const { spawnSync, execSync } = require('child_process');
+            const runOk = (cmd, args) => spawnSync(cmd, args, { stdio: 'ignore' }).status === 0;
+
+            const headSha = process.env.HEAD_SHA;
+            const gateJobName = 'Pipeline gate (Trunk)';
+            const perPage = 50;
+            const maxPages = 5;
+
+            let affectedBase = null;
+            for (let page = 1; page <= maxPages && !affectedBase; page++) {
+              const { data: { workflow_runs: runs } } = await github.rest.actions.listWorkflowRuns({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: 'checks.yml',
+                branch: 'main',
+                event: 'push',
+                status: 'completed',
+                per_page: perPage,
+                page,
+              });
+              if (runs.length === 0) break;
+
+              for (const run of runs) {
+                // Guard against out-of-order run completion: only consider runs whose
+                // commit is actually an ancestor of the commit we're testing now.
+                if (!runOk('git', ['merge-base', '--is-ancestor', run.head_sha, headSha])) continue;
+
+                const { data: { jobs } } = await github.rest.actions.listJobsForWorkflowRun({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  run_id: run.id,
+                  per_page: 100,
+                });
+                const gateJob = jobs.find((job) => job.name === gateJobName);
+                if (gateJob?.conclusion === 'success') {
+                  affectedBase = run.head_sha;
+                  break;
+                }
+              }
+            }
+
+            if (!affectedBase) {
+              core.warning(
+                `No ancestor commit on main with a successful "${gateJobName}" run was found — ` +
+                'treating every project as affected (diffing against the empty tree).'
+              );
+              affectedBase = execSync('git hash-object -t tree /dev/null').toString().trim();
+            }
+
+            core.info(`Trunk affected base: ${affectedBase}`);
+            core.setOutput('affected_base', affectedBase);
+
+      - name: Compute affected projects
+        id: affected
+        shell: bash
+        env:
+          AFFECTED_BASE: ${{ steps.pr_base.outputs.affected_base || steps.trunk_base.outputs.affected_base }}
+        run: |
+          affectedProjects=$(pnpm -s nx show projects --affected --base "$AFFECTED_BASE" --json | jq -c 'sort')
+          lintProjects=$(pnpm -s nx show projects --affected --base "$AFFECTED_BASE" --with-target lint --json | jq -c 'sort')
+          testProjects=$(pnpm -s nx show projects --affected --base "$AFFECTED_BASE" --with-target test --json | jq -c 'sort')
+          deployProjects=$(pnpm -s nx show projects --affected --base "$AFFECTED_BASE" --with-target build-ci --json | jq -c 'sort')
+          echo "Affected: $affectedProjects"
+          echo "Lint projects: $lintProjects"
+          echo "Test projects: $testProjects"
+          echo "Deploy projects: $deployProjects"
+          {
+            echo "affected=$affectedProjects"
+            echo "lint_projects=$lintProjects"
+            echo "lint_projects_csv=$(echo "$lintProjects" | jq -r 'join(",")')"
+            echo "test_projects=$testProjects"
+            echo "test_projects_csv=$(echo "$testProjects" | jq -r 'join(",")')"
+            echo "deploy_targets=$deployProjects"
+            echo "deploy_targets_csv=$(echo "$deployProjects" | jq -r 'join(",")')"
+          } >> "$GITHUB_OUTPUT"
+
+          renderList() {
+            local json="$1"
+            local count
+            count=$(echo "$json" | jq -r 'length')
+            if [ "$count" -eq 0 ]; then
+              echo "_none_"
+            else
+              echo "$json" | jq -r '.[] | "`\(.)`"' | paste -sd, -
+            fi
+          }
+
+          {
+            echo "### Affected"
+            echo
+            echo "| | |"
+            echo "| --- | --- |"
+            echo "| Mode | \`${{ steps.refs.outputs.mode }}\` |"
+            echo "| Diff base | \`$AFFECTED_BASE\` |"
+            echo
+            echo "| Target | Projects |"
+            echo "| --- | --- |"
+            echo "| affected (all) | $(renderList "$affectedProjects") |"
+            echo "| lint | $(renderList "$lintProjects") |"
+            echo "| test | $(renderList "$testProjects") |"
+            echo "| build-ci (deploy) | $(renderList "$deployProjects") |"
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -4,11 +4,8 @@
   "projectType": "application",
   "sourceRoot": "platform/bastion",
   "tags": [],
-  "metadata": {
-    "deployPaths": []
-  },
   "targets": {
-    "build": {
+    "build-ci": {
       "executor": "nx:noop"
     }
   }

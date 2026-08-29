@@ -6,12 +6,6 @@
   "sourceRoot": "apps/portfolio/src",
   "tags": [],
   "metadata": {
-    "deployPaths": [
-      "apps/portfolio/chart/**",
-      "apps/portfolio/Dockerfile",
-      "apps/portfolio/Caddyfile",
-      ".github/workflows/build-portfolio.yml"
-    ],
     "manifestsValuesPath": "portfolio/values.yaml"
   },
   "targets": {
@@ -64,6 +58,16 @@
         }
       },
       "defaultConfiguration": "development"
+    },
+    "build-ci": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "pnpm nx build portfolio --configuration=production",
+          "tools/docker-build-and-push.sh apps/portfolio/Dockerfile . kbntx/portfolio:$IMAGE_TAG"
+        ],
+        "parallel": false
+      }
     }
   }
 }
