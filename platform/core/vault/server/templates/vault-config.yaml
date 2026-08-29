@@ -9,9 +9,7 @@ data:
     {{- if .Values.dev }}
     storage "inmem" {}
     {{- else }}
-    storage "postgresql" {
-      connection_url = "${VAULT_POSTGRES_CONNECTION_URI}"
-    }
+    storage "postgresql" {}
 
     listener "tcp" {
       address     = "0.0.0.0:8200"
