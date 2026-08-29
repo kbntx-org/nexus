@@ -94,7 +94,7 @@ jobs:
     name: Deploy (${{ github.event_name == 'pull_request' && 'PR' || 'Trunk' }})
     needs: [affected, checks-gate]
     if: |
-      needs.checks-gate.result == 'success' &&
+      needs['checks-gate'].result == 'success' &&
       needs.affected.outputs.deployTargets != '[]'
     uses: ./.github/workflows/deploy.yml
     secrets: inherit
