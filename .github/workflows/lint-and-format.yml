@@ -42,5 +42,6 @@ jobs:
             shell: bash
 
           - name: Lint
+            if: inputs.lint_projects_csv != ''
             run: pnpm nx run-many --target lint --projects="${{ inputs.lint_projects_csv }}" --parallel --outputStyle=stream
             shell: bash
