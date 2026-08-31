@@ -15,11 +15,17 @@ on:
         description: 'Branch in nexus-manifests to push to (main for trunk, pr-<number> for previews)'
         required: true
         type: string
+      queue_max:
+        description: 'Let queued deploys pile up and run FIFO instead of the newest replacing the pending one'
+        required: false
+        type: boolean
+        default: false
   workflow_dispatch:
 
 concurrency:
   group: deploy-${{ inputs.branch || 'bastion' }}
   cancel-in-progress: false
+  queue: ${{ inputs.queue_max && 'max' || 'single' }}
 
 jobs:
   deploy:
