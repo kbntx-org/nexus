@@ -11,6 +11,9 @@
   "separateMultipleMajor": true,
   "timezone": "Europe/Berlin",
   "npmrc": "frozen-lockfile=false",
+  "customEnvVariables": {
+    "PNPM_CONFIG_FROZEN_LOCKFILE": "false"
+  },
   "packageRules": [
     {
       "matchUpdateTypes": ["minor", "patch"],
