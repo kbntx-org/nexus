@@ -64,7 +64,7 @@
       "options": {
         "commands": [
           "pnpm nx build portfolio --configuration=production",
-          "tools/docker-build-and-push.sh apps/portfolio/Dockerfile . kbntx/portfolio:$IMAGE_TAG"
+          "tools/docker-build-and-push.sh apps/portfolio/Dockerfile . kbntx/portfolio:$IMAGE_TAG --build-arg NODE_VERSION=$(node -p \"require('./package.json').engines.node.replace(/^\\^/, '')\")"
         ],
         "parallel": false
       }

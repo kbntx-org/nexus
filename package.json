@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "license": "MIT",
   "private": true,
+  "packageManager": "pnpm@11.24.0",
   "engines": {
-    "node": ">=24.0.0",
-    "pnpm": ">=11.0.0"
+    "node": "^24.15.0"
   },
   "scripts": {
     "cluster:create": "bash platform/core/local/cluster.sh create",
