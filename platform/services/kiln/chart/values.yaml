@@ -1,6 +1,7 @@
 image:
   repository: kbntx/kiln
   tag: latest
+internalIngressTarget: 10.43.216.131
 containerPort: 8080
 replicas: 2
 healthProbes: true
