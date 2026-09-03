@@ -1,7 +1,7 @@
 load('ext://helm_resource', 'helm_resource')
 load('./lib.tilt', 'buildkit_build', 'root_path')
 
-PRODUCT_RESOURCES = ['docs', 'portfolio']
+PRODUCT_RESOURCES = ['docs', 'kiln', 'portfolio']
 
 # ── Docs ──────────────────────────────────────────────────────────────────────
 buildkit_build(
@@ -26,6 +26,64 @@ helm_resource(
     '--create-namespace',
   ],
   links=[link('http://docs.localhost', 'docs.localhost')],
+  labels=['1-Product'],
+)
+
+# ── Kiln ──────────────────────────────────────────────────────────────────────
+buildkit_build(
+  'kiln',
+  root_path('platform/services/kiln/server'),
+  dockerfile=root_path('platform/services/kiln/Dockerfile'),
+  target='local-backend',
+  only=[
+    root_path('platform/services/kiln/server'),
+    root_path('platform/services/kiln/Dockerfile'),
+  ],
+  live_update=[
+    # go.mod/go.sum need `go mod download` re-run, and .air.toml is air's own config, so
+    # both fall back to a full image rebuild; everything else just gets synced in place.
+    fall_back_on([
+      root_path('platform/services/kiln/server/go.mod'),
+      root_path('platform/services/kiln/server/go.sum'),
+      root_path('platform/services/kiln/server/.air.toml'),
+    ]),
+    sync(root_path('platform/services/kiln/server'), '/workspace'),
+  ],
+)
+
+buildkit_build(
+  'kiln-client',
+  root_path('.'),
+  dockerfile=root_path('platform/services/kiln/Dockerfile'),
+  target='local-client',
+  only=[
+    root_path('platform/services/kiln/client'),
+    root_path('platform/services/kiln/Dockerfile'),
+    root_path('tsconfig.base.json'),
+    root_path('pnpm-lock.yaml'),
+    root_path('pnpm-workspace.yaml'),
+    root_path('package.json'),
+    root_path('.pnpmfile.mjs'),
+  ],
+  live_update=[
+    # Everything besides src/ (package.json, index.html, ...) falls outside this sync,
+    # so it falls back to a full image rebuild instead.
+    sync(root_path('platform/services/kiln/client/src'), '/usr/src/app/platform/services/kiln/client/src'),
+  ],
+)
+
+helm_resource(
+  'kiln',
+  root_path('platform/services/kiln/chart'),
+  deps=[root_path('platform/services/kiln/chart')],
+  image_deps=['kiln', 'kiln-client'],
+  image_keys=[('image.repository', 'image.tag'), ('frontend.image.repository', 'frontend.image.tag')],
+  namespace='default',
+  flags=[
+    '--values', root_path('platform/services/kiln/chart/values.local.yaml'),
+    '--create-namespace',
+  ],
+  links=[link('http://kiln.localhost', 'kiln.localhost')],
   labels=['1-Product'],
 )
 

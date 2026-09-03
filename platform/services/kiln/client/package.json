@@ -1,0 +1,22 @@
+{
+  "name": "kiln-client",
+  "version": "0.0.0",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build"
+  },
+  "dependencies": {
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.3",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "^6.1.1",
+    "typescript": "6.0.3",
+    "vite": "^8.2.2"
+  }
+}

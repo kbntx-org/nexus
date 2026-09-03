@@ -1,0 +1,18 @@
+{
+  "name": "kiln",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "platform/services/kiln",
+  "tags": [],
+  "metadata": {
+    "manifestsValuesPath": "kiln/values.yaml"
+  },
+  "targets": {
+    "build-ci": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tools/docker-build-and-push.sh platform/services/kiln/Dockerfile . kbntx/kiln:$IMAGE_TAG"
+      }
+    }
+  }
+}

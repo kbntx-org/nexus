@@ -4,6 +4,7 @@ minimumReleaseAgeStrict: true
 
 packages:
   - 'apps/portfolio'
+  - 'platform/services/kiln/client'
 
 minimumReleaseAgeExclude:
   - '@nx/angular@22.7.3'

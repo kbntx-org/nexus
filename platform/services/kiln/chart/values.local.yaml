@@ -1,0 +1,10 @@
+replicas: 1
+healthProbes: false
+ingressHosts:
+  - kiln.localhost
+deploymentStrategy: Recreate
+
+devMode: true
+
+certificate:
+  enabled: false
