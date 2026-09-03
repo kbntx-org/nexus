@@ -1,3 +1,7 @@
+ARG NODE_VERSION
+
+FROM node:${NODE_VERSION}-slim AS node-source
+
 FROM mcr.microsoft.com/dotnet/runtime-deps:8.0-noble AS build
 
 ARG TARGETOS
@@ -23,7 +27,6 @@ ENV RUNNER_MANUALLY_TRAP_SIG=1
 ENV ACTIONS_RUNNER_PRINT_LOG_TO_STDOUT=1
 ENV ImageOS=ubuntu24
 
-ARG NODE_VERSION
 ARG PNPM_VERSION
 ARG GO_VERSION
 ARG KUBECTL_VERSION
@@ -69,16 +72,8 @@ RUN install -m 0755 -d /etc/apt/keyrings && \
     rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
 # Install Node.js
-RUN ARCH="$(dpkg --print-architecture)" && \
-    case "$ARCH" in \
-      amd64) NODE_ARCH=x64 ;; \
-      arm64) NODE_ARCH=arm64 ;; \
-      *) echo "unsupported architecture: $ARCH" && exit 1 ;; \
-    esac && \
-    curl -fsSLO "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${NODE_ARCH}.tar.xz" && \
-    tar -xJf "node-v${NODE_VERSION}-linux-${NODE_ARCH}.tar.xz" -C /usr/local --strip-components=1 --no-same-owner && \
-    rm "node-v${NODE_VERSION}-linux-${NODE_ARCH}.tar.xz" && \
-    node --version && npm --version
+COPY --from=node-source /usr/local /usr/local
+RUN node --version && npm --version
 
 # Install PNPM
 RUN npm install -g pnpm@${PNPM_VERSION}
