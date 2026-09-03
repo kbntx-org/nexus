@@ -360,6 +360,29 @@ argocd-apps:
         syncOptions:
           - CreateNamespace=true
 
+    kiln:
+      project: default
+      sources:
+        - repoURL: https://github.com/kbntx-org/nexus.git
+          path: platform/services/kiln/chart
+          targetRevision: main
+          helm:
+            valueFiles:
+              - values.yaml
+              - $values/kiln/values.yaml
+        - repoURL: https://github.com/kbntx-org/nexus-manifests.git
+          targetRevision: main
+          ref: values
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: kiln
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+
     smelt:
       project: default
       sources:

@@ -1,0 +1,19 @@
+image:
+  repository: kbntx/kiln
+  tag: latest
+containerPort: 8080
+replicas: 2
+healthProbes: true
+ingressHosts:
+  - kiln.kbntx.com
+deploymentStrategy: RollingUpdate
+
+devMode: false
+frontend:
+  image:
+    repository: kbntx/kiln-client
+    tag: latest
+  containerPort: 5173
+
+certificate:
+  enabled: true

@@ -18,9 +18,6 @@ metadata:
   annotations:
     external-dns.kubernetes.io/target: {{ .Values.internalServiceClusterIP }}
 spec:
-  entryPoints:
-    - internal-web
-    - internal-secure
   routes:
     - match: Host(`{{ .Values.dashboardHost }}`)
       kind: Rule
