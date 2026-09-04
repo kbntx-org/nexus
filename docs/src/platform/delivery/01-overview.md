@@ -28,9 +28,8 @@ graph LR
 up and syncs directly. This is most of the platform: Traefik, ArgoCD itself, External Secrets, the
 monitoring stack, ARC runners, and so on are all configured this way.
 
-**Source change** (portfolio, the docs site, or the
-[cloudflare-controller](../traffic/01-overview.md) operator) goes through CI first — build the
-image, then hand ArgoCD a new tag. See [CI/CD pipeline](02-ci-cd-pipeline.md) and
+**Source change** — anything this repo builds an image for — goes through CI first: build the image,
+then hand ArgoCD a new tag. See [CI/CD pipeline](02-ci-cd-pipeline.md) and
 [GitOps deploys](03-gitops-deploys.md) for that path in full.
 
 ## The app-of-apps pattern
@@ -42,9 +41,8 @@ chart — a thin wrapper around
 that declares every other `Application` the platform needs as a child. Bootstrapping the platform is
 one sync of the root; everything declared in
 <a href="https://github.com/kbntx-org/nexus/blob/main/platform/services/app-of-apps/values.yaml" target="_blank" rel="noopener"><code>app-of-apps/values.yaml</code></a>
-is then materialized on its own — today that's every `platform/core/*` and `platform/services/*`
-component plus the apps (portfolio, docs, n8n), around two dozen `Application`s total, all traceable
-back to one file.
+is then materialized on its own — every `platform/core/*` and `platform/services/*` component plus
+the apps, all traceable back to one file.
 
 **Runbook — add a new cluster-side workload:** drop the chart under `platform/core/<name>/` or
 `platform/services/<name>/`, add an entry under `argocd-apps.applications` in
@@ -52,10 +50,10 @@ back to one file.
 
 ## Sync model
 
-| Workload                                                      | Source of truth                             | Why                                                                |
-| ------------------------------------------------------------- | ------------------------------------------- | ------------------------------------------------------------------ |
-| Platform components (Traefik, ESO, monitoring, ARC…)          | This repo (single-source `Application`)     | Manifests _are_ the source of truth — converge on every Git change |
-| Apps shipping images (portfolio, docs, cloudflare-controller) | This repo (chart) + `nexus-manifests` (tag) | Image tag is decoupled from the chart so CI can bump it atomically |
+| Workload             | Source of truth                             | Why                                                                |
+| -------------------- | ------------------------------------------- | ------------------------------------------------------------------ |
+| Platform components  | This repo (single-source `Application`)     | Manifests _are_ the source of truth — converge on every Git change |
+| Apps shipping images | This repo (chart) + `nexus-manifests` (tag) | Image tag is decoupled from the chart so CI can bump it atomically |
 
 Image-shipping apps use a
 <a href="https://argo-cd.readthedocs.io/en/stable/user-guide/multiple_sources/" target="_blank" rel="noopener">multi-source
