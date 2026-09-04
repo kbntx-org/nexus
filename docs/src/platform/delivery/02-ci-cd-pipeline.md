@@ -69,9 +69,24 @@ else on the cluster network directly.
 
 Every workflow runs on
 <a href="https://github.com/kbntx-org/nexus/tree/main/platform/core/github-arc-runners/base-image" target="_blank" rel="noopener"><code>kbntx-org/nexus-ci-toolkit</code></a>,
-built on the GitHub Actions runner image and layered with `pnpm`, `kubectl`, the ArgoCD CLI, and
-everything else the pipelines need. It **is** the runner's image, not a separate job container, so
-tools are already there when the pod starts — no `setup-node`, no per-job installs.
+built on the <a href="https://github.com/actions/runner" target="_blank" rel="noopener">official
+GitHub Actions runner image</a> and layered with `pnpm`, Go, the Docker CLI, and everything else the
+pipelines need. It **is** the runner's image, not a separate job container, so tools are already
+there when the pod starts — no `setup-node`, no per-job installs.
+
+Building that image is the one exception to "every workflow runs on it": you can't bootstrap an
+image from the runner it produces, so
+<a href="https://github.com/kbntx-org/nexus/blob/main/.github/workflows/build-docker-images.yml" target="_blank" rel="noopener"><code>build-docker-images.yml</code></a>
+runs on a GitHub-hosted runner and installs Node/pnpm itself rather than inheriting them. Past that
+bootstrapping step, it builds the toolkit image the same way any other image-shipping project does —
+a `build-ci` Nx target — alongside other standalone base images that have no running Kubernetes
+workload (the Sysbox installer, for one); an edit to one of their Dockerfiles rebuilds it through
+the normal affected pipeline described below, and a nightly schedule additionally forces a full
+rebuild of all of them (selected by a shared Nx tag) regardless of what changed, to pick up upstream
+drift — base image security patches and the like — that a git diff can't see. Unlike
+per-commit-tagged apps, these use a manually pinned tag baked into their `build-ci` command, so bump
+that literal alongside a Dockerfile change — otherwise the next affected build silently overwrites
+the current tag on the registry with new content under the old version.
 
 ## Pipeline shape
 
@@ -203,3 +218,6 @@ already makes the newer commit's tag win.
   together
 - <a href="https://github.com/kbntx-org/nexus/blob/main/.github/workflows/affected.yml" target="_blank" rel="noopener"><code>.github/workflows/affected.yml</code></a>
   — the single upfront job: affected + deploy-target computation, including the trunk diff-base walk
+- <a href="https://github.com/kbntx-org/nexus/blob/main/.github/workflows/build-docker-images.yml" target="_blank" rel="noopener"><code>.github/workflows/build-docker-images.yml</code></a>
+  — builds the toolkit image itself plus other standalone base images, on a nightly schedule and via
+  `workflow_dispatch`

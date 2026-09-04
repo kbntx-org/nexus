@@ -5,7 +5,8 @@
   "private": true,
   "packageManager": "pnpm@11.24.0",
   "engines": {
-    "node": "^24.15.0"
+    "node": "^24.15.0",
+    "go": "1.26.1"
   },
   "scripts": {
     "cluster:create": "bash platform/core/local/cluster.sh create",
