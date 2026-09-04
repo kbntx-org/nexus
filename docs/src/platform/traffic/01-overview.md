@@ -95,7 +95,13 @@ graph LR
 Two separate tunnels carry private traffic, each routing a different scope:
 
 - The bastion's tunnel routes the _entire_ VPC subnet (node IPs, the bastion itself — mainly used
-  for SSH for non kubernetes operations),
+  for SSH for non kubernetes operations). It is the one connector that cannot live in the cluster:
+  it is also the VPC's NAT gateway, so it has to be reachable when nothing else is. It runs as a
+  Compose stack on a VPS, and its
+  <a href="https://github.com/kbntx-org/nexus/tree/main/platform/core/bastion" target="_blank" rel="noopener">Terraform</a>
+  owns both the machine and the rollout — the same run that creates the tunnel deploys the stack
+  that uses its token, so the token never has to leave Terraform. Redeploys go in place rather than
+  replacing the server, since every private node loses egress while the NAT gateway is gone.
 
 - The cluster's CR `Tunnel` routes the pod and service CIDRs. This allow me to publish private dns
   on cloudflare and reaching private applications and databases through the vpc directly. This
@@ -138,6 +144,7 @@ graph LR
 - <a href="https://github.com/kbntx-org/nexus/tree/main/platform/core/warp" target="_blank" rel="noopener"><code>platform/core/warp/</code></a>
   — WARP device profile, split-tunnel and local-domain-fallback config
 - <a href="https://github.com/kbntx-org/nexus/tree/main/platform/core/bastion" target="_blank" rel="noopener"><code>platform/core/bastion/</code></a>
-  — the bastion VM (VPC-wide private-network tunnel)
+  — the bastion VM: NAT gateway, VPC-wide private-network tunnel, and the Terraform that rolls its
+  Compose stack out
 - <a href="https://github.com/kbntx-org/nexus/tree/main/platform/core/network" target="_blank" rel="noopener"><code>platform/core/network/</code></a>
   — the Hetzner VPC every private route ultimately targets

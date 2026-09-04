@@ -2,9 +2,9 @@
 title: GitOps deploys
 ---
 
-Image-shipping apps (portfolio, documentation, cloudflare-controller) are deployed through a
-**separate manifests repo** rather than CI patching ArgoCD directly. This page covers why, what that
-repo looks like, and how a push to `main` actually reaches the cluster.
+Apps that ship an image are deployed through a **separate manifests repo** rather than CI patching
+ArgoCD directly. This page covers why, what that repo looks like, and how a push to `main` actually
+reaches the cluster.
 
 ## Why a separate repo
 
@@ -38,23 +38,17 @@ The [Affected job](02-ci-cd-pipeline.md#affected-detection) computes deploy targ
 <a href="https://github.com/kbntx-org/nexus/blob/main/.github/workflows/build.yml" target="_blank" rel="noopener"><code>build.yml</code></a>
 runs `pnpm nx run-many --target=build-ci --projects=<the list> --parallel`, tagged with the commit
 SHA via an `IMAGE_TAG` env var. Nx's own task graph decides what actually happens per project —
-portfolio, documentation, and cloudflare-controller each run
-<a href="https://github.com/kbntx-org/nexus/blob/main/tools/docker-build-and-push.sh" target="_blank" rel="noopener"><code>tools/docker-build-and-push.sh</code></a>,
-`bastion` (if present in the list) runs its no-op `build-ci` target and does nothing here — its
-actual deploy happens later in this same pipeline, via `deploy.yml`'s SSH step below. `build-ci`
-only produces and pushes the image — it never touches `nexus-manifests`; that's entirely
+every deploy target runs
+<a href="https://github.com/kbntx-org/nexus/blob/main/tools/docker-build-and-push.sh" target="_blank" rel="noopener"><code>tools/docker-build-and-push.sh</code></a>.
+`build-ci` only produces and pushes the image — it never touches `nexus-manifests`; that's entirely
 `deploy.yml`'s job, described next.
 
 <a href="https://github.com/kbntx-org/nexus/blob/main/.github/workflows/deploy.yml" target="_blank" rel="noopener"><code>deploy.yml</code></a>
-is **one job** (`deploy`) with conditional steps, not separate jobs per trigger type. On a normal
-push or PR event it clones `nexus-manifests`, bumps `image.tag` for each target, and produces one
-commit per wave — using a rebase-retry loop so two waves landing back-to-back serialize cleanly at
-the git layer. Auto-sync + a GitHub webhook mean ArgoCD picks up the change within seconds; a manual
-`argocd app set` is never part of this flow, since `selfHeal: true` would just revert it on the next
-reconcile.
-
-The same job also has a "deploy bastion" step — see
-[What's not GitOps-managed](#whats-not-gitops-managed).
+is **one job** (`deploy`), invoked only through `workflow_call`. It clones `nexus-manifests`, bumps
+`image.tag` for each target, and produces one commit per wave — using a rebase-retry loop so two
+waves landing back-to-back serialize cleanly at the git layer. Auto-sync + a GitHub webhook mean
+ArgoCD picks up the change within seconds; a manual `argocd app set` is never part of this flow,
+since `selfHeal: true` would just revert it on the next reconcile.
 
 ## Deploy target computation
 
@@ -106,12 +100,15 @@ deletes the `pr-<number>` branch when the PR closes, merged or not.
 
 ## What's not GitOps-managed
 
-<a href="https://github.com/kbntx-org/nexus/tree/main/platform/core/bastion" target="_blank" rel="noopener"><code>platform/core/bastion/</code></a>
-is deployed by the same `deploy` job, but through a different mechanism — its "Deploy bastion" step
-SSHes in and runs `docker compose up` directly, rather than going through ArgoCD. That step runs
-whenever `bastion` is a deploy target _or_ the workflow was triggered manually — it is not mutually
-exclusive with the `nexus-manifests` bump above; both can run in the same invocation. It's on the
-list to migrate into the cluster as a real ArgoCD app in a separate effort.
+The
+<a href="https://github.com/kbntx-org/nexus/tree/main/platform/core/bastion" target="_blank" rel="noopener"><code>bastion</code></a>
+runs a Compose stack on a VPS rather than a workload in the cluster, so neither ArgoCD nor this
+pipeline deploys it — its Terraform owns the rollout end to end, and it has no `project.json`, so Nx
+never sees it. That keeps the one component that cannot be a cluster workload out of the delivery
+pipeline entirely instead of bolting a second deploy mechanism onto it; the Compose stack's only
+secret is a tunnel token Terraform already creates, so it never has to round-trip through repository
+secrets. See [private access](../traffic/01-overview.md#private-access-via-warp) for why the VPS
+exists at all.
 
 ## References
 
@@ -126,6 +123,6 @@ list to migrate into the cluster as a real ArgoCD app in a separate effort.
 - <a href="https://github.com/kbntx-org/nexus/blob/main/tools/docker-build-and-push.sh" target="_blank" rel="noopener"><code>tools/docker-build-and-push.sh</code></a>
   — the shared build/push script each image-shipping app's `deploy` target runs
 - <a href="https://github.com/kbntx-org/nexus/blob/main/.github/workflows/deploy.yml" target="_blank" rel="noopener"><code>.github/workflows/deploy.yml</code></a>
-  — the single `deploy` job (manifests bump + bastion step)
+  — the single `deploy` job (the `nexus-manifests` bump)
 - <a href="https://github.com/kbntx-org/nexus/blob/main/.github/workflows/cleanup-pr-manifests.yml" target="_blank" rel="noopener"><code>.github/workflows/cleanup-pr-manifests.yml</code></a>
   — deletes the PR branch on close

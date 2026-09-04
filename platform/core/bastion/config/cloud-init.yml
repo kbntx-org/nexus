@@ -17,14 +17,8 @@ users:
       - ALL=(ALL) NOPASSWD:ALL
     shell: /bin/bash
     lock_passwd: true
-
-  - name: ci
-    groups:
-      - docker
-    shell: /bin/bash
-    lock_passwd: true
     ssh_authorized_keys:
-      - ${ci_ssh_public_key}
+      - ${nexus_ci_public_key}
 
 write_files:
   - path: /etc/ssh/cloudflare-access-ca.pub
@@ -45,14 +39,6 @@ write_files:
     content: |
       TrustedUserCAKeys /etc/ssh/cloudflare-access-ca.pub
 
-  - path: /home/ci/docker-cleanup.sh
-    owner: ci:ci
-    permissions: '0700'
-    content: |
-      #!/bin/bash
-      docker system prune -af
-
-%{ if use_as_nat ~}
   - path: /etc/networkd-dispatcher/routable.d/10-eth0-post-up
     owner: root:root
     permissions: '0755'
@@ -60,11 +46,7 @@ write_files:
       #!/bin/bash
 
       echo 1 > /proc/sys/net/ipv4/ip_forward
-%{ if floating_ip != "" ~}
       iptables -t nat -A POSTROUTING -o eth0 -j SNAT --to ${floating_ip}
-%{ else ~}
-      iptables -t nat -A POSTROUTING -s '${vpc_cidr}' -o eth0 -j MASQUERADE
-%{ endif ~}
 
       # Docker sets the FORWARD chain default policy to DROP and only allows
       # forwarding for its own bridge networks, which would otherwise block
@@ -73,9 +55,7 @@ write_files:
       # it, so rules added here survive Docker restarts and reboots.
       iptables -I DOCKER-USER -s '${vpc_cidr}' -j ACCEPT
       iptables -I DOCKER-USER -d '${vpc_cidr}' -j ACCEPT
-%{ endif ~}
 
-%{ if floating_ip != "" ~}
   - path: /etc/netplan/60-floating-ip.yaml
     owner: root:root
     permissions: '0600'
@@ -87,7 +67,6 @@ write_files:
           eth0:
             addresses:
               - ${floating_ip}/32
-%{ endif ~}
 
 runcmd:
   - ufw disable
@@ -102,18 +81,12 @@ runcmd:
 
     # Update and install Docker
     apt-get update
-    apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin
 
     # Verify installation
     docker --version
-    docker compose version
-  - echo "0 23 * * * /home/ci/docker-cleanup.sh" | crontab -u ci -
   - passwd -l root
   - chage -E -1 -M -1 -I -1 -m 0 root
   - systemctl restart ssh
-%{ if floating_ip != "" ~}
   - netplan apply
-%{ endif ~}
-%{ if use_as_nat ~}
-  - reboot
-%{ endif ~}
+  - docker run --detach --name cloudflared --restart unless-stopped -e TUNNEL_TOKEN=${cloudflare_tunnel_token} cloudflare/cloudflared:2026.8.2 tunnel --no-autoupdate run

@@ -47,8 +47,15 @@ Do not hard-code specifics that can be found in the repository itself:
   not appear in prose. Refer to services by name ("the ArgoCD UI", "the Grafana dashboard") and link
   to the Ingress template that owns the hostname. In code samples, use placeholders
   (`my-app.example.com`) or environment variables (`${{ vars.ARGOCD_SERVER }}`)
+- **No enumerations of what currently exists** — never list every app, project, chart, or component
+  of a kind ("the portfolio, documentation, and cloudflare-controller images"). Describe the
+  category the architecture actually acts on instead ("one image per deploy target"). A list like
+  that is wrong the day something is added, and it is exactly what the code already answers. A
+  single named example to illustrate a point is fine; an exhaustive roll-call is not.
 
-These details age badly and create maintenance burden. Link to the relevant file instead.
+These details age badly and create maintenance burden. The docs are architectural — they explain how
+the pieces fit and why, and are read to understand the system, not to inventory it. Link to the
+relevant file instead.
 
 ### Code References
 

@@ -97,11 +97,9 @@ graph LR
 1. **Lint & format** — `nx run-many` scoped to the projects Affected marked as lint-affected.
    Skipped entirely, runner and all, when that list is empty — both on a PR and on `main`.
 2. **Test** — same scoping/skip behavior against the test-affected list.
-3. **Build** — build — and, outside a PR, push — the portfolio, documentation, and
-   cloudflare-controller images as parallel steps in one job, each individually skipped if not a
-   deploy target. Skipped as a whole job when Affected found no deploy targets at all. On a PR the
-   images are built but never pushed, so a broken Dockerfile fails the check without publishing
-   anything.
+3. **Build** — build — and, outside a PR, push — one image per deploy target, as parallel steps in
+   one job. Skipped as a whole job when Affected found no deploy targets at all. On a PR the images
+   are built but never pushed, so a broken Dockerfile fails the check without publishing anything.
 4. **Checks gate** — reads the result of Affected, Lint & format, Test, and Build, and fails unless
    every one of them is `success` or `skipped`. This is what branch protection should require
    instead of the individual jobs — a job that's legitimately skipped (nothing affected) shouldn't
@@ -118,18 +116,17 @@ graph LR
 <a href="https://nx.dev/" target="_blank" rel="noopener">Nx</a> answers "what changed since
 `<base>`", and every question the pipeline asks it — what to lint, what to test, what to build for
 CI — is the exact same call shape:
-`nx show projects --affected --base <base> --with-target <target>`. Each deployable project
-(`portfolio`, `documentation`, `cloudflare-controller`, and `bastion`) declares a real `build-ci`
+`nx show projects --affected --base <base> --with-target <target>`. Each deployable project declares
+a real `build-ci`
 <a href="https://nx.dev/reference/project-configuration#targets" target="_blank" rel="noopener">Nx
 target</a> in its `project.json`, deliberately named differently from the plain `build` target some
 of these projects already have for local dev (`portfolio:build` is what `nx serve` depends on;
-folding a Docker push into it would make local dev accidentally publish images). For the three
-Docker-shipping apps, `build-ci` is an `nx:run-commands` target that runs
-<a href="https://github.com/kbntx-org/nexus/blob/main/tools/docker-build-and-push.sh" target="_blank" rel="noopener"><code>tools/docker-build-and-push.sh</code></a>;
-for `bastion`, which is deployed by SSH rather than an image (see
-[What's not GitOps-managed](03-gitops-deploys.md#whats-not-gitops-managed)), it's a plain `nx:noop`
-that exists purely so `bastion` still participates in affected detection. All of this runs as steps
-directly inside the
+folding a Docker push into it would make local dev accidentally publish images). `build-ci` is an
+`nx:run-commands` target that runs
+<a href="https://github.com/kbntx-org/nexus/blob/main/tools/docker-build-and-push.sh" target="_blank" rel="noopener"><code>tools/docker-build-and-push.sh</code></a>.
+Only projects that ship an image are in the Nx graph at all — pure infrastructure like the
+[bastion](../traffic/01-overview.md#private-access-via-warp) has no `project.json` and is rolled out
+by Terraform, not by this pipeline. All of this runs as steps directly inside the
 <a href="https://github.com/kbntx-org/nexus/blob/main/.github/workflows/affected.yml" target="_blank" rel="noopener"><code>Affected</code></a>
 job — it has no read dependency on `nexus-manifests` at all; every app's deploy-target decision is
 Nx's own affected-graph computation, diffed against the same shared base described below. `build-ci`
