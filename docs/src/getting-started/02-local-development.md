@@ -79,11 +79,16 @@ already there, runs `mise install` to fetch every other pinned tool, then uses `
 create the cluster, starts a local Docker image registry alongside it, and wires the cluster's
 containerd to use it as a mirror. The host port mapping in the same script is what lets
 `*.localhost` URLs reach Traefik without `kubectl port-forward`. Every step is idempotent — safe to
-re-run any time, e.g. after pulling a change that bumped a pinned version (`pnpm cluster:create`).
+re-run any time, e.g. after pulling a change that bumped a pinned version. Once mise itself is
+installed, re-running it is just `mise run cluster:create` — every command in this doc past this
+first bootstrap is a <a href="https://mise.jdx.dev/tasks/" target="_blank" rel="noopener">mise
+task</a> defined in
+<a href="https://github.com/kbntx-org/nexus/blob/main/mise.toml" target="_blank" rel="noopener"><code>mise.toml</code></a>.
 
-`pnpm cluster:recreate` tears the cluster down and re-creates it, and `pnpm cluster:delete` removes
-it. There's no separate command to just re-trust the local TLS certificate — `pnpm cluster:create`
-already re-installs the CA and reissues the cert every time, even when the cluster already exists.
+`mise run cluster:recreate` tears the cluster down and re-creates it, and `mise run cluster:delete`
+removes it. There's no separate command to just re-trust the local TLS certificate —
+`mise run cluster:create` already re-installs the CA and reissues the cert every time, even when the
+cluster already exists.
 
 **2. Start the environment**
 
@@ -115,6 +120,5 @@ This will stop all resources managed by tilt.
 - <a href="https://github.com/kbntx-org/nexus/tree/main/platform/core/local" target="_blank" rel="noopener"><code>platform/core/local/</code></a>
   — `lib.tilt`, `platform.tilt`, `apps.tilt`, and `local.sh`
 - <a href="https://github.com/kbntx-org/nexus/blob/main/mise.toml" target="_blank" rel="noopener"><code>mise.toml</code></a>
-  — every pinned local tool version
-- <a href="https://github.com/kbntx-org/nexus/blob/main/package.json" target="_blank" rel="noopener"><code>package.json</code></a>
-  — `cluster:create`, `cluster:recreate`, `cluster:delete`, `dev:docs`, `dev:portfolio`
+  — every pinned local tool version, plus the `cluster:create`, `cluster:recreate`,
+  `cluster:delete`, `dev:docs`, `dev:kiln`, `dev:portfolio` tasks

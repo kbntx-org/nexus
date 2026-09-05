@@ -2,6 +2,8 @@ min_version = "2026.9.1"
 
 [settings]
 lockfile = true
+locked = true
+minimum_release_age = "14d"
 
 [tools]
 node = "24.15.0"
@@ -17,3 +19,32 @@ helm = "3.15.3"
 python = "3.14.4"
 uv = "0.12.3"
 yq = "4.52.5"
+
+
+[tasks."lock:update"]
+run = "mise install"
+env = { MISE_LOCKED = "0" }
+
+[tasks."cluster:create"]
+description = "Create (or converge) the local kind cluster, registry, and buildx builder"
+run = "bash platform/core/local/local.sh create"
+
+[tasks."cluster:delete"]
+description = "Delete the local kind cluster, registry, and buildx builder"
+run = "bash platform/core/local/local.sh delete"
+
+[tasks."cluster:recreate"]
+description = "Tear down and re-create the local kind cluster in one step"
+run = "bash platform/core/local/local.sh recreate"
+
+[tasks."dev:docs"]
+description = "tilt up the documentation site alongside core infra"
+run = "tilt up -- docs"
+
+[tasks."dev:kiln"]
+description = "tilt up kiln alongside core infra"
+run = "tilt up -- kiln"
+
+[tasks."dev:portfolio"]
+description = "tilt up the portfolio app alongside core infra"
+run = "tilt up -- portfolio"
