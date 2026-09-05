@@ -2,10 +2,12 @@ ARG NODE_VERSION
 
 FROM node:${NODE_VERSION}-alpine AS local
 
+ARG PNPM_VERSION
+
 WORKDIR /usr/src/app
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
-RUN npm install -g pnpm@$(node -p "require('./package.json').packageManager.split('@')[1]")
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .pnpmfile.mjs ./
+RUN npm install -g pnpm@${PNPM_VERSION}
 RUN pnpm install --frozen-lockfile
 
 COPY nx.json tsconfig.base.json ./

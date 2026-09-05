@@ -1,7 +1,11 @@
 load('ext://helm_resource', 'helm_resource')
-load('./lib.tilt', 'buildkit_build', 'root_path')
+load('./lib.tilt', 'buildkit_build', 'mise_tool_version', 'root_path')
 
 PRODUCT_RESOURCES = ['docs', 'kiln', 'portfolio']
+
+NODE_VERSION = mise_tool_version('node')
+PNPM_VERSION = mise_tool_version('pnpm')
+GO_VERSION = mise_tool_version('go')
 
 # ── Docs ──────────────────────────────────────────────────────────────────────
 buildkit_build(
@@ -35,6 +39,7 @@ buildkit_build(
   root_path('platform/services/kiln/server'),
   dockerfile=root_path('platform/services/kiln/Dockerfile'),
   target='local-backend',
+  build_args={'GO_VERSION': GO_VERSION},
   only=[
     root_path('platform/services/kiln/server'),
     root_path('platform/services/kiln/Dockerfile'),
@@ -56,6 +61,7 @@ buildkit_build(
   root_path('.'),
   dockerfile=root_path('platform/services/kiln/Dockerfile'),
   target='local-client',
+  build_args={'NODE_VERSION': NODE_VERSION, 'PNPM_VERSION': PNPM_VERSION},
   only=[
     root_path('platform/services/kiln/client'),
     root_path('platform/services/kiln/Dockerfile'),
@@ -93,6 +99,7 @@ buildkit_build(
   root_path('.'),
   dockerfile=root_path('apps/portfolio/Dockerfile'),
   target='local',
+  build_args={'NODE_VERSION': NODE_VERSION, 'PNPM_VERSION': PNPM_VERSION},
   only=[
     root_path('apps/portfolio'),
     root_path('tsconfig.base.json'),
@@ -100,7 +107,7 @@ buildkit_build(
     root_path('tools'),
     root_path('pnpm-lock.yaml'),
     root_path('package.json'),
-    root_path('.npmrc'),
+    root_path('.pnpmfile.mjs'),
     root_path('pnpm-workspace.yaml'),
   ],
   live_update=[

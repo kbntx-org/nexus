@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
+
 CLUSTER_NAME="kind"
 REGISTRY_NAME="kind-registry"
 REGISTRY_PORT="5000"
@@ -28,6 +31,33 @@ print_config() {
 EOF
 }
 
+ensure_mise() {
+  local requiredVersion
+  requiredVersion="$(grep -m1 '^min_version' "${REPO_ROOT}/mise.toml" | sed -E 's/^min_version[[:space:]]*=[[:space:]]*"([^"]+)"/\1/')"
+
+  if command -v mise &> /dev/null; then
+    local installedVersion
+    installedVersion="$(mise --version | awk '{print $1}')"
+    if [ "$(printf '%s\n%s\n' "${requiredVersion}" "${installedVersion}" | sort -V | head -n1)" = "${requiredVersion}" ]; then
+      echo "mise ${installedVersion} already satisfies the minimum ${requiredVersion}."
+      return
+    fi
+    echo "mise ${installedVersion} is older than the required ${requiredVersion}, installing ${requiredVersion}..."
+  else
+    echo "mise is not installed, installing ${requiredVersion}..."
+  fi
+
+  curl https://mise.run | MISE_VERSION="v${requiredVersion}" sh
+  export PATH="${HOME}/.local/bin:${PATH}"
+}
+
+ensure_toolchain() {
+  ensure_mise
+
+  cd "${REPO_ROOT}"
+  mise install
+}
+
 ensure_kube_context() {
   if ! kubectl config get-contexts "${KUBE_CONTEXT}" &> /dev/null; then
     echo "Kubernetes context '${KUBE_CONTEXT}' does not exist. Run '$0 create' first." >&2
@@ -52,6 +82,8 @@ create_buildx_builder() {
 }
 
 create() {
+  ensure_toolchain
+
   if [ "$(docker inspect -f '{{.State.Running}}' "${REGISTRY_NAME}" 2>/dev/null || true)" = 'true' ]; then
     echo "Registry '${REGISTRY_NAME}' is already running."
   else
@@ -64,11 +96,14 @@ create() {
     echo "Registry '${REGISTRY_NAME}' started."
   fi
 
-  echo "Creating kind cluster '${CLUSTER_NAME}' (Kubernetes ${KUBERNETES_VERSION})..."
-  cat <<EOF | kind create cluster \
-    --name "${CLUSTER_NAME}" \
-    --image "kindest/node:${KUBERNETES_VERSION}" \
-    --config=-
+  if kind get clusters 2>/dev/null | grep -qx "${CLUSTER_NAME}"; then
+    echo "kind cluster '${CLUSTER_NAME}' already exists."
+  else
+    echo "Creating kind cluster '${CLUSTER_NAME}' (Kubernetes ${KUBERNETES_VERSION})..."
+    cat <<EOF | kind create cluster \
+      --name "${CLUSTER_NAME}" \
+      --image "kindest/node:${KUBERNETES_VERSION}" \
+      --config=-
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
@@ -94,6 +129,7 @@ containerdConfigPatches:
     [plugins."io.containerd.grpc.v1.cri".registry.mirrors."${REGISTRY_NAME}:${REGISTRY_PORT}"]
       endpoint = ["http://${REGISTRY_NAME}:${REGISTRY_PORT}"]
 EOF
+  fi
 
   ensure_kube_context
 

@@ -29,18 +29,17 @@ and hosts the apps published under [kbntx.com](https://kbntx.com).
 
 You can spin up a local cluster and run the apps with live reload.
 
-**Prerequisites**: [Node.js](https://nodejs.org/en/download), [pnpm](https://pnpm.io/), Docker,
-[kind](https://kind.sigs.k8s.io/), [kubectl](https://kubernetes.io/docs/tasks/tools/),
-[Tilt](https://tilt.dev/), [mkcert](https://github.com/FiloSottile/mkcert).
+**Prerequisites**: Docker. Everything else (Node.js, pnpm, kind, kubectl, Tilt, mkcert, Helm,
+Terraform, ...) is pinned in [mise.toml](mise.toml) and installed by the bootstrap script below.
 
-**Bootstrap a local cluster** — creates a KinD cluster with a local registry and a port mapping that
-lets `*.localhost` routes hit Traefik directly. See
-[platform/core/local/cluster.sh](platform/core/local/cluster.sh). Use `pnpm cluster:recreate`
-instead of `create` to tear down and re-create in one step.
+**Bootstrap** — `create` installs [mise](https://mise.jdx.dev/) if it isn't already there, installs
+every tool pinned in `mise.toml`, then creates a KinD cluster with a local registry and a port
+mapping that lets `*.localhost` routes hit Traefik directly. See
+[platform/core/local/local.sh](platform/core/local/local.sh). Safe to re-run any time — every step
+is idempotent.
 
 ```sh
-pnpm install
-pnpm cluster:create
+platform/core/local/local.sh create
 ```
 
 **Run an app** — Tilt deploys core infra (Traefik, metrics-server, etc.) plus the app(s) named on

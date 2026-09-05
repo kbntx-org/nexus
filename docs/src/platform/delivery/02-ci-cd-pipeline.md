@@ -70,23 +70,35 @@ else on the cluster network directly.
 Every workflow runs on
 <a href="https://github.com/kbntx-org/nexus/tree/main/platform/core/github-arc-runners/base-image" target="_blank" rel="noopener"><code>kbntx-org/nexus-ci-toolkit</code></a>,
 built on the <a href="https://github.com/actions/runner" target="_blank" rel="noopener">official
-GitHub Actions runner image</a> and layered with `pnpm`, Go, the Docker CLI, and everything else the
-pipelines need. It **is** the runner's image, not a separate job container, so tools are already
-there when the pod starts — no `setup-node`, no per-job installs.
+GitHub Actions runner image</a> and layered with `pnpm`, Go, `yq`, the Docker CLI, and everything
+else the pipelines need. It **is** the runner's image, not a separate job container, so tools are
+already there when the pod starts — no `setup-node`, no per-job installs. The Node.js, pnpm, and Go
+versions it's built with come from the root
+<a href="https://github.com/kbntx-org/nexus/blob/main/mise.toml" target="_blank" rel="noopener"><code>mise.toml</code></a>
+— every `build-ci` target that needs one of these versions as a Docker build-arg resolves it with
+`yq '.tools.<name>' mise.toml` instead of hardcoding or re-deriving it, so there's a single place to
+bump a runtime version. <a href="https://mise.jdx.dev/" target="_blank" rel="noopener">mise</a>
+itself is a local-dev tool for activating these same pinned versions in a contributor's shell (see
+[Local Development](../../getting-started/02-local-development.md)) — CI reads its config file but
+never installs or invokes the CLI.
 
 Building that image is the one exception to "every workflow runs on it": you can't bootstrap an
 image from the runner it produces, so
 <a href="https://github.com/kbntx-org/nexus/blob/main/.github/workflows/build-docker-images.yml" target="_blank" rel="noopener"><code>build-docker-images.yml</code></a>
-runs on a GitHub-hosted runner and installs Node/pnpm itself rather than inheriting them. Past that
-bootstrapping step, it builds the toolkit image the same way any other image-shipping project does —
-a `build-ci` Nx target — alongside other standalone base images that have no running Kubernetes
-workload (the Sysbox installer, for one); an edit to one of their Dockerfiles rebuilds it through
-the normal affected pipeline described below, and a nightly schedule additionally forces a full
-rebuild of all of them (selected by a shared Nx tag) regardless of what changed, to pick up upstream
-drift — base image security patches and the like — that a git diff can't see. Unlike
-per-commit-tagged apps, these use a manually pinned tag baked into their `build-ci` command, so bump
-that literal alongside a Dockerfile change — otherwise the next affected build silently overwrites
-the current tag on the registry with new content under the old version.
+runs on a GitHub-hosted runner, which already ships `yq`, to read `mise.toml` the same way. Past
+that bootstrapping step, it builds the toolkit image the same way any other image-shipping project
+does — a `build-ci` Nx target — alongside other standalone base images that have no running
+Kubernetes workload (the Sysbox installer, for one); an edit to one of their Dockerfiles rebuilds it
+through the normal affected pipeline described below, and a nightly schedule additionally forces a
+full rebuild of all of them (selected by a shared Nx tag) regardless of what changed, to pick up
+upstream drift — base image security patches and the like — that a git diff can't see.
+`nexus-ci-toolkit` is tagged `:latest` and overwritten on every rebuild — pinning it to a
+semver-style tag and bumping it by hand on every Dockerfile change wasn't worth the churn, since
+it's the runner's own image rather than something another manifest pins a version of. Other
+standalone base images may still pin a tag that mirrors an upstream release version instead (the
+Sysbox installer's tag tracks the Sysbox version it bundles, for one) — bump that alongside a
+Dockerfile change so the next rebuild doesn't silently overwrite the current tag with new content
+under the old version.
 
 ## Pipeline shape
 

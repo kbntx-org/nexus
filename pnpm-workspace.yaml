@@ -1,5 +1,4 @@
 injectWorkspacePackages: true
-engineStrict: true
 minimumReleaseAgeStrict: true
 
 packages:
