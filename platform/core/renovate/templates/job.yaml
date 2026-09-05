@@ -1,0 +1,140 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: renovate
+spec:
+  schedule: 0 19-23,0-8 * * *
+  timeZone: Europe/Berlin
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 2400
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            app: renovate
+        spec:
+          restartPolicy: Never
+          nodeSelector:
+            pool: renovate
+          tolerations:
+            - key: renovate
+              operator: Equal
+              value: 'true'
+              effect: NoSchedule
+          initContainers:
+            - name: generate-tokens
+              image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+              command:
+                - sh
+                - -c
+                - |
+                  set -e
+                  apk add -q curl jq openssl
+
+                  NOW=$(date +%s)
+                  IAT=$((NOW - 60))
+                  EXP=$((NOW + 540))
+
+                  HDR=$(printf '{"alg":"RS256","typ":"JWT"}' | base64 | tr -d '=' | tr '/+' '_-' | tr -d '\n')
+                  PLD=$(printf '{"iat":%d,"exp":%d,"iss":"%s"}' "$IAT" "$EXP" "$GITHUB_RENOVATE_APP_ID" | base64 | tr -d '=' | tr '/+' '_-' | tr -d '\n')
+                  SIG=$(printf '%s.%s' "$HDR" "$PLD" | openssl dgst -sha256 -sign /etc/secrets/renovate-key.pem | base64 | tr -d '=' | tr '/+' '_-' | tr -d '\n')
+                  JWT="$HDR.$PLD.$SIG"
+
+                  INSTALL_ID=$(curl -sf \
+                    -H "Authorization: Bearer $JWT" \
+                    -H "Accept: application/vnd.github.v3+json" \
+                    "https://api.github.com/app/installations" \
+                    | jq '.[0].id')
+
+                  TOKEN=$(curl -sf -X POST \
+                    -H "Authorization: Bearer $JWT" \
+                    -H "Accept: application/vnd.github.v3+json" \
+                    "https://api.github.com/app/installations/${INSTALL_ID}/access_tokens" \
+                    | jq -r '.token')
+
+                  printf '%s' "$TOKEN" > /tmp/tokens/renovate-token
+                  echo "Token generated for app $GITHUB_RENOVATE_APP_ID"
+              env:
+                - name: GITHUB_RENOVATE_APP_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: renovate-secrets
+                      key: renovateAppId
+              volumeMounts:
+                - name: tokens
+                  mountPath: /tmp/tokens
+                - name: renovate-app-secrets
+                  mountPath: /etc/secrets
+                  readOnly: true
+          containers:
+            - name: renovate
+              image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+              command:
+                - sh
+                - -c
+                - |
+                  set -euo pipefail
+                  apk add -q curl github-cli
+
+                  export RENOVATE_TOKEN=$(cat /tmp/tokens/renovate-token)
+                  export GH_TOKEN="$RENOVATE_TOKEN"
+                  export MISE_DATA_DIR=/mise
+                  export MISE_CONFIG_DIR=/mise
+                  export MISE_CACHE_DIR=/mise/cache
+                  export MISE_INSTALL_PATH=/usr/local/bin/mise
+                  export PATH="/mise/shims:/usr/local/bin:$PATH"
+
+                  mkdir -p /tmp/toolchain
+                  gh api "repos/kbntx-org/nexus/contents/mise.toml" --jq '.content' \
+                    | base64 -d > /tmp/toolchain/mise.toml
+
+                  # Install the exact mise version this repo requires, read
+                  # straight from its own mise.toml, instead of pinning it
+                  # separately here too.
+                  export MISE_VERSION="v$(grep '^min_version' /tmp/toolchain/mise.toml | sed -E 's/.*"(.*)".*/\1/')"
+                  curl -fsSL https://mise.run | sh
+
+                  cd /tmp/toolchain
+                  mise install
+                  mise use --global npm:renovate@44.52.1
+                  eval "$(mise env -s bash)"
+
+                  exec renovate
+              env:
+                - name: RENOVATE_CONFIG_FILE
+                  value: /etc/renovate/config.json
+                - name: LOG_LEVEL
+                  value: debug
+                - name: LOG_FORMAT
+                  value: json
+                - name: RENOVATE_IGNORE_PR_AUTHOR
+                  value: "true"
+                - name: RENOVATE_REQUIRE_CONFIG
+                  value: "optional"
+                - name: RENOVATE_PLATFORM
+                  value: github
+                - name: RENOVATE_AUTODISCOVER
+                  value: 'false'
+                - name: RENOVATE_REPOSITORIES
+                  value: kbntx-org/nexus
+              volumeMounts:
+                - name: tokens
+                  mountPath: /tmp/tokens
+                  readOnly: true
+                - name: renovate-config
+                  mountPath: /etc/renovate
+                  readOnly: true
+          volumes:
+            - name: tokens
+              emptyDir: {}
+            - name: renovate-config
+              configMap:
+                name: renovate-extra-config
+            - name: renovate-app-secrets
+              secret:
+                secretName: renovate-secrets
+                items:
+                  - key: renovateAppPrivateKey
+                    path: renovate-key.pem
