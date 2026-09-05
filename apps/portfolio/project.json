@@ -62,11 +62,7 @@
     "build-ci": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": [
-          "pnpm nx build portfolio --configuration=production",
-          "tools/docker-build-and-push.sh apps/portfolio/Dockerfile . kbntx/portfolio:$IMAGE_TAG --build-arg NODE_VERSION=$(yq '.tools.node' mise.toml) --build-arg PNPM_VERSION=$(yq '.tools.pnpm' mise.toml)"
-        ],
-        "parallel": false
+        "command": "tools/docker-build-and-push.sh apps/portfolio/Dockerfile . kbntx/portfolio:$IMAGE_TAG --build-arg NODE_VERSION=$(yq '.tools.node' mise.toml) --build-arg PNPM_VERSION=$(yq '.tools.pnpm' mise.toml)"
       }
     }
   }

@@ -46,15 +46,15 @@ platform/core/local/local.sh create
 the command line, with source hot-reload through Docker sync.
 
 ```sh
-pnpm dev:portfolio   # → http://portfolio.localhost
-pnpm dev:docs        # → http://docs.localhost
+mise run dev:portfolio   # → http://portfolio.localhost
+mise run dev:docs        # → http://docs.localhost
 ```
 
 **Tear down**:
 
 ```sh
-pnpm dev:reset       # tilt down — keeps the cluster
-pnpm cluster:delete  # remove the KinD cluster + local registry
+tilt down                    # keeps the cluster
+mise run cluster:delete      # remove the KinD cluster + local registry
 ```
 
 See the [Tiltfile](Tiltfile) and [platform/core/local/](platform/core/local/) for the full set of

@@ -3,14 +3,6 @@
   "version": "0.0.0",
   "license": "MIT",
   "private": true,
-  "scripts": {
-    "cluster:create": "bash platform/core/local/local.sh create",
-    "cluster:delete": "bash platform/core/local/local.sh delete",
-    "cluster:recreate": "bash platform/core/local/local.sh recreate",
-    "dev:docs": "tilt up -- docs",
-    "dev:kiln": "tilt up -- kiln",
-    "dev:portfolio": "tilt up -- portfolio"
-  },
   "dependencies": {
     "@angular/common": "21.2.20",
     "@angular/compiler": "21.2.20",

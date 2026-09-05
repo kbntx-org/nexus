@@ -111,10 +111,8 @@ buildkit_build(
     root_path('pnpm-workspace.yaml'),
   ],
   live_update=[
-    sync(root_path('apps/portfolio/package.json'), '/usr/src/app/apps/portfolio/package.json'),
     sync(root_path('apps/portfolio/src'), '/usr/src/app/apps/portfolio/src'),
     sync(root_path('tsconfig.base.json'), '/usr/src/app/tsconfig.base.json'),
-    run('cd /usr/src/app && pnpm install --no-frozen-lockfile', trigger=[root_path('apps/portfolio/package.json')]),
   ],
 )
 

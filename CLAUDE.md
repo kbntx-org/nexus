@@ -184,6 +184,11 @@ version string. Nothing else should hardcode or re-derive one of these versions:
   `yq '.tools.<name>' mise.toml`.
 - Don't `jq`/`node -p`/etc. a version out of `package.json` — that pattern is exactly what
   `mise.toml` replaced.
+- Repo-level command shortcuts (creating the local cluster, `tilt up` variants, etc.) are
+  <a href="https://mise.jdx.dev/tasks/">mise tasks</a> in `mise.toml`'s `[tasks]`, not
+  `package.json` `scripts` — `package.json` isn't even the right home for non-JS-workspace commands
+  (Tilt/kind orchestration) once `mise.toml` is already the tool that installs and runs them. Run
+  one with `mise run <name>` (or the bare `mise <name>` shorthand).
 
 ## Package Management
 
@@ -216,9 +221,8 @@ order causes a Tiltfile error.
 ```python
 # Correct order
 live_update=[
-  sync('apps/portfolio/package.json', '/usr/src/app/apps/portfolio/package.json'),
-  sync('apps/portfolio/src', '/usr/src/app/apps/portfolio/src'),
-  run('pnpm install --no-frozen-lockfile', trigger=['apps/portfolio/package.json']),
+  sync('platform/services/kiln/server', '/workspace'),
+  run('go build -o /tmp/kiln-bin ./cmd', trigger=['platform/services/kiln/server/go.mod']),
 ]
 ```
 
