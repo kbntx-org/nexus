@@ -79,7 +79,7 @@ argocd-apps:
                     memory: 80Gi
                   userData:
                     # renovate: datasource=github-releases depName=k3s-io/k3s
-                    k3sVersion: v1.36.2+k3s1
+                    k3sVersion: v1.36.3+k3s1
                     k3sServerURL: nexus-control-plane.kbntx.com
                 {{- else }}
                 karpenter:
