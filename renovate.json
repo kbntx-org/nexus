@@ -10,9 +10,14 @@
   "automergeType": "pr",
   "separateMultipleMajor": true,
   "timezone": "Europe/Berlin",
-  "npmrc": "frozen-lockfile=false",
   "customEnvVariables": {
     "PNPM_CONFIG_FROZEN_LOCKFILE": "false"
+  },
+  "allowedCommands": ["^pnpm install --fix-lockfile --lockfile-only$"],
+  "postUpgradeTasks": {
+    "commands": ["pnpm install --fix-lockfile --lockfile-only"],
+    "fileFilters": ["**/pnpm-lock.yaml"],
+    "executionMode": "branch"
   },
   "packageRules": [
     {
