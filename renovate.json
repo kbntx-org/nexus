@@ -13,12 +13,6 @@
   "customEnvVariables": {
     "PNPM_CONFIG_FROZEN_LOCKFILE": "false"
   },
-  "allowedCommands": ["^pnpm install --fix-lockfile --lockfile-only$"],
-  "postUpgradeTasks": {
-    "commands": ["pnpm install --fix-lockfile --lockfile-only"],
-    "fileFilters": ["**/pnpm-lock.yaml"],
-    "executionMode": "branch"
-  },
   "packageRules": [
     {
       "matchUpdateTypes": ["minor", "patch"],
