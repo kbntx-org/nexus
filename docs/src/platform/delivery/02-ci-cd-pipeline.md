@@ -82,23 +82,17 @@ itself is a local-dev tool for activating these same pinned versions in a contri
 [Local Development](../../getting-started/02-local-development.md)) — CI reads its config file but
 never installs or invokes the CLI.
 
-Building that image is the one exception to "every workflow runs on it": you can't bootstrap an
-image from the runner it produces, so
-<a href="https://github.com/kbntx-org/nexus/blob/main/.github/workflows/build-docker-images.yml" target="_blank" rel="noopener"><code>build-docker-images.yml</code></a>
-runs on a GitHub-hosted runner, which already ships `yq`, to read `mise.toml` the same way. Past
-that bootstrapping step, it builds the toolkit image the same way any other image-shipping project
-does — a `build-ci` Nx target — alongside other standalone base images that have no running
-Kubernetes workload (the Sysbox installer, for one); an edit to one of their Dockerfiles rebuilds it
-through the normal affected pipeline described below, and a nightly schedule additionally forces a
-full rebuild of all of them (selected by a shared Nx tag) regardless of what changed, to pick up
-upstream drift — base image security patches and the like — that a git diff can't see.
-`nexus-ci-toolkit` is tagged `:latest` and overwritten on every rebuild — pinning it to a
-semver-style tag and bumping it by hand on every Dockerfile change wasn't worth the churn, since
-it's the runner's own image rather than something another manifest pins a version of. Other
-standalone base images may still pin a tag that mirrors an upstream release version instead (the
-Sysbox installer's tag tracks the Sysbox version it bundles, for one) — bump that alongside a
-Dockerfile change so the next rebuild doesn't silently overwrite the current tag with new content
-under the old version.
+The toolkit image is built the same way as any other image-shipping project — a `build-ci` Nx target
+— alongside other standalone base images that have no running Kubernetes workload (the Sysbox
+installer, for one); an edit to one of their Dockerfiles rebuilds it through the normal affected
+pipeline described below, on `nexus-org-runners` like every other build, the same current toolkit
+image building its own next version. `nexus-ci-toolkit` is tagged `:latest` and overwritten on every
+rebuild — pinning it to a semver-style tag and bumping it by hand on every Dockerfile change wasn't
+worth the churn, since it's the runner's own image rather than something another manifest pins a
+version of. Other standalone base images may still pin a tag that mirrors an upstream release
+version instead (the Sysbox installer's tag tracks the Sysbox version it bundles, for one) — bump
+that alongside a Dockerfile change so the next rebuild doesn't silently overwrite the current tag
+with new content under the old version.
 
 ## Pipeline shape
 
@@ -230,6 +224,3 @@ already makes the newer commit's tag win.
   together
 - <a href="https://github.com/kbntx-org/nexus/blob/main/.github/workflows/affected.yml" target="_blank" rel="noopener"><code>.github/workflows/affected.yml</code></a>
   — the single upfront job: affected + deploy-target computation, including the trunk diff-base walk
-- <a href="https://github.com/kbntx-org/nexus/blob/main/.github/workflows/build-docker-images.yml" target="_blank" rel="noopener"><code>.github/workflows/build-docker-images.yml</code></a>
-  — builds the toolkit image itself plus other standalone base images, on a nightly schedule and via
-  `workflow_dispatch`

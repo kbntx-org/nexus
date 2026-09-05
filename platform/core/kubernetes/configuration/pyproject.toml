@@ -1,7 +1,7 @@
 [project]
 name = "nexus-k3s-ansible"
 version = "1.0.0"
-requires-python = ">=3.11"
+requires-python = ">=3.14,<4"
 dependencies = [
     "ansible-core>=2.16",
     "requests>=2.20",

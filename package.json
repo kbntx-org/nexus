@@ -3,6 +3,13 @@
   "version": "0.0.0",
   "license": "MIT",
   "private": true,
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "24.x",
+      "onFail": "warn"
+    }
+  },
   "dependencies": {
     "@angular/common": "21.2.20",
     "@angular/compiler": "21.2.20",

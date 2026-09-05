@@ -178,7 +178,13 @@ version string. Nothing else should hardcode or re-derive one of these versions:
 
 - Don't add `engines` or `packageManager` fields to `package.json` — they'd duplicate `mise.toml`,
   and `packageManager` specifically triggers corepack's auto-install/enforcement behavior, which is
-  unwanted here.
+  unwanted here. `devEngines` is the one exception: it declares the supported Node.js version
+  _range_ (currently `24.x`) as a soft (`onFail: warn`) compatibility check for contributors, not an
+  exact pin — nothing reads it to resolve a version for CI, so it doesn't re-introduce the
+  duplication `mise.toml` replaced. Same idea applies per-language elsewhere: a Go module's `go`
+  directive in `go.mod` and a Python project's `requires-python` in `pyproject.toml` state the
+  supported language-version range for that module/package, independent of `mise.toml` pinning the
+  exact toolchain CI builds with.
 - Don't hardcode a runtime version in a Dockerfile. Take it as a build `ARG` and resolve the actual
   value where the image is built (an Nx `build-ci` target, a CI workflow step) with
   `yq '.tools.<name>' mise.toml`.
