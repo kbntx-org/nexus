@@ -1,6 +1,6 @@
 module github.com/kbntx-org/nexus/platform/core/cloudflare-controller
 
-go 1.26.1
+go 1.26
 
 require (
 	github.com/caarlos0/env/v11 v11.4.1

@@ -1,6 +1,6 @@
 {{- define "vault.seedContainer" -}}
 - name: vault-seed
-  image: {{ .Values.image }}
+  image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
   restartPolicy: Always
   env:
     - name: VAULT_ADDR

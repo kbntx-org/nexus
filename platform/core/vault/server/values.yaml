@@ -1,4 +1,6 @@
-image: hashicorp/vault:1.21.2
+image:
+  repository: hashicorp/vault
+  tag: 1.21.2
 ingressHost: vault.kbntx.com
 internalIngressTarget: 10.43.216.131
 args: ['server']
