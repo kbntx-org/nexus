@@ -156,37 +156,37 @@ url = "https://github.com/kubernetes-sigs/kind/releases/download/v0.33.0/kind-wi
 url_api = "https://api.github.com/repos/kubernetes-sigs/kind/releases/assets/531396499"
 
 [[tools.kubectl]]
-version = "1.36.1"
+version = "1.36.4"
 backend = "aqua:kubernetes/kubernetes/kubectl"
-specifiers = ["1.36.1"]
+specifiers = ["1.36.4"]
 
 [tools.kubectl."platforms.linux-arm64"]
-checksum = "sha256:59f7ee8e477fae658447607dc3c8790ac17a1b016c01c622c12070e969e2d4e7"
-url = "https://dl.k8s.io/v1.36.1/bin/linux/arm64/kubectl"
+checksum = "sha256:0ecf44450ee6063bf19dd166a103ee6df4a9034455c2abce626e6eea657d73fb"
+url = "https://dl.k8s.io/v1.36.4/bin/linux/arm64/kubectl"
 
 [tools.kubectl."platforms.linux-arm64-musl"]
-checksum = "sha256:59f7ee8e477fae658447607dc3c8790ac17a1b016c01c622c12070e969e2d4e7"
-url = "https://dl.k8s.io/v1.36.1/bin/linux/arm64/kubectl"
+checksum = "sha256:0ecf44450ee6063bf19dd166a103ee6df4a9034455c2abce626e6eea657d73fb"
+url = "https://dl.k8s.io/v1.36.4/bin/linux/arm64/kubectl"
 
 [tools.kubectl."platforms.linux-x64"]
-checksum = "sha256:629d3f410e09bf49b64ae7079f7f0bda1191efed311f7d37fdbab0ad5b0ec2b7"
-url = "https://dl.k8s.io/v1.36.1/bin/linux/amd64/kubectl"
+checksum = "sha256:8b8f088da2dab964f853b38464033b1be15ede2839eca751482357c45abdd05a"
+url = "https://dl.k8s.io/v1.36.4/bin/linux/amd64/kubectl"
 
 [tools.kubectl."platforms.linux-x64-musl"]
-checksum = "sha256:629d3f410e09bf49b64ae7079f7f0bda1191efed311f7d37fdbab0ad5b0ec2b7"
-url = "https://dl.k8s.io/v1.36.1/bin/linux/amd64/kubectl"
+checksum = "sha256:8b8f088da2dab964f853b38464033b1be15ede2839eca751482357c45abdd05a"
+url = "https://dl.k8s.io/v1.36.4/bin/linux/amd64/kubectl"
 
 [tools.kubectl."platforms.macos-arm64"]
-checksum = "sha256:9092778abaef3079449da4cd70ded0e4be112480c93efcdeace3155968d1d133"
-url = "https://dl.k8s.io/v1.36.1/bin/darwin/arm64/kubectl"
+checksum = "sha256:c9e4f713d6fee0043a3d835cca13077cda2bc0973840eb9779360df0b5bdfc69"
+url = "https://dl.k8s.io/v1.36.4/bin/darwin/arm64/kubectl"
 
 [tools.kubectl."platforms.macos-x64"]
-checksum = "sha256:b4973e90ebb00537d735b63d6f8293c1959156e6ff435f6a43c08aeaa1a2e7d7"
-url = "https://dl.k8s.io/v1.36.1/bin/darwin/amd64/kubectl"
+checksum = "sha256:71a3aa7c2ee2c974d9fbb462cba0c5c04a4df2e8d85eee94714fd819ea3c4e63"
+url = "https://dl.k8s.io/v1.36.4/bin/darwin/amd64/kubectl"
 
 [tools.kubectl."platforms.windows-x64"]
-checksum = "sha256:538f4229eee91a17b34724da7daade7687393d6988e33b723c6c306572c13900"
-url = "https://dl.k8s.io/v1.36.1/bin/windows/amd64/kubectl.exe"
+checksum = "sha256:31947857be7583f3e4e6d889a3fb781ca813a45c20f11ccb3ef309714d01a9f3"
+url = "https://dl.k8s.io/v1.36.4/bin/windows/amd64/kubectl.exe"
 
 [[tools.mkcert]]
 version = "1.4.4"
