@@ -1,6 +1,9 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "$schema": "https://docs.renovatebot.com/renovate-global-schema.json",
   "extends": ["config:recommended"],
+  "onboarding": false,
+  "requireConfig": "optional",
+  "binarySource": "global",
   "prConcurrentLimit": 5,
   "prHourlyLimit": 0,
   "minimumReleaseAge": "14 days",
@@ -28,6 +31,42 @@
       "automerge": false
     },
     {
+      "matchManagers": ["helmv3", "helm-values"],
+      "minimumReleaseAge": "7 days",
+      "automerge": false,
+      "dependencyDashboardApproval": true,
+      "addLabels": ["helm"]
+    },
+    {
+      "matchManagers": ["terraform"],
+      "minimumReleaseAge": "7 days",
+      "automerge": false,
+      "dependencyDashboardApproval": true,
+      "addLabels": ["terraform"]
+    },
+    {
+      "matchManagers": ["dockerfile"],
+      "minimumReleaseAge": "7 days",
+      "automerge": false,
+      "dependencyDashboardApproval": true,
+      "addLabels": ["docker"]
+    },
+    {
+      "matchManagers": ["mise"],
+      "minimumReleaseAge": "7 days",
+      "automerge": false,
+      "dependencyDashboardApproval": true,
+      "addLabels": ["toolchain"]
+    },
+    {
+      "groupName": "GitHub Actions",
+      "matchManagers": ["github-actions"],
+      "minimumReleaseAge": "7 days",
+      "automerge": false,
+      "dependencyDashboardApproval": true,
+      "addLabels": ["github-actions"]
+    },
+    {
       "matchManagers": ["helmv3"],
       "matchFileNames": ["platform/services/monitoring/Chart.yaml"],
       "groupName": "monitoring sub-charts"
@@ -48,6 +87,7 @@
     {
       "matchFileNames": [
         "platform/core/karpenter/values.yaml",
+        "platform/core/renovate/values.yaml",
         "platform/core/kubernetes/upgrades/plans/values.yaml",
         "platform/core/github-arc-runners/runners-generator/values.yaml"
       ],
@@ -57,6 +97,7 @@
     {
       "matchFileNames": [
         "platform/core/karpenter/values.yaml",
+        "platform/core/renovate/values.yaml",
         "platform/core/kubernetes/upgrades/plans/values.yaml",
         "platform/core/github-arc-runners/runners-generator/values.yaml"
       ],
@@ -69,6 +110,7 @@
       "customType": "regex",
       "fileMatch": [
         "^platform/core/karpenter/values\\.yaml$",
+        "^platform/core/renovate/values\\.yaml$",
         "^platform/core/kubernetes/upgrades/plans/values\\.yaml$",
         "^platform/core/github-arc-runners/runners-generator/values\\.yaml$"
       ],
