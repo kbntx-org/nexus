@@ -67,6 +67,13 @@ is a descendant of the first, whichever tag lands last is the one that should be
 case is one redundant image build for a tag that gets superseded moments later, not a wrong or
 missing deploy.
 
+Having a `build-ci` target is necessary but not sufficient for a manifests bump: `deploy.yml` reads
+each target's `manifestsValuesPath` metadata and skips any project that doesn't declare one. A
+standalone image with no running Kubernetes workload (see
+[CI toolkit image](02-ci-cd-pipeline.md#ci-toolkit-image)) is a perfectly valid `build-ci` project —
+Nx builds and pushes it like any other — it just has nothing for `nexus-manifests` to track, so that
+half of the pipeline is a deliberate no-op for it.
+
 What this design intentionally does _not_ self-heal: a deploy whose manifests push fails is caught
 automatically (see [Pipeline gate](02-ci-cd-pipeline.md#diff-base) — a failed deploy makes that
 commit ineligible as a future diff base, so the next run's diff widens to pick it back up), but a

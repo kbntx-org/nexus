@@ -1,24 +1,11 @@
 ARG NODE_VERSION
+ARG RUNNER_VERSION
 
 FROM node:${NODE_VERSION}-slim AS node-source
 
-FROM mcr.microsoft.com/dotnet/runtime-deps:8.0-noble AS build
+FROM ghcr.io/actions/actions-runner:${RUNNER_VERSION} AS build
 
-ARG TARGETOS
-ARG TARGETARCH
-ARG RUNNER_VERSION
-
-RUN apt-get update -y && \
-    apt-get install --no-install-recommends -y curl unzip && \
-    rm -rf /var/lib/apt/lists/*
-
-WORKDIR /actions-runner
-RUN export RUNNER_ARCH=${TARGETARCH} && \
-    if [ "$RUNNER_ARCH" = "amd64" ]; then export RUNNER_ARCH=x64 ; fi && \
-    curl -f -L -o runner.tar.gz "https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-${TARGETOS}-${RUNNER_ARCH}-${RUNNER_VERSION}.tar.gz" && \
-    tar xzf ./runner.tar.gz && \
-    rm runner.tar.gz && \
-    rm -rf ./externals/node20
+RUN rm -rf /home/runner/externals/node20
 
 FROM mcr.microsoft.com/dotnet/runtime-deps:8.0-noble
 
@@ -29,8 +16,6 @@ ENV ImageOS=ubuntu24
 
 ARG PNPM_VERSION
 ARG GO_VERSION
-ARG KUBECTL_VERSION
-ARG ARGOCD_VERSION
 
 RUN apt-get update -y && \
     apt-get install --no-install-recommends -y \
@@ -54,7 +39,7 @@ RUN adduser --disabled-password --gecos "" --uid 1001 runner && \
 
 WORKDIR /home/runner
 
-COPY --chown=runner:docker --from=build /actions-runner .
+COPY --chown=runner:docker --from=build /home/runner .
 
 # Install the Docker CLI, Buildx and Compose plugins.
 RUN install -m 0755 -d /etc/apt/keyrings && \
