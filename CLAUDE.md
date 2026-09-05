@@ -165,6 +165,26 @@ rather than trusting incremental affected-detection.
 
 ---
 
+## Runtime Versions (mise)
+
+The root [`mise.toml`](mise.toml) is the single source of truth for every language runtime version
+in this repo (Node.js, pnpm, Go, ...) and for the minimum required `mise` CLI version
+(`min_version`). The `mise` CLI itself is a local-dev tool — it's what installs and activates the
+pinned Node.js/pnpm on a contributor's machine (see the local development doc). CI and Dockerfiles
+never invoke the `mise` CLI to resolve a version; they read `mise.toml` directly with `yq`, which
+the CI toolkit image already ships, e.g. `yq '.tools.node' mise.toml`,
+`yq '.min_version' mise.toml`. This avoids a job needing `mise` pre-installed just to compute a
+version string. Nothing else should hardcode or re-derive one of these versions:
+
+- Don't add `engines` or `packageManager` fields to `package.json` — they'd duplicate `mise.toml`,
+  and `packageManager` specifically triggers corepack's auto-install/enforcement behavior, which is
+  unwanted here.
+- Don't hardcode a runtime version in a Dockerfile. Take it as a build `ARG` and resolve the actual
+  value where the image is built (an Nx `build-ci` target, a CI workflow step) with
+  `yq '.tools.<name>' mise.toml`.
+- Don't `jq`/`node -p`/etc. a version out of `package.json` — that pattern is exactly what
+  `mise.toml` replaced.
+
 ## Package Management
 
 This repo uses **pnpm**. When adding or updating a dependency in any `package.json`, always

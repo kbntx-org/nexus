@@ -25,7 +25,7 @@
     "build-ci": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tools/docker-build-and-push.sh platform/core/cloudflare-controller/Dockerfile platform/core/cloudflare-controller kbntx/cloudflare-controller:$IMAGE_TAG"
+        "command": "tools/docker-build-and-push.sh platform/core/cloudflare-controller/Dockerfile platform/core/cloudflare-controller kbntx/cloudflare-controller:$IMAGE_TAG --build-arg GO_VERSION=$(yq '.tools.go' mise.toml)"
       }
     }
   }

@@ -20,7 +20,9 @@
       "{workspaceRoot}/.github/workflows/deploy.yml",
       "{workspaceRoot}/.github/workflows/checks.yml",
       "{workspaceRoot}/.github/workflows/lint-and-format.yml",
-      "{workspaceRoot}/.github/workflows/test.yml"
+      "{workspaceRoot}/.github/workflows/test.yml",
+      "{workspaceRoot}/mise.toml",
+      "{workspaceRoot}/pnpm-lock.yaml"
     ]
   },
   "targetDefaults": {

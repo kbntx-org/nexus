@@ -8,7 +8,7 @@
     "build-ci": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tools/docker-build-and-push.sh platform/core/github-arc-runners/base-image/Dockerfile platform/core/github-arc-runners/base-image kbntx/nexus-ci-toolkit:1.7.2 --build-arg RUNNER_VERSION=2.337.0 --build-arg NODE_VERSION=$(jq -r '.engines.node | ltrimstr(\"^\")' package.json) --build-arg PNPM_VERSION=$(jq -r '.packageManager | split(\"@\")[1]' package.json) --build-arg GO_VERSION=$(jq -r '.engines.go' package.json)"
+        "command": "tools/docker-build-and-push.sh platform/core/github-arc-runners/base-image/Dockerfile platform/core/github-arc-runners/base-image kbntx/nexus-ci-toolkit:latest --build-arg NODE_VERSION=$(yq '.tools.node' mise.toml) --build-arg PNPM_VERSION=$(yq '.tools.pnpm' mise.toml) --build-arg GO_VERSION=$(yq '.tools.go' mise.toml)"
       }
     }
   }

@@ -1,9 +1,7 @@
 ARG NODE_VERSION
-ARG RUNNER_VERSION
-
 FROM node:${NODE_VERSION}-slim AS node-source
 
-FROM ghcr.io/actions/actions-runner:${RUNNER_VERSION} AS build
+FROM ghcr.io/actions/actions-runner:2.337.0 AS build
 
 RUN rm -rf /home/runner/externals/node20
 

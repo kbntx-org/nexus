@@ -2,11 +2,14 @@ def root_path(path):
   return config.main_dir + '/' + path
 
 CLUSTER_CONFIG = decode_json(str(local(
-  [root_path('platform/core/local/cluster.sh'), 'config'],
+  [root_path('platform/core/local/local.sh'), 'config'],
   quiet=True,
 )))
 BUILDX_BUILDER_NAME = CLUSTER_CONFIG['builderName']
 REGISTRY_REF = '%s:%s' % (CLUSTER_CONFIG['registryName'], CLUSTER_CONFIG['registryPort'])
+
+def mise_tool_version(name):
+  return str(local(['mise', 'config', 'get', 'tools.%s' % name], quiet=True)).strip()
 
 def helm_chart_deps(chartPath):
   if config.tilt_subcommand == 'down':

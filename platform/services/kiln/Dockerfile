@@ -1,6 +1,10 @@
 # syntax=docker/dockerfile:1.20
 
-FROM golang:1.26.6-alpine AS local-backend
+ARG GO_VERSION
+ARG NODE_VERSION
+ARG PNPM_VERSION
+
+FROM golang:${GO_VERSION}-alpine AS local-backend
 
 RUN go install github.com/air-verse/air@v1.62.0
 
@@ -15,12 +19,14 @@ EXPOSE 8080
 
 CMD ["air"]
 
-FROM node:24.19.0-alpine AS node-tooling
+FROM node:${NODE_VERSION}-alpine AS node-tooling
+
+ARG PNPM_VERSION
 
 ENV PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN=false
 ENV PNPM_CONFIG_TRUST_LOCKFILE=true
 
-RUN npm install -g pnpm@11.9.0
+RUN npm install -g pnpm@${PNPM_VERSION}
 
 FROM node-tooling AS client-node-modules
 
@@ -53,7 +59,7 @@ COPY --from=client-node-modules /pruned/node_modules ./node_modules
 
 RUN pnpm build
 
-FROM golang:1.26.6-alpine AS go-builder
+FROM golang:${GO_VERSION}-alpine AS go-builder
 
 WORKDIR /workspace
 

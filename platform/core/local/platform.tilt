@@ -13,7 +13,7 @@ PERSISTED_ON_DOWN = ['cloudnative-pg', 'cilium']
 bootstrap_kubernetes(DOCKER_CONTEXT)
 
 # ── Cilium (CNI + kube-proxy replacement; kind's own CNI/kube-proxy are off, ──
-# ── see cluster.sh, so nothing else can schedule until this is installed) ────
+# ── see local.sh, so nothing else can schedule until this is installed) ────
 if config.tilt_subcommand != 'down':
   KUBE_APISERVER_HOST = str(local(
     "docker inspect --format='{{ .NetworkSettings.Networks.kind.IPAddress }}' kind-control-plane",
@@ -94,8 +94,8 @@ helm_resource(
 # ── Ingress TLS watcher (reissues the local mkcert cert whenever a new IngressRoute host appears) ──
 local_resource(
   'watch-ingresses',
-  serve_cmd=[root_path('platform/core/local/cluster.sh'), 'watch-ingresses'],
-  deps=[root_path('platform/core/local/cluster.sh')],
+  serve_cmd=[root_path('platform/core/local/local.sh'), 'watch-ingresses'],
+  deps=[root_path('platform/core/local/local.sh')],
   resource_deps=['traefik'],
   labels=['2-Infra'],
 )

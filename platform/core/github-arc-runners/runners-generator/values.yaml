@@ -111,7 +111,7 @@ argocd-apps:
                       automountServiceAccountToken: false
                       containers:
                         - name: runner
-                          image: kbntx/nexus-ci-toolkit:1.7
+                          image: kbntx/nexus-ci-toolkit:latest
                           command:
                             - /home/runner/run.sh
                           env:

@@ -11,16 +11,17 @@ before deploying it to the cluster, an idea can be tested locally.
 
 ## Prerequisites
 
-These tools are needed to run the local environment:
+Only one thing can't come from
+<a href="https://mise.jdx.dev/" target="_blank" rel="noopener">mise</a>:
 
-| Tool    | Why                                                                 | Install                                                                                                                 |
-| ------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Node.js | Runtime for the Nx workspace and pnpm itself                        | <a href="https://nodejs.org/en/download" target="_blank" rel="noopener">Install guide</a>                               |
-| pnpm    | Package manager for the workspace, and the `pnpm run` scripts below | <a href="https://pnpm.io/installation" target="_blank" rel="noopener">Install guide</a>                                 |
-| Docker  | Container runtime — required by kind                                | <a href="https://docs.docker.com/engine/install/" target="_blank" rel="noopener">Install guide</a>                      |
-| kind    | Runs Kubernetes inside Docker                                       | <a href="https://kind.sigs.k8s.io/docs/user/quick-start/#installation" target="_blank" rel="noopener">Install guide</a> |
-| Tilt    | Builds, deploys, and live-reloads everything                        | <a href="https://docs.tilt.dev/install.html" target="_blank" rel="noopener">Install guide</a>                           |
-| mkcert  | Issues the locally-trusted TLS certificate for `*.localhost`        | <a href="https://github.com/FiloSottile/mkcert#installation" target="_blank" rel="noopener">Install guide</a>           |
+| Tool   | Why                                  | Install                                                                                            |
+| ------ | ------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| Docker | Container runtime — required by kind | <a href="https://docs.docker.com/engine/install/" target="_blank" rel="noopener">Install guide</a> |
+
+Everything else — kind, Tilt, kubectl, mkcert, Helm, Terraform, Node.js, pnpm — is pinned in
+<a href="https://github.com/kbntx-org/nexus/blob/main/mise.toml" target="_blank" rel="noopener"><code>mise.toml</code></a>,
+and the bootstrap script below installs mise itself if it's missing, then installs every one of
+those pinned tools.
 
 ## Why Tilt?
 
@@ -65,20 +66,24 @@ running container — no rebuild needed.
 
 ## Getting started
 
-**1. Create the local cluster**
+**1. Bootstrap**
 
 ```bash
-pnpm run cluster:create
+platform/core/local/local.sh create
 ```
 
 This runs
-<a href="https://github.com/kbntx-org/nexus/blob/main/platform/core/local/cluster.sh" target="_blank" rel="noopener"><code>platform/core/local/cluster.sh</code></a>,
-which uses `kind` directly to create the cluster, starts a local Docker image registry alongside it,
-and wires the cluster's containerd to use it as a mirror. The host port mapping in the same script
-is what lets `*.localhost` URLs reach Traefik without `kubectl port-forward`. It also issues a
-locally-trusted TLS certificate with `mkcert` so those URLs work over `https://` too. The script
-also supports `recreate`, which tears down and re-creates the cluster in one step
-(`pnpm run cluster:recreate`).
+<a href="https://github.com/kbntx-org/nexus/blob/main/platform/core/local/local.sh" target="_blank" rel="noopener"><code>platform/core/local/local.sh</code></a>'s
+`create` command: it installs mise (at the minimum version pinned in `mise.toml`) if it isn't
+already there, runs `mise install` to fetch every other pinned tool, then uses `kind` directly to
+create the cluster, starts a local Docker image registry alongside it, and wires the cluster's
+containerd to use it as a mirror. The host port mapping in the same script is what lets
+`*.localhost` URLs reach Traefik without `kubectl port-forward`. Every step is idempotent — safe to
+re-run any time, e.g. after pulling a change that bumped a pinned version (`pnpm cluster:create`).
+
+`pnpm cluster:recreate` tears the cluster down and re-creates it, and `pnpm cluster:delete` removes
+it. There's no separate command to just re-trust the local TLS certificate — `pnpm cluster:create`
+already re-installs the CA and reissues the cert every time, even when the cluster already exists.
 
 **2. Start the environment**
 
@@ -103,17 +108,13 @@ tilt down
 
 This will stop all resources managed by tilt.
 
-**4. Delete the cluster entirely**
-
-```bash
-pnpm run cluster:delete
-```
-
 ## References
 
 - <a href="https://github.com/kbntx-org/nexus/blob/main/Tiltfile" target="_blank" rel="noopener"><code>Tiltfile</code></a>
   — local dev entrypoint (resource enablement)
 - <a href="https://github.com/kbntx-org/nexus/tree/main/platform/core/local" target="_blank" rel="noopener"><code>platform/core/local/</code></a>
-  — `lib.tilt`, `platform.tilt`, `apps.tilt`, and the cluster bootstrap script
+  — `lib.tilt`, `platform.tilt`, `apps.tilt`, and `local.sh`
+- <a href="https://github.com/kbntx-org/nexus/blob/main/mise.toml" target="_blank" rel="noopener"><code>mise.toml</code></a>
+  — every pinned local tool version
 - <a href="https://github.com/kbntx-org/nexus/blob/main/package.json" target="_blank" rel="noopener"><code>package.json</code></a>
   — `cluster:create`, `cluster:recreate`, `cluster:delete`, `dev:docs`, `dev:portfolio`
