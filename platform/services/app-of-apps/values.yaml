@@ -195,6 +195,22 @@ argocd-apps:
         syncOptions:
           - CreateNamespace=true
 
+    zot:
+      project: default
+      source:
+        repoURL: https://github.com/kbntx-org/nexus.git
+        path: platform/core/zot
+        targetRevision: main
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: zot
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+
     monitoring:
       project: default
       source:
