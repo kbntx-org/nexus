@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: renovate
 spec:
-  schedule: 0 */4 * * *
+  schedule: 0 4 * * *
   timeZone: Europe/Berlin
   concurrencyPolicy: Forbid
   jobTemplate:
