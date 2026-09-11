@@ -59,20 +59,6 @@ export default [
             }
           }
         ],
-        '@typescript-eslint/indent': 'off',
-        '@typescript-eslint/member-delimiter-style': [
-          'off',
-          {
-            multiline: {
-              delimiter: 'none',
-              requireLast: true
-            },
-            singleline: {
-              delimiter: 'semi',
-              requireLast: false
-            }
-          }
-        ],
         '@typescript-eslint/member-ordering': [
           'error',
           {
@@ -131,9 +117,6 @@ export default [
         '@typescript-eslint/no-useless-constructor': 'warn',
         '@typescript-eslint/prefer-for-of': 'error',
         '@typescript-eslint/prefer-function-type': 'error',
-        '@typescript-eslint/quotes': 'off',
-        '@typescript-eslint/semi': ['off', null],
-        '@typescript-eslint/type-annotation-spacing': 'off',
         '@typescript-eslint/unified-signatures': 'off',
         'arrow-body-style': 'error',
         'arrow-parens': ['off', 'always'],
