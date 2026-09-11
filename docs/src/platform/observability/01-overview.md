@@ -3,7 +3,7 @@ title: Overview
 ---
 
 Observability in Nexus is a single Helm chart at
-<a href="https://github.com/kbntx-org/nexus/tree/main/platform/services/monitoring" target="_blank" rel="noopener"><code>platform/services/monitoring/</code></a>,
+<a href="https://github.com/kbntx-org/nexus/tree/main/platform/core/monitoring" target="_blank" rel="noopener"><code>platform/core/monitoring/</code></a>,
 built on the Grafana OSS stack rather than something like Datadog. Two reasons drive that: cost, and
 control over visualization — Grafana lets us mix metrics, logs, and arbitrary external data sources
 (custom APIs included) on the same dashboard, instead of being boxed into one vendor's model of what
@@ -83,7 +83,7 @@ representing things like CI/CD visibility (global data, tests failures, etc).
 - **Imported through the UI.** The Grafana sidecar runs with `allowUiUpdates: true`, so dashboards
   saved interactively persist and survive pod restarts. Good for iterating.
 - **Provisioned via the chart.** Anything that should be source-of-truth belongs in the
-  <a href="https://github.com/kbntx-org/nexus/blob/main/platform/services/monitoring/values.yaml" target="_blank" rel="noopener">monitoring
+  <a href="https://github.com/kbntx-org/nexus/blob/main/platform/core/monitoring/values.yaml" target="_blank" rel="noopener">monitoring
   values file</a> so it's reapplied on every ArgoCD sync. UI-edited dashboards should eventually be
   promoted there.
 
@@ -96,7 +96,7 @@ run, and rules live next to the dashboards that inform them.
 
 ## References
 
-- <a href="https://github.com/kbntx-org/nexus/tree/main/platform/services/monitoring" target="_blank" rel="noopener"><code>platform/services/monitoring/</code></a>
+- <a href="https://github.com/kbntx-org/nexus/tree/main/platform/core/monitoring" target="_blank" rel="noopener"><code>platform/core/monitoring/</code></a>
   — full monitoring Helm chart
 - [Databases](../databases/01-overview.md) — CNPG pattern backing Grafana's own state
 - [Secrets](../secrets/01-overview.md) — how Loki's S3 credentials reach the cluster

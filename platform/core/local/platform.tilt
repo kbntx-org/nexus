@@ -112,16 +112,16 @@ helm_resource(
 )
 
 # ── Monitoring (VictoriaMetrics + Grafana + Loki + node/kube-state metrics) ───
-helm_chart_deps(root_path('platform/services/monitoring'))
+helm_chart_deps(root_path('platform/core/monitoring'))
 helm_resource(
   'monitoring',
-  root_path('platform/services/monitoring'),
+  root_path('platform/core/monitoring'),
   namespace='monitoring',
   flags=[
-    '--values', root_path('platform/services/monitoring/values.local.yaml'),
+    '--values', root_path('platform/core/monitoring/values.local.yaml'),
     '--create-namespace',
   ],
-  deps=[root_path('platform/services/monitoring')],
+  deps=[root_path('platform/core/monitoring')],
   resource_deps=['vault', 'external-secrets', 'cloudnative-pg', 'traefik'],
   labels=['2-Infra'],
   links=[link('http://grafana.localhost', 'grafana.localhost')],

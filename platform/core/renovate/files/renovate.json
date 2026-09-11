@@ -38,7 +38,7 @@
     },
     {
       "matchManagers": ["helmv3"],
-      "matchFileNames": ["platform/services/monitoring/Chart.yaml"],
+      "matchFileNames": ["platform/core/monitoring/Chart.yaml"],
       "groupName": "monitoring sub-charts"
     },
     {
