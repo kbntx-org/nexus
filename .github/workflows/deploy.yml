@@ -38,6 +38,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: Install mise-managed tools
+        uses: ./.github/actions/mise-install
+        with:
+          tools: node pnpm
+
       - name: Install dependencies
         run: pnpm install
 

@@ -1,0 +1,32 @@
+name: Install mise-managed tools
+description: >
+  Ensures the mise CLI is available (installing it if this runner doesn't already have one), then
+  installs the given mise.toml-tracked tools at their pinned versions and puts them on PATH for
+  the rest of the job.
+
+inputs:
+  tools:
+    description: >
+      Space-separated mise.toml tool names to install, e.g. "node pnpm go". Omit to install every
+      tool declared in mise.toml.
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - name: mise install
+      shell: bash
+      env:
+        MISE_TRUSTED_CONFIG_PATHS: ${{ github.workspace }}
+        MISE_YES: '1'
+        MISE_VERSION: v2026.9.1
+      run: |
+        if ! command -v mise >/dev/null 2>&1; then
+          curl -fsSL https://mise.run | MISE_INSTALL_PATH="$HOME/.local/bin/mise" sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          export PATH="$HOME/.local/bin:$PATH"
+        fi
+
+        mise install ${{ inputs.tools }}
+        mise bin-paths ${{ inputs.tools }} >> "$GITHUB_PATH"

@@ -19,6 +19,8 @@ helm = "3.21.4"
 python = "3.14.7"
 uv = "0.12.7"
 yq = "4.53.6"
+golangci-lint = "2.13.2"
+s5cmd = "2.3.0"
 
 
 [tasks."lock:update"]
