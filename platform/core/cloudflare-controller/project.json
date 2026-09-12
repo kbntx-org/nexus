@@ -22,6 +22,20 @@
         "command": "go build ./..."
       }
     },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "platform/core/cloudflare-controller",
+        "command": "golangci-lint run --config ../../../.golangci.yml ./..."
+      }
+    },
+    "format-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "platform/core/cloudflare-controller",
+        "command": "golangci-lint fmt --config ../../../.golangci.yml --diff ./..."
+      }
+    },
     "build-ci": {
       "executor": "nx:run-commands",
       "options": {

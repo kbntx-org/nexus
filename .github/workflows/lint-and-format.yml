@@ -7,6 +7,10 @@ on:
         description: 'Comma-delimited list of affected projects with a lint target'
         required: true
         type: string
+      format_check_projects_csv:
+        description: 'Comma-delimited list of affected projects with a format-check target'
+        required: true
+        type: string
       affected_base:
         description: 'Git ref/SHA to diff format:check against (Affected job output)'
         required: true
@@ -49,4 +53,9 @@ jobs:
           - name: Lint
             if: inputs.lint_projects_csv != ''
             run: pnpm nx run-many --target lint --projects="${{ inputs.lint_projects_csv }}" --parallel --outputStyle=stream
+            shell: bash
+
+          - name: Format check (non-Prettier)
+            if: inputs.format_check_projects_csv != ''
+            run: pnpm nx run-many --target format-check --projects="${{ inputs.format_check_projects_csv }}" --parallel --outputStyle=stream
             shell: bash

@@ -217,6 +217,29 @@ listing exactly the tools that job's steps invoke — e.g. `tools: node pnpm` fo
 shells out to both. Don't list every `mise.toml` tool "to be safe" — only what that job actually
 runs, so jobs stay fast.
 
+### Go projects: `lint` and `format-check` Nx targets
+
+Every Go project (`cloudflare-controller`, `kiln`'s `server/`, ...) declares two Nx targets
+alongside `build`:
+
+- `lint`: `golangci-lint run --config <relative-path-to-root>/.golangci.yml ./...`, with `cwd` set
+  to the module's own directory. `cwd` is required, not optional — each Go project is its own module
+  with no root `go.mod`, so `golangci-lint`/`go build` refuse to target it from outside (confirmed:
+  `directory prefix ... does not contain main module`). The `--config` flag is explicit rather than
+  relying on `golangci-lint`'s own upward directory search, even though that search already resolves
+  the root file correctly on its own.
+- `format-check`: `golangci-lint fmt --config <same path> --diff ./...` — exits non-zero if
+  `gofmt`/`goimports` (declared under `formatters` in [`.golangci.yml`](.golangci.yml)) would change
+  anything, without rewriting files. This is the non-Prettier counterpart to Nx's `format:check`,
+  which only covers JS/TS.
+
+[`affected.yml`](.github/workflows/affected.yml) computes a `formatCheckProjectsCsv` output the same
+way it does for `lintProjectsCsv` (`nx show projects --affected --with-target format-check`), and
+[`lint-and-format.yml`](.github/workflows/lint-and-format.yml) runs it as its own parallel step
+(`nx run-many --target format-check`) alongside `Lint` and `Check formatting`. Adding a new Go
+project means adding both targets to its `project.json` — Nx's affected-detection then wires it into
+CI automatically, no workflow changes needed.
+
 ## Package Management
 
 This repo uses **pnpm**. When adding or updating a dependency in any `package.json`, always
