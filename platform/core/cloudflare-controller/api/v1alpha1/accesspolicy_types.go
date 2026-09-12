@@ -86,7 +86,3 @@ type AccessPolicyList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []AccessPolicy `json:"items"`
 }
-
-func init() {
-	SchemeBuilder.Register(&AccessPolicy{}, &AccessPolicyList{})
-}

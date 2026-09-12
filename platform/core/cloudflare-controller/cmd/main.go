@@ -49,7 +49,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	eventRecorder := mgr.GetEventRecorderFor("cloudflare-controller")
+	// GetEventRecorder returns the new events.EventRecorder, whose Eventf signature (regarding,
+	// related, action, note) doesn't map onto the plain Event(object, message) calls the
+	// controllers make today — that's a real API migration, not a rename, so we keep the old API.
+	eventRecorder := mgr.GetEventRecorderFor("cloudflare-controller") //nolint:staticcheck
 
 	if err := (&controller.AccessPolicyReconciler{
 		Client:           mgr.GetClient(),

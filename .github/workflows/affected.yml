@@ -15,6 +15,12 @@ on:
       lintProjectsCsv:
         description: 'Comma-delimited list of nx-affected projects with a lint target'
         value: ${{ jobs.affected.outputs.lintProjectsCsv }}
+      formatCheckProjects:
+        description: 'JSON array of nx-affected projects with a format-check target'
+        value: ${{ jobs.affected.outputs.formatCheckProjects }}
+      formatCheckProjectsCsv:
+        description: 'Comma-delimited list of nx-affected projects with a format-check target'
+        value: ${{ jobs.affected.outputs.formatCheckProjectsCsv }}
       testProjects:
         description: 'JSON array of nx-affected projects with a test target'
         value: ${{ jobs.affected.outputs.testProjects }}
@@ -41,6 +47,8 @@ jobs:
       affectedBase: ${{ steps.pr_base.outputs.affected_base || steps.trunk_base.outputs.affected_base }}
       lintProjects: ${{ steps.affected.outputs.lint_projects }}
       lintProjectsCsv: ${{ steps.affected.outputs.lint_projects_csv }}
+      formatCheckProjects: ${{ steps.affected.outputs.format_check_projects }}
+      formatCheckProjectsCsv: ${{ steps.affected.outputs.format_check_projects_csv }}
       testProjects: ${{ steps.affected.outputs.test_projects }}
       testProjectsCsv: ${{ steps.affected.outputs.test_projects_csv }}
       deployTargets: ${{ steps.affected.outputs.deploy_targets }}
@@ -146,16 +154,20 @@ jobs:
         run: |
           affectedProjects=$(pnpm nx show projects --affected --base "$AFFECTED_BASE" --json | jq -c 'sort')
           lintProjects=$(pnpm nx show projects --affected --base "$AFFECTED_BASE" --with-target lint --json | jq -c 'sort')
+          formatCheckProjects=$(pnpm nx show projects --affected --base "$AFFECTED_BASE" --with-target format-check --json | jq -c 'sort')
           testProjects=$(pnpm nx show projects --affected --base "$AFFECTED_BASE" --with-target test --json | jq -c 'sort')
           deployProjects=$(pnpm nx show projects --affected --base "$AFFECTED_BASE" --with-target build-ci --json | jq -c 'sort')
           echo "Affected: $affectedProjects"
           echo "Lint projects: $lintProjects"
+          echo "Format-check projects: $formatCheckProjects"
           echo "Test projects: $testProjects"
           echo "Deploy projects: $deployProjects"
           {
             echo "affected=$affectedProjects"
             echo "lint_projects=$lintProjects"
             echo "lint_projects_csv=$(echo "$lintProjects" | jq -r 'join(",")')"
+            echo "format_check_projects=$formatCheckProjects"
+            echo "format_check_projects_csv=$(echo "$formatCheckProjects" | jq -r 'join(",")')"
             echo "test_projects=$testProjects"
             echo "test_projects_csv=$(echo "$testProjects" | jq -r 'join(",")')"
             echo "deploy_targets=$deployProjects"
@@ -185,6 +197,7 @@ jobs:
             echo "| --- | --- |"
             echo "| affected (all) | $(renderList "$affectedProjects") |"
             echo "| lint | $(renderList "$lintProjects") |"
+            echo "| format-check | $(renderList "$formatCheckProjects") |"
             echo "| test | $(renderList "$testProjects") |"
             echo "| build-ci (deploy) | $(renderList "$deployProjects") |"
           } >> "$GITHUB_STEP_SUMMARY"

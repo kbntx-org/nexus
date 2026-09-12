@@ -25,6 +25,7 @@ jobs:
     secrets: inherit
     with:
       lint_projects_csv: ${{ needs.affected.outputs.lintProjectsCsv }}
+      format_check_projects_csv: ${{ needs.affected.outputs.formatCheckProjectsCsv }}
       affected_base: ${{ needs.affected.outputs.affectedBase }}
 
   test:

@@ -64,7 +64,3 @@ type AccessApplicationList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []AccessApplication `json:"items"`
 }
-
-func init() {
-	SchemeBuilder.Register(&AccessApplication{}, &AccessApplicationList{})
-}

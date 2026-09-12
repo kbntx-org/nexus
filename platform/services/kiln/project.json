@@ -8,6 +8,20 @@
     "manifestsValuesPath": "kiln/values.yaml"
   },
   "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "platform/services/kiln/server",
+        "command": "golangci-lint run --config ../../../../.golangci.yml ./..."
+      }
+    },
+    "format-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "platform/services/kiln/server",
+        "command": "golangci-lint fmt --config ../../../../.golangci.yml --diff ./..."
+      }
+    },
     "build-ci": {
       "executor": "nx:run-commands",
       "options": {
