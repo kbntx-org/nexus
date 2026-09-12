@@ -52,6 +52,11 @@ jobs:
           fetch-depth: 0
           filter: tree:0
 
+      - name: Install mise-managed tools
+        uses: ./.github/actions/mise-install
+        with:
+          tools: node pnpm
+
       - name: Install dependencies
         run: pnpm install
         shell: bash
@@ -139,10 +144,10 @@ jobs:
         env:
           AFFECTED_BASE: ${{ steps.pr_base.outputs.affected_base || steps.trunk_base.outputs.affected_base }}
         run: |
-          affectedProjects=$(pnpm -s nx show projects --affected --base "$AFFECTED_BASE" --json | jq -c 'sort')
-          lintProjects=$(pnpm -s nx show projects --affected --base "$AFFECTED_BASE" --with-target lint --json | jq -c 'sort')
-          testProjects=$(pnpm -s nx show projects --affected --base "$AFFECTED_BASE" --with-target test --json | jq -c 'sort')
-          deployProjects=$(pnpm -s nx show projects --affected --base "$AFFECTED_BASE" --with-target build-ci --json | jq -c 'sort')
+          affectedProjects=$(pnpm nx show projects --affected --base "$AFFECTED_BASE" --json | jq -c 'sort')
+          lintProjects=$(pnpm nx show projects --affected --base "$AFFECTED_BASE" --with-target lint --json | jq -c 'sort')
+          testProjects=$(pnpm nx show projects --affected --base "$AFFECTED_BASE" --with-target test --json | jq -c 'sort')
+          deployProjects=$(pnpm nx show projects --affected --base "$AFFECTED_BASE" --with-target build-ci --json | jq -c 'sort')
           echo "Affected: $affectedProjects"
           echo "Lint projects: $lintProjects"
           echo "Test projects: $testProjects"

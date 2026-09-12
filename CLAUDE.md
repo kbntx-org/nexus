@@ -169,12 +169,20 @@ rather than trusting incremental affected-detection.
 
 The root [`mise.toml`](mise.toml) is the single source of truth for every language runtime version
 in this repo (Node.js, pnpm, Go, ...) and for the minimum required `mise` CLI version
-(`min_version`). The `mise` CLI itself is a local-dev tool — it's what installs and activates the
-pinned Node.js/pnpm on a contributor's machine (see the local development doc). CI and Dockerfiles
-never invoke the `mise` CLI to resolve a version; they read `mise.toml` directly with `yq`, which
-the CI toolkit image already ships, e.g. `yq '.tools.node' mise.toml`,
-`yq '.min_version' mise.toml`. This avoids a job needing `mise` pre-installed just to compute a
-version string. Nothing else should hardcode or re-derive one of these versions:
+(`min_version`). The CI toolkit image
+([`base-image/Dockerfile`](platform/core/github-arc-runners/base-image/Dockerfile)) only bakes in
+generic, version-insensitive pipeline utilities that nearly every job needs regardless of which
+project it's touching — `jq` and `git` via `apt`, `yq` copied from its upstream image, the Docker
+CLI/Buildx/Compose plugins — plus the Docker/GH Actions runner scaffolding itself. It does **not**
+bake in `mise` or any other `mise.toml`-tracked tool (Node.js, pnpm, Go, the GitHub CLI,
+golangci-lint, s5cmd, ...) — it's deliberately agnostic to this repo's state otherwise. Every
+pipeline resolves those on demand via the [`mise-install`](.github/actions/mise-install/action.yaml)
+composite action, which installs `mise` itself first if the runner doesn't already have one (pinned
+to a version hardcoded in the action, since bootstrapping `mise` can't itself depend on reading
+`mise.toml` with `mise`), then runs `mise install <tools>` against the checkout's own `mise.toml`.
+`yq` still has an entry in `mise.toml` too (for contributors' local dev environments), but CI
+doesn't route it through mise since it's baked into the runner already — don't add `yq` to a
+`mise-install` `tools:` list. Nothing else should hardcode or re-derive one of these versions:
 
 - Don't add `engines` or `packageManager` fields to `package.json` — they'd duplicate `mise.toml`,
   and `packageManager` specifically triggers corepack's auto-install/enforcement behavior, which is
@@ -185,9 +193,14 @@ version string. Nothing else should hardcode or re-derive one of these versions:
   directive in `go.mod` and a Python project's `requires-python` in `pyproject.toml` state the
   supported language-version range for that module/package, independent of `mise.toml` pinning the
   exact toolchain CI builds with.
-- Don't hardcode a runtime version in a Dockerfile. Take it as a build `ARG` and resolve the actual
-  value where the image is built (an Nx `build-ci` target, a CI workflow step) with
-  `yq '.tools.<name>' mise.toml`.
+- Don't hardcode a runtime version in a Dockerfile. Project Dockerfiles (`cloudflare-controller`,
+  `kiln`, `portfolio`, ...) that pick an upstream base image tag
+  (`FROM golang:${GO_VERSION}-alpine`, `FROM node:${NODE_VERSION}-alpine`) still take that version
+  as a build `ARG` resolved with `yq '.tools.<name>' mise.toml` at the call site (the project's
+  `build-ci` target) — there's no base image to pick for a binary the Dockerfile installs directly,
+  so that case installs `mise` instead and runs `mise install <name>` against its own copy of
+  `mise.toml`. The one exception is `mise-install`'s own bootstrap `mise` version (see above),
+  hardcoded on purpose since it can't depend on the very tool it's installing.
 - Don't `jq`/`node -p`/etc. a version out of `package.json` — that pattern is exactly what
   `mise.toml` replaced.
 - Repo-level command shortcuts (creating the local cluster, `tilt up` variants, etc.) are
@@ -195,6 +208,14 @@ version string. Nothing else should hardcode or re-derive one of these versions:
   `package.json` `scripts` — `package.json` isn't even the right home for non-JS-workspace commands
   (Tilt/kind orchestration) once `mise.toml` is already the tool that installs and runs them. Run
   one with `mise run <name>` (or the bare `mise <name>` shorthand).
+
+A GitHub Actions job that needs one or more `mise.toml`-tracked tools on `PATH` uses the
+[`mise-install`](.github/actions/mise-install/action.yaml) composite action right after checkout,
+listing exactly the tools that job's steps invoke — e.g. `tools: node pnpm` for a plain Nx job,
+`tools: node pnpm go golangci-lint` for
+[`lint-and-format.yml`](.github/workflows/lint-and-format.yml) since a Go project's `lint` target
+shells out to both. Don't list every `mise.toml` tool "to be safe" — only what that job actually
+runs, so jobs stay fast.
 
 ## Package Management
 

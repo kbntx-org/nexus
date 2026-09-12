@@ -25,6 +25,11 @@ jobs:
           fetch-depth: 0
           filter: tree:0
 
+      - name: Install mise-managed tools
+        uses: ./.github/actions/mise-install
+        with:
+          tools: node pnpm go golangci-lint
+
       - name: Install dependencies
         run: pnpm install
         shell: bash
