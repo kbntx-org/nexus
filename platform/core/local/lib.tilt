@@ -9,7 +9,7 @@ BUILDX_BUILDER_NAME = CLUSTER_CONFIG['builderName']
 REGISTRY_REF = '%s:%s' % (CLUSTER_CONFIG['registryName'], CLUSTER_CONFIG['registryPort'])
 
 def mise_tool_version(name):
-  return str(local(['mise', 'config', 'get', 'tools.%s' % name], quiet=True)).strip()
+  return str(local(['mise', 'current', name], quiet=True)).strip()
 
 def helm_chart_deps(chartPath):
   if config.tilt_subcommand == 'down':
