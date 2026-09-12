@@ -93,7 +93,7 @@ jobs:
               return r.stdout.trim();
             };
             const nxProject = (name) =>
-              JSON.parse(run('pnpm', ['-s', 'nx', 'show', 'project', name, '--json']));
+              JSON.parse(run('pnpm', ['nx', 'show', 'project', name, '--json']));
 
             const tag = process.env.TAG;
             const deployTargets = JSON.parse(process.env.DEPLOY_TARGETS);

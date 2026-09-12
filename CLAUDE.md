@@ -196,11 +196,14 @@ doesn't route it through mise since it's baked into the runner already — don't
 - Don't hardcode a runtime version in a Dockerfile. Project Dockerfiles (`cloudflare-controller`,
   `kiln`, `portfolio`, ...) that pick an upstream base image tag
   (`FROM golang:${GO_VERSION}-alpine`, `FROM node:${NODE_VERSION}-alpine`) still take that version
-  as a build `ARG` resolved with `yq '.tools.<name>' mise.toml` at the call site (the project's
-  `build-ci` target) — there's no base image to pick for a binary the Dockerfile installs directly,
-  so that case installs `mise` instead and runs `mise install <name>` against its own copy of
-  `mise.toml`. The one exception is `mise-install`'s own bootstrap `mise` version (see above),
-  hardcoded on purpose since it can't depend on the very tool it's installing.
+  as a build `ARG`, resolved at the call site (the project's `build-ci` target) with
+  `mise current <name>` — not `yq`; the CI runner's `mise-install` step already guarantees `mise` is
+  on `PATH` by the time any `build-ci` target runs, and `mise current <name>` reads the pinned
+  version straight out of `mise.toml` without needing the tool installed first. There's no base
+  image to pick for a binary the Dockerfile installs directly, so that case installs `mise` instead
+  and runs `mise install <name>` against its own copy of `mise.toml`. The one exception is
+  `mise-install`'s own bootstrap `mise` version (see above), hardcoded on purpose since it can't
+  depend on the very tool it's installing.
 - Don't `jq`/`node -p`/etc. a version out of `package.json` — that pattern is exactly what
   `mise.toml` replaced.
 - Repo-level command shortcuts (creating the local cluster, `tilt up` variants, etc.) are

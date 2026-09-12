@@ -62,7 +62,7 @@
     "build-ci": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tools/docker-build-and-push.sh apps/portfolio/Dockerfile . kbntx/portfolio:$IMAGE_TAG --build-arg NODE_VERSION=$(yq '.tools.node' mise.toml) --build-arg PNPM_VERSION=$(yq '.tools.pnpm' mise.toml)"
+        "command": "tools/docker-build-and-push.sh apps/portfolio/Dockerfile . kbntx/portfolio:$IMAGE_TAG --build-arg NODE_VERSION=$(mise current node) --build-arg PNPM_VERSION=$(mise current pnpm)"
       }
     }
   }
